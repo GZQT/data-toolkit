@@ -9,6 +9,7 @@ cache:
 build:
   stage: build
   script:
-      - bun run build:electron
-      - bun run build
+    - bun install
+    - bun run build:electron
+    - bun run build
   environment: production
