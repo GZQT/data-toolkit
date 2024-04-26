@@ -1,4 +1,4 @@
-image: oven/bun:alpine
+image: node:latest
 
 # This folder is cached between builds
 # https://docs.gitlab.com/ee/ci/yaml/index.html#cache
@@ -9,7 +9,7 @@ cache:
 build:
   stage: build
   script:
-    - bun install --frozen-lockfile --production
-    - bun run build:electron
-    - bun run build
+    - npm install
+    - npm run build:electron
+    - npm run build
   environment: production
