@@ -9,7 +9,7 @@ cache:
 build:
   stage: build
   script:
-    - bun install
+    - bun install --frozen-lockfile --production
     - bun run build:electron
     - bun run build
   environment: production
