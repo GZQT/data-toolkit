@@ -27,14 +27,14 @@
  *   }
  * }
  */
-import { contextBridge } from 'electron'
 import { BrowserWindow } from '@electron/remote'
+import { contextBridge } from 'electron'
 
-contextBridge.exposeInMainWorld('myWindowAPI', {
-  minimize () {
+contextBridge.exposeInMainWorld('WindowsApi', {
+  minimize: () => {
     BrowserWindow.getFocusedWindow()?.minimize()
   },
-  toggleMaximize () {
+  toggleMaximize: () => {
     const win = BrowserWindow.getFocusedWindow()
 
     if (win?.isMaximized()) {
@@ -43,7 +43,7 @@ contextBridge.exposeInMainWorld('myWindowAPI', {
       win?.maximize()
     }
   },
-  close () {
+  close: () => {
     BrowserWindow.getFocusedWindow()?.close()
   }
 })

@@ -196,7 +196,8 @@ export default configure((/* ctx */) => {
         // https://www.electron.build/configuration/configuration
 
         appId: 'data-toolkit'
-      }
+      },
+      unPackagedInstallParams: ['install', '--prod', '--no-frozen-lockfile']
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex

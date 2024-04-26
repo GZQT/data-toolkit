@@ -1,7 +1,7 @@
-import { app, BrowserWindow } from 'electron'
-import { initialize, enable } from '@electron/remote/main'
-import path from 'path'
+import { enable, initialize } from '@electron/remote/main/index.js'
+import { BrowserWindow, app } from 'electron'
 import os from 'os'
+import path from 'path'
 import { fileURLToPath } from 'url'
 
 // https://quasar.dev/quasar-cli-vite/developing-electron-apps/frameless-electron-window#setting-frameless-window
@@ -13,7 +13,7 @@ const currentDir = fileURLToPath(new URL('.', import.meta.url))
 
 let mainWindow: BrowserWindow | undefined
 
-function createWindow () {
+const createWindow = () => {
   /**
    * Initial window options
    */
