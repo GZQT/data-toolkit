@@ -1,0 +1,14 @@
+image: oven/bun:alpine
+
+# This folder is cached between builds
+# https://docs.gitlab.com/ee/ci/yaml/index.html#cache
+cache:
+  paths:
+    - node_modules/
+
+build:
+  stage: build
+  script:
+      - bun run build:electron
+      - bun run build
+  environment: production
