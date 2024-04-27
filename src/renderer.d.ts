@@ -4,8 +4,13 @@ export interface WindowsApi {
   close: () => void
 }
 
+export interface FileApi {
+  getFileCount: () => Promise<number>
+}
+
 declare global {
   interface Window {
     WindowsApi: WindowsApi
+    FileApi: FileApi
   }
 }

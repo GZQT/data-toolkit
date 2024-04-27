@@ -9,6 +9,7 @@ cache:
 build:
   stage: build
   script:
+    - npm config set registry http://mirrors.cloud.tencent.com/npm/
     - npm install
     - npm run build:electron
   environment: production

@@ -29,6 +29,8 @@
  */
 import { BrowserWindow } from '@electron/remote'
 import { contextBridge } from 'electron'
+import fs from 'fs'
+import readline from 'readline'
 
 contextBridge.exposeInMainWorld('WindowsApi', {
   minimize: () => {
@@ -45,5 +47,29 @@ contextBridge.exposeInMainWorld('WindowsApi', {
   },
   close: () => {
     BrowserWindow.getFocusedWindow()?.close()
+  }
+})
+
+contextBridge.exposeInMainWorld('FileApi', {
+  getFileCount: async (): Promise<number> => {
+    const fileStream = fs.createReadStream('C:\\Users\\zyue\\PycharmProjects\\data-crawl\\data_chart\\pu_an_no_1\\data_dau_pa1_1_通用采集仪\\data_dau_pa1_1_通用采集仪_20240331.csv')
+    const rl = readline.createInterface({
+      input: fileStream,
+      crlfDelay: Infinity
+    })
+    return new Promise((resolve, reject) => {
+      let lineCount = 0
+      rl.on('line', () => {
+        lineCount++
+      })
+
+      rl.on('close', () => {
+        resolve(lineCount)
+      })
+
+      rl.on('error', (error) => {
+        reject(error)
+      })
+    })
   }
 })
