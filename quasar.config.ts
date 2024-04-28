@@ -14,7 +14,7 @@ export default configure((/* ctx */) => {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: [
-
+      'request'
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
@@ -77,12 +77,22 @@ export default configure((/* ctx */) => {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
-      open: true // opens browser window automatically
+      open: true, // opens browser window automatically
+      proxy: {
+        '/api': {
+          target: 'http://localhost:8080',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        }
+      },
+      watch: {
+      }
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
-      config: {},
+      config: {
+      },
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -95,7 +105,14 @@ export default configure((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'BottomSheet',
+        'Cookies',
+        'Dialog',
+        'Loading',
+        'LoadingBar',
+        'Notify'
+      ]
     },
 
     // animations: 'all', // --- includes all animations
@@ -110,7 +127,7 @@ export default configure((/* ctx */) => {
     //   pwaRegisterServiceWorker: 'src-pwa/register-service-worker',
     //   pwaServiceWorker: 'src-pwa/custom-service-worker',
     //   pwaManifestFile: 'src-pwa/manifest.json',
-    //   electronMain: 'src-electron/electron-main',
+    // electronMain: 'src-electron/electron-main'
     //   electronPreload: 'src-electron/electron-preload'
     //   bexManifestFile: 'src-bex/manifest.json
     // },
@@ -177,7 +194,7 @@ export default configure((/* ctx */) => {
       // specify the debugging port to use for the Electron app when running in development mode
       inspectPort: 5858,
 
-      bundler: 'packager', // 'packager' or 'builder'
+      bundler: 'builder', // 'packager' or 'builder'
 
       packager: {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
@@ -194,8 +211,29 @@ export default configure((/* ctx */) => {
 
       builder: {
         // https://www.electron.build/configuration/configuration
-
-        appId: 'data-toolkit'
+        appId: 'data-toolkit',
+        extraResources: [
+          {
+            from: 'src-electron/icons',
+            to: 'appearance/icons',
+            filter: '!**/{.DS_Store}'
+          },
+          {
+            from: 'src-electron/boot.html',
+            to: 'appearance/boot.html',
+            filter: '!**/{.DS_Store}'
+          },
+          {
+            from: 'src-electron/error.html',
+            to: 'appearance/error.html',
+            filter: '!**/{.DS_Store}'
+          },
+          {
+            from: 'src-electron/application.exe',
+            to: 'appearance/application.exe',
+            filter: '!**/{.DS_Store}'
+          }
+        ]
       },
       unPackagedInstallParams: ['install', '--prod', '--no-frozen-lockfile']
     },

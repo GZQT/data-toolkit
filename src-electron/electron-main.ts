@@ -1,8 +1,10 @@
 import { enable, initialize } from '@electron/remote/main/index.js'
-import { BrowserWindow, app } from 'electron'
+import { BrowserWindow, app, net } from 'electron'
 import os from 'os'
 import path from 'path'
+import treeKill from 'tree-kill'
 import { fileURLToPath } from 'url'
+import { getServer, initKernel, kernelProcess, setProxy } from './start-kernel'
 
 // https://quasar.dev/quasar-cli-vite/developing-electron-apps/frameless-electron-window#setting-frameless-window
 initialize()
@@ -36,6 +38,41 @@ const createWindow = () => {
 
   enable(mainWindow.webContents)
 
+  net.fetch(getServer() + '/api/system/getNetwork', { method: 'POST' }).then((response) => {
+    return response.json()
+  }).then((response) => {
+    setProxy(`${response.data.proxy.scheme}://${response.data.proxy.host}:${response.data.proxy.port}`, mainWindow!.webContents).then(() => {
+      // 加载主界面
+      // mainWindow!.loadURL(getServer() + '/stage/build/app/index.html?v=' + new Date().getTime())
+      console.log('代理设置成功')
+    })
+  })
+
+  mainWindow.webContents.session.setSpellCheckerLanguages(['zh-CN'])
+
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
+    const header = { requestHeaders: details.requestHeaders }
+    for (const key in details.requestHeaders) {
+      if (key.toLowerCase() === 'referer') {
+        delete details.requestHeaders[key]
+      }
+    }
+    cb(header)
+  })
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, cb) => {
+    for (const key in details.responseHeaders) {
+      if (key.toLowerCase() === 'x-frame-options') {
+        delete details.responseHeaders[key]
+      } else if (key.toLowerCase() === 'content-security-policy') {
+        delete details.responseHeaders[key]
+      } else if (key.toLowerCase() === 'access-control-allow-origin') {
+        delete details.responseHeaders[key]
+      }
+    }
+    const header = { responseHeaders: details.responseHeaders }
+    cb(header)
+  })
+
   if (process.env.DEV) {
     mainWindow.loadURL(process.env.APP_URL)
   } else {
@@ -57,8 +94,16 @@ const createWindow = () => {
   })
 }
 
-app.whenReady().then(createWindow)
-
+app.whenReady().then(() => {
+  initKernel(8080).then(() => {
+  })
+})
+app.on('before-quit', () => {
+  // see  https://github.com/nodejs/help/issues/4050
+  if (kernelProcess && kernelProcess.pid) {
+    treeKill(kernelProcess.pid)
+  }
+})
 app.on('window-all-closed', () => {
   if (platform !== 'darwin') {
     app.quit()
