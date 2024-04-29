@@ -3,12 +3,19 @@ import { RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/BlankLayout.vue'),
+    // redirect: '/task'
     children: [
       {
         path: '',
-        redirect: '/task'
-      },
+        component: () => import('pages/boot/BootPage.vue')
+      }
+    ]
+  },
+  {
+    path: '/',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
       {
         path: 'task',
         component: () => import('pages/task/TaskPage.vue'),
@@ -21,7 +28,6 @@ const routes: RouteRecordRaw[] = [
       }
     ]
   },
-
   // Always leave this as last one,
   // but you can also remove it
   {

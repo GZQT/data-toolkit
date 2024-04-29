@@ -13,7 +13,8 @@
     "dev:electron": "quasar dev -m electron",
     "dev:electron:kernel": "RUN_SERVER=true quasar dev -m electron",
     "build": "quasar build",
-    "build:electron": "quasar build -m electron"
+    "build:electron": "quasar build -m electron",
+    "generate:types": "npx openapi-typescript http://127.0.0.1:8080/openapi.json -o ./src/types/api.d.ts --enum -t"
   },
   "dependencies": {
     "@electron/remote": "^2.1.2",

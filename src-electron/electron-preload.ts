@@ -28,7 +28,7 @@
  * }
  */
 import { BrowserWindow } from '@electron/remote'
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import fs from 'fs'
 import readline from 'readline'
 
@@ -40,7 +40,7 @@ contextBridge.exposeInMainWorld('WindowsApi', {
     const win = BrowserWindow.getFocusedWindow()
 
     if (win?.isMaximized()) {
-      win.unmaximize()
+      win?.unmaximize()
     } else {
       win?.maximize()
     }
@@ -48,6 +48,10 @@ contextBridge.exposeInMainWorld('WindowsApi', {
   close: () => {
     BrowserWindow.getFocusedWindow()?.close()
   }
+})
+
+contextBridge.exposeInMainWorld('KernelApi', {
+  start: () => ipcRenderer.invoke('KernelApi:start')
 })
 
 contextBridge.exposeInMainWorld('FileApi', {

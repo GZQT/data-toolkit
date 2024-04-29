@@ -3,46 +3,56 @@
  * Do not make direct changes to the file.
  */
 
-export type paths = {
-  '/': {
-    /** Read Root */
-    get: operations['read_root__get']
-  }
-  '/items/{item_id}': {
-    /** Read Item */
-    get: operations['read_item_items__item_id__get']
-  }
-}
 
-export type webhooks = Record<string, never>
+export type paths = {
+  "/": {
+    /** Read Root */
+    get: operations["read_root__get"];
+  };
+  "/health": {
+    /** Health */
+    get: operations["health_health_get"];
+  };
+  "/items/{item_id}": {
+    /** Read Item */
+    get: operations["read_item_items__item_id__get"];
+  };
+};
+
+export type webhooks = Record<string, never>;
 
 export type components = {
   schemas: {
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
-      detail?: components['schemas']['ValidationError'][]
-    }
+      detail?: components["schemas"]["ValidationError"][];
+    };
+    /** HealthResponse */
+    HealthResponse: {
+      /** Status */
+      status: string;
+    };
     /** ValidationError */
     ValidationError: {
       /** Location */
-      loc: (string | number)[]
+      loc: (string | number)[];
       /** Message */
-      msg: string
+      msg: string;
       /** Error Type */
-      type: string
-    }
-  }
-  responses: never
-  parameters: never
-  requestBodies: never
-  headers: never
-  pathItems: never
-}
+      type: string;
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
+};
 
-export type $defs = Record<string, never>
+export type $defs = Record<string, never>;
 
-export type external = Record<string, never>
+export type external = Record<string, never>;
 
 export type operations = {
 
@@ -52,34 +62,45 @@ export type operations = {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown
-        }
-      }
-    }
-  }
-  /** Read Item */
-  read_item_items__item_id__get: {
-    parameters: {
-      query?: {
-        q?: string | null
-      }
-      path: {
-        item_id: number
-      }
-    }
+          "application/json": unknown;
+        };
+      };
+    };
+  };
+  /** Health */
+  health_health_get: {
     responses: {
       /** @description Successful Response */
       200: {
         content: {
-          'application/json': unknown
-        }
-      }
+          "application/json": components["schemas"]["HealthResponse"];
+        };
+      };
+    };
+  };
+  /** Read Item */
+  read_item_items__item_id__get: {
+    parameters: {
+      query?: {
+        q?: string | null;
+      };
+      path: {
+        item_id: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
+      };
       /** @description Validation Error */
       422: {
         content: {
-          'application/json': components['schemas']['HTTPValidationError']
-        }
-      }
-    }
-  }
-}
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+};

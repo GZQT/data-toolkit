@@ -1,10 +1,10 @@
 import { enable, initialize } from '@electron/remote/main/index.js'
-import { BrowserWindow, app, net } from 'electron'
+import { BrowserWindow, app, ipcMain } from 'electron'
 import os from 'os'
 import path from 'path'
 import treeKill from 'tree-kill'
 import { fileURLToPath } from 'url'
-import { getServer, initKernel, kernelProcess, setProxy } from './start-kernel'
+import { initKernel, kernelProcess } from './start-kernel'
 
 // https://quasar.dev/quasar-cli-vite/developing-electron-apps/frameless-electron-window#setting-frameless-window
 initialize()
@@ -28,6 +28,7 @@ const createWindow = () => {
     webPreferences: {
       sandbox: false,
       contextIsolation: true,
+      webSecurity: false,
       // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
       preload: path.resolve(
         currentDir,
@@ -38,17 +39,17 @@ const createWindow = () => {
 
   enable(mainWindow.webContents)
 
-  net.fetch(getServer() + '/api/system/getNetwork', { method: 'POST' }).then((response) => {
-    return response.json()
-  }).then((response) => {
-    setProxy(`${response.data.proxy.scheme}://${response.data.proxy.host}:${response.data.proxy.port}`, mainWindow!.webContents).then(() => {
-      // 加载主界面
-      // mainWindow!.loadURL(getServer() + '/stage/build/app/index.html?v=' + new Date().getTime())
-      console.log('代理设置成功')
-    })
-  })
+  // net.fetch(getServer() + '/api/system/getNetwork', { method: 'POST' }).then((response) => {
+  //   return response.json()
+  // }).then((response) => {
+  //   setProxy(`${response.data.proxy.scheme}://${response.data.proxy.host}:${response.data.proxy.port}`, mainWindow!.webContents).then(() => {
+  //     加载主界面
+  //     mainWindow!.loadURL(getServer() + '/stage/build/app/index.html?v=' + new Date().getTime())
+  //     console.log('代理设置成功')
+  //   })
+  // })
 
-  mainWindow.webContents.session.setSpellCheckerLanguages(['zh-CN'])
+  mainWindow.webContents.session.setSpellCheckerLanguages(['en-US'])
 
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
     const header = { requestHeaders: details.requestHeaders }
@@ -94,17 +95,16 @@ const createWindow = () => {
   })
 }
 
-app.whenReady().then(() => {
-  initKernel(8080).then(() => {
-  })
+ipcMain.handle('KernelApi:start', async () => {
+  return initKernel()
 })
-app.on('before-quit', () => {
+app.whenReady().then(createWindow)
+
+app.on('window-all-closed', () => {
   // see  https://github.com/nodejs/help/issues/4050
   if (kernelProcess && kernelProcess.pid) {
     treeKill(kernelProcess.pid)
   }
-})
-app.on('window-all-closed', () => {
   if (platform !== 'darwin') {
     app.quit()
   }

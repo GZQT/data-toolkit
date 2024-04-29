@@ -214,21 +214,6 @@ export default configure((/* ctx */) => {
         appId: 'data-toolkit',
         extraResources: [
           {
-            from: 'src-electron/icons',
-            to: 'appearance/icons',
-            filter: '!**/{.DS_Store}'
-          },
-          {
-            from: 'src-electron/boot.html',
-            to: 'appearance/boot.html',
-            filter: '!**/{.DS_Store}'
-          },
-          {
-            from: 'src-electron/error.html',
-            to: 'appearance/error.html',
-            filter: '!**/{.DS_Store}'
-          },
-          {
             from: 'src-electron/application.exe',
             to: 'appearance/application.exe',
             filter: '!**/{.DS_Store}'
