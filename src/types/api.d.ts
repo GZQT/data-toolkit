@@ -5,17 +5,27 @@
 
 
 export type paths = {
-  "/": {
-    /** Read Root */
-    get: operations["read_root__get"];
+  "/task": {
+    /** Get Task */
+    get: operations["get_task_task_get"];
+    /** Add Task */
+    post: operations["add_task_task_post"];
+  };
+  "/task/{task_id}/file": {
+    /** Get Task File */
+    get: operations["get_task_file_task__task_id__file_get"];
+    /** Add Task File */
+    post: operations["add_task_file_task__task_id__file_post"];
+  };
+  "/task/{task_id}/file/{task_file_id}": {
+    /** Update Task File */
+    put: operations["update_task_file_task__task_id__file__task_file_id__put"];
+    /** Remove Task File */
+    delete: operations["remove_task_file_task__task_id__file__task_file_id__delete"];
   };
   "/health": {
     /** Health */
     get: operations["health_health_get"];
-  };
-  "/items/{item_id}": {
-    /** Read Item */
-    get: operations["read_item_items__item_id__get"];
   };
 };
 
@@ -32,6 +42,57 @@ export type components = {
     HealthResponse: {
       /** Status */
       status: string;
+    };
+    /** TaskCreateRequest */
+    TaskCreateRequest: {
+      /** Name */
+      name: string;
+    };
+    /** TaskFileCreateRequest */
+    TaskFileCreateRequest: {
+      /** Names */
+      names: string[];
+    };
+    /** TaskFileResponse */
+    TaskFileResponse: {
+      /** Name */
+      name: string;
+      /** Id */
+      id: number;
+      /** Taskid */
+      taskId: number;
+      /**
+       * Createddate
+       * Format: date-time
+       */
+      createdDate: string;
+      /**
+       * Updateddate
+       * Format: date-time
+       */
+      updatedDate: string;
+    };
+    /** TaskFileUpdateRequest */
+    TaskFileUpdateRequest: {
+      /** Name */
+      name: string;
+    };
+    /** TaskResponse */
+    TaskResponse: {
+      /** Name */
+      name: string;
+      /** Id */
+      id: number;
+      /**
+       * Createddate
+       * Format: date-time
+       */
+      createdDate: string;
+      /**
+       * Updateddate
+       * Format: date-time
+       */
+      updatedDate: string;
     };
     /** ValidationError */
     ValidationError: {
@@ -56,13 +117,131 @@ export type external = Record<string, never>;
 
 export type operations = {
 
-  /** Read Root */
-  read_root__get: {
+  /** Get Task */
+  get_task_task_get: {
     responses: {
       /** @description Successful Response */
       200: {
         content: {
+          "application/json": components["schemas"]["TaskResponse"][];
+        };
+      };
+    };
+  };
+  /** Add Task */
+  add_task_task_post: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TaskCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["TaskResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get Task File */
+  get_task_file_task__task_id__file_get: {
+    parameters: {
+      path: {
+        task_id: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["TaskFileResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Add Task File */
+  add_task_file_task__task_id__file_post: {
+    parameters: {
+      path: {
+        task_id: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TaskFileCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        content: {
           "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Update Task File */
+  update_task_file_task__task_id__file__task_file_id__put: {
+    parameters: {
+      path: {
+        task_id: number;
+        task_file_id: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TaskFileUpdateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Remove Task File */
+  remove_task_file_task__task_id__file__task_file_id__delete: {
+    parameters: {
+      path: {
+        task_id: number;
+        task_file_id: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };
@@ -74,31 +253,6 @@ export type operations = {
       200: {
         content: {
           "application/json": components["schemas"]["HealthResponse"];
-        };
-      };
-    };
-  };
-  /** Read Item */
-  read_item_items__item_id__get: {
-    parameters: {
-      query?: {
-        q?: string | null;
-      };
-      path: {
-        item_id: number;
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };

@@ -75,5 +75,8 @@ contextBridge.exposeInMainWorld('FileApi', {
         reject(error)
       })
     })
+  },
+  selectFiles: (multiSelections: boolean = true): Promise<string[] | undefined> => {
+    return ipcRenderer.invoke('FileApi:selectFiles', multiSelections)
   }
 })

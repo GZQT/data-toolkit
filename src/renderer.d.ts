@@ -6,6 +6,7 @@ export interface WindowsApi {
 
 export interface FileApi {
   getFileCount: () => Promise<number>
+  selectFiles: (multiSelections: boolean) => Promise<string[] | undefined>
 }
 
 export interface KernelApi {

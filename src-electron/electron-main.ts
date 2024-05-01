@@ -1,5 +1,5 @@
 import { enable, initialize } from '@electron/remote/main/index.js'
-import { BrowserWindow, app, ipcMain } from 'electron'
+import { BrowserWindow, app, dialog, ipcMain } from 'electron'
 import os from 'os'
 import path from 'path'
 import treeKill from 'tree-kill'
@@ -98,6 +98,20 @@ const createWindow = () => {
 ipcMain.handle('KernelApi:start', async () => {
   return initKernel()
 })
+
+ipcMain.handle('FileApi:selectFiles', async (_, multiSelections: boolean = true) => {
+  const properties: Array<'openFile' | 'openDirectory' | 'multiSelections' | 'showHiddenFiles' | 'createDirectory' | 'promptToCreate' | 'noResolveAliases' | 'treatPackageAsDirectory' | 'dontAddToRecent'> = ['openFile']
+  if (multiSelections) {
+    properties.push('multiSelections')
+  }
+  return dialog.showOpenDialogSync({
+    properties,
+    filters: [
+      { name: 'CSV', extensions: ['csv'] }
+    ]
+  })
+})
+
 app.whenReady().then(createWindow)
 
 app.on('window-all-closed', () => {

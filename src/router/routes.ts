@@ -22,7 +22,21 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: ':id?',
-            component: () => import('pages/task/TaskContent.vue')
+            component: () => import('pages/task/TaskContent.vue'),
+            children: [
+              {
+                path: 'file',
+                component: () => import('pages/task/TaskFile.vue')
+              },
+              {
+                path: 'table',
+                component: () => import('pages/task/TaskTable.vue')
+              },
+              {
+                path: 'chart',
+                component: () => import('pages/task/TaskChart.vue')
+              }
+            ]
           }
         ]
       }
