@@ -15,7 +15,7 @@ build:
   script:
     - npm config set registry http://mirrors.cloud.tencent.com/npm/
     - npm install
-    - npm run build:electron
+    - npm run build:electron -A arm64
   environment: production
 
 sonarqube-check:
