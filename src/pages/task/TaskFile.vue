@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { QTableProps, date, useQuasar } from 'quasar'
 import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 interface EditItem {
@@ -13,20 +13,34 @@ interface EditItem {
 
 const $q = useQuasar()
 const route = useRoute()
-const taskFileData = ref<components['schemas']['TaskFileResponse'][]>([])
+const taskFileData = ref<(components['schemas']['TaskFileResponse'] & { total?: number, fileUpdatedDate?: Date })[]>([])
 const editDialog = ref(false)
 const editItem = ref<EditItem>({
   id: null,
   name: []
 })
 const taskId = ref<number>()
+const filter = ref('')
+const loading = reactive({
+  table: false,
+  dialog: false,
+  refresh: false,
+  row: false
+})
 
 const handleData = async () => {
   taskId.value = Number(route.params.id as string)
-  const { data } = await client.GET('/task/{task_id}/file', {
-    params: { path: { task_id: taskId.value } }
-  })
-  taskFileData.value = data ?? []
+  try {
+    loading.table = true
+    loading.refresh = true
+    const { data } = await client.GET('/task/{task_id}/file', {
+      params: { path: { task_id: taskId.value } }
+    })
+    taskFileData.value = data ?? []
+  } finally {
+    loading.table = false
+    loading.refresh = false
+  }
 }
 
 onMounted(() => {
@@ -40,9 +54,9 @@ const isAdd = computed(() => {
 })
 
 const columns: QTableProps['columns'] = [
-  { name: 'name', label: '文件路径', field: 'name', align: 'left' },
-  { name: 'total', label: '数据总数', field: 'total', align: 'left' },
-  { name: 'updateDate', label: '更新时间', field: 'updateDate', align: 'left' },
+  { name: 'name', label: '文件路径', field: 'name', align: 'left', sortable: true },
+  { name: 'total', label: '数据总数', field: 'total', align: 'left', sortable: true },
+  { name: 'updateDate', label: '更新时间', field: 'updatedDate', align: 'left', sortable: true },
   { name: 'action', label: '操作', field: 'name', align: 'left' }
 ]
 
@@ -51,6 +65,14 @@ const handleAdd = () => {
   editItem.value = {
     id: null,
     name: []
+  }
+}
+
+const handleEdit = (row: components['schemas']['TaskFileResponse'] & { total?: number }) => {
+  editDialog.value = true
+  editItem.value = {
+    id: row.id,
+    name: [row.name]
   }
 }
 
@@ -110,6 +132,7 @@ const handleSave = async () => {
   if (editItem.value.name.length === 0) {
     return
   }
+  loading.dialog = true
   try {
     if (isAdd.value) {
       await client.POST('/task/{task_id}/file', {
@@ -124,6 +147,7 @@ const handleSave = async () => {
     }
   } finally {
     handleData()
+    loading.dialog = false
   }
 }
 
@@ -152,12 +176,50 @@ const handleDeleteItem = (item: components['schemas']['TaskFileResponse']) => {
   })
 }
 
+const handleLoadCount = () => {
+  if (loading.row) {
+    return
+  }
+  loading.row = true
+  const promiseList = []
+  const data = _.cloneDeep(taskFileData.value)
+  for (const index in data) {
+    const promise = window.FileApi.getFileCount(data[index].name)
+      .then(file => {
+        data[index].total = file.total
+        data[index].fileUpdatedDate = file.updatedDate
+      })
+    promiseList.push(promise)
+  }
+  Promise.all(promiseList)
+    .then(() => { taskFileData.value = data })
+    .finally(() => { loading.row = false })
+}
+
+const handleOpenFile = (file: string) => {
+  window.FileApi.openFileDirectory(file)
+}
+
 </script>
 
 <template>
   <div class="container">
     <q-table class="container-table" flat bordered :rows="taskFileData" :columns="columns" row-key="id"
-      :pagination="{ rowsPerPage: 10 }">
+      :pagination="{ rowsPerPage: 10 }" :filter="filter" :loading="loading.table">
+      <template v-slot:header-cell-total="props">
+        <q-th :props="props">
+          {{ props.col.label }}
+          <q-icon name="refresh" size="1.5em"
+            :class="loading.row ? 'cursor-not-allowed animation-rotate' : 'cursor-pointer '" @click="handleLoadCount" />
+        </q-th>
+      </template>
+      <template v-slot:header-cell-updateDate="props">
+        <q-th :props="props">
+          {{ props.col.label }}
+          <q-icon name="refresh" size="1.5em"
+            :class="loading.row ? 'cursor-not-allowed animation-rotate' : 'cursor-pointer '" @click="handleLoadCount" />
+        </q-th>
+      </template>
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td key="name" :props="props">
@@ -167,18 +229,29 @@ const handleDeleteItem = (item: components['schemas']['TaskFileResponse']) => {
             {{ props.row.total }}
           </q-td>
           <q-td key="updateDate" :props="props">
-            {{ props.row.updateDate }}
+            {{ date.formatDate(props.row.fileUpdatedDate, 'YYYY年MM月DD日HH点mm分ss秒') }}
           </q-td>
           <q-td key="action" :props="props">
+            <q-btn flat round color="secondary" icon="edit" size="sm" dense @click="() => handleEdit(props.row)" />
+            <q-btn flat round color="primary" icon="folder" size="sm" dense
+              @click="() => handleOpenFile(props.row.name)" />
             <q-btn flat round color="red" icon="delete" size="sm" dense @click="() => handleDeleteItem(props.row)" />
           </q-td>
         </q-tr>
       </template>
+      <template v-slot:top>
+        <q-input dense debounce="300" style="width: 20rem;" color="primary" v-model="filter" placeholder="输入名称进行搜索">
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+        <q-space />
+        <div class="row q-gutter-md">
+          <q-btn color="primary" outline label="刷新" :loading="loading.refresh" @click="handleData" size="sm" />
+          <q-btn color="primary" outline label="添加" @click="handleAdd" size="sm" />
+        </div>
+      </template>
     </q-table>
-
-    <q-page-sticky position="bottom-right" :offset="[24, 24]">
-      <q-btn fab size="xl" dense icon="add" color="primary" @click="handleAdd" />
-    </q-page-sticky>
 
     <q-dialog v-model="editDialog" persistent>
       <q-card style="min-width: 350px">
@@ -192,7 +265,13 @@ const handleDeleteItem = (item: components['schemas']['TaskFileResponse']) => {
         <q-card-section class="q-pt-none">
           <div v-if="editItem.name.length === 0" class="text-tip cursor-pointer" @click="handleSelect">请选择至少一个文件</div>
           <q-list v-else dense class="text-left full-width">
-            <q-item v-for="item in editItem.name" :key="item" clickable v-ripple @click="() => handleDeleteFile(item)">
+            <q-item v-for="item in editItem.name" :key="item" clickable v-ripple @click="() => {
+              if (editItem.id) {
+                handleSelect()
+              } else {
+                handleDeleteFile(item)
+              }
+            }">
               <q-item-section>
                 {{ item }}
               </q-item-section>
@@ -202,7 +281,8 @@ const handleDeleteItem = (item: components['schemas']['TaskFileResponse']) => {
 
         <q-card-actions :align="'right'" class="text-primary">
           <q-btn flat label="取消" v-close-popup @click="editDialog = false" />
-          <q-btn flat :disable="editItem.name.length === 0" label="保存" v-close-popup @click="handleSave" />
+          <q-btn flat :disable="editItem.name.length === 0" label="保存" :loading="loading.dialog" v-close-popup
+            @click="handleSave" />
         </q-card-actions>
       </q-card>
     </q-dialog>

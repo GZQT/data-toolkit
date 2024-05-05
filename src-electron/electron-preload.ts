@@ -28,8 +28,9 @@
  * }
  */
 import { BrowserWindow } from '@electron/remote'
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, shell } from 'electron'
 import fs from 'fs'
+import path from 'path'
 import readline from 'readline'
 
 contextBridge.exposeInMainWorld('WindowsApi', {
@@ -55,8 +56,12 @@ contextBridge.exposeInMainWorld('KernelApi', {
 })
 
 contextBridge.exposeInMainWorld('FileApi', {
-  getFileCount: async (): Promise<number> => {
-    const fileStream = fs.createReadStream('C:\\Users\\zyue\\PycharmProjects\\data-crawl\\data_chart\\pu_an_no_1\\data_dau_pa1_1_通用采集仪\\data_dau_pa1_1_通用采集仪_20240331.csv')
+  getFileCount: async (file: string): Promise<{ total: number, updatedDate?: Date }> => {
+    if (!fs.existsSync(file)) {
+      return { total: -1 }
+    }
+    const fileStat = fs.statSync(file)
+    const fileStream = fs.createReadStream(file)
     const rl = readline.createInterface({
       input: fileStream,
       crlfDelay: Infinity
@@ -68,7 +73,10 @@ contextBridge.exposeInMainWorld('FileApi', {
       })
 
       rl.on('close', () => {
-        resolve(lineCount)
+        resolve({
+          total: lineCount,
+          updatedDate: fileStat.mtime
+        })
       })
 
       rl.on('error', (error) => {
@@ -78,5 +86,10 @@ contextBridge.exposeInMainWorld('FileApi', {
   },
   selectFiles: (multiSelections: boolean = true): Promise<string[] | undefined> => {
     return ipcRenderer.invoke('FileApi:selectFiles', multiSelections)
+  },
+  openFileDirectory: async (file: string) => {
+    if (fs.existsSync(file)) {
+      await shell.openPath(path.dirname(file))
+    }
   }
 })

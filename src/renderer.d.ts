@@ -5,8 +5,9 @@ export interface WindowsApi {
 }
 
 export interface FileApi {
-  getFileCount: () => Promise<number>
+  getFileCount: (file: string) => Promise<{ total: number, updatedDate?: Date }>
   selectFiles: (multiSelections: boolean) => Promise<string[] | undefined>
+  openFileDirectory: (file: string) => void
 }
 
 export interface KernelApi {

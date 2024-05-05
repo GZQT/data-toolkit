@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import { useInterval, useQuasar } from 'quasar'
 import { client } from 'src/boot/request'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+const $q = useQuasar()
 const tip = ref('内核加载中...')
 const router = useRouter()
+const {
+  registerInterval,
+  removeInterval
+} = useInterval()
 
 onMounted(async () => {
   const result = await window.KernelApi.start()
@@ -13,13 +19,19 @@ onMounted(async () => {
   } else {
     tip.value = result as string
   }
-  const { data, error } = await client.GET('/health')
-  if (error) {
-    console.error(error)
-  }
-  if (data?.status === 'ok') {
-    router.push('/task')
-  }
+
+  registerInterval(async () => {
+    try {
+      const { data } = await client.GET('/health')
+      if (data?.status === 'ok') {
+        removeInterval()
+        router.push('/task')
+      }
+    } catch (error) {
+      tip.value = `内核检测中... Error ${error}`
+      $q.loadingBar.stop()
+    }
+  }, 2000)
 })
 
 </script>
