@@ -114,9 +114,9 @@ contextBridge.exposeInMainWorld('FileApi', {
   selectFiles: (multiSelections: boolean = true): Promise<string[] | undefined> => {
     return ipcRenderer.invoke('FileApi:selectFiles', multiSelections)
   },
-  openFileDirectory: async (file: string) => {
+  openFileDirectory: (file: string) => {
     if (fs.existsSync(file)) {
-      await shell.openPath(path.dirname(file))
+      shell.showItemInFolder(file)
     }
   },
   openApplicationDirectory: async (dirname: string) => {

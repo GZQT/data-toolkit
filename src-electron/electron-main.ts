@@ -21,8 +21,10 @@ const createWindow = () => {
    */
   mainWindow = new BrowserWindow({
     icon: path.resolve(currentDir, 'icons/icon.png'), // tray icon
-    width: 1000,
-    height: 600,
+    width: 1100,
+    height: 720,
+    minWidth: 1100,
+    minHeight: 480,
     useContentSize: true,
     frame: false,
     webPreferences: {

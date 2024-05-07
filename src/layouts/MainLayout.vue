@@ -1,82 +1,46 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh lpR fFf">
     <q-header elevated>
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+      <q-bar class="q-electron-drag bg-primary">
+        <!-- <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" /> -->
+        <img style="width:18px; height: 18px;" alt="logo" src="../assets/logo.png" />
 
+        <div class="q-ml-md">Data Toolkit</div>
         <q-space />
 
         <q-btn dense flat icon="minimize" @click="handleMinimize" />
         <q-btn dense flat icon="crop_square" @click="handleToggleMaximize" />
         <q-btn dense flat icon="close" @click="handleCloseApp" />
-      </q-toolbar>
+      </q-bar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered :width="200">
+    <!-- <q-drawer v-model="leftDrawerOpen" show-if-above bordered :width="200">
       <q-list>
         <q-item-label header> Essential Links </q-item-label>
 
         <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
       </q-list>
-    </q-drawer>
+    </q-drawer> -->
 
     <q-page-container>
-      <router-view />
+      <q-page padding>
+        <router-view />
+      </q-page>
+
+      <q-page-scroller position="bottom-right" :scroll-offset="150" :offset="[18, 18]">
+        <q-btn fab icon="keyboard_arrow_up" color="accent" />
+      </q-page-scroller>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue'
-import { ref } from 'vue'
-
 defineOptions({
   name: 'MainLayout'
 })
 
-const linksList: EssentialLinkProps[] = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    link: 'https://awesome.quasar.dev'
-  }
-]
+// const leftDrawerOpen = ref(false)
 
-const leftDrawerOpen = ref(false)
-
-const toggleLeftDrawer = () => {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
 const handleMinimize = () => {
   if (process.env.MODE === 'electron') {
     window.WindowsApi.minimize()

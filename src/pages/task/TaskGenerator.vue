@@ -19,6 +19,7 @@ interface TableExtend {
 
 const taskGeneratorData = ref<(components['schemas']['GeneratorResponse'] & TableExtend)[]>([])
 const columns: QTableProps['columns'] = [
+  { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
   { name: 'name', label: '批次', field: 'name', align: 'left', sortable: true },
   { name: 'status', label: '状态', field: 'status', align: 'left', sortable: true },
   { name: 'total', label: '文件数', field: 'total', align: 'left', sortable: true },
@@ -169,9 +170,12 @@ const handleShowOutput = (output: string) => {
     <GeneratorStartDialog ref="generatorStartDialog" :task-id="taskId" />
     <GeneratorOutputDialog ref="generatorOutputDialog" />
     <q-table class="container-table" flat bordered :rows="taskGeneratorData" :columns="columns" row-key="id"
-      :pagination="{ rowsPerPage: 10 }" :filter="filter" :loading="loading.table">
+      :pagination="{ rowsPerPage: 10 }" :filter="filter" :loading="loading.table" table-header-class="sticky-head">
       <template v-slot:body="props">
         <q-tr :props="props">
+          <q-td key="id" class="cursor-pointer" :props="props" @click="props.expand = !props.expand">
+            {{ props.row.id }}
+          </q-td>
           <q-td key="name" class="cursor-pointer" :props="props" @click="props.expand = !props.expand">
             {{ props.row.name }}
           </q-td>
@@ -202,7 +206,6 @@ const handleShowOutput = (output: string) => {
               @click="() => handleHomeDirectoryOpenFile(props.row.name)" />
             <q-btn flat round color="secondary" icon="edit" size="sm" dense @click="() => handleEdit(props.row)" />
             <q-btn flat round color="red" icon="delete" size="sm" dense @click="() => handleDelete(props.row)" />
-
           </q-td>
         </q-tr>
         <q-tr v-show="props.expand" :props="props">
@@ -236,4 +239,8 @@ const handleShowOutput = (output: string) => {
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.container-table {
+  height: calc(100vh - 140px);
+}
+</style>

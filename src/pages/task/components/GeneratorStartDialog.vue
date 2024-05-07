@@ -119,18 +119,6 @@ const handleBarSelect = (index: number, key: 'averageBarGroup' | 'maxMinBarGroup
             <q-checkbox left-label v-model="form.maxMinDataTable" label="生成最大最小值数据表格" />
           </div>
           <div>
-            <q-checkbox left-label v-model="form.averageBarChart" label="生成平均值柱状图" />
-            <q-btn v-if="form.averageBarChart" flat rounded color="secondary"
-              @click="() => handleAddBarGroup('averageBarGroupSelect')">添加对比组</q-btn>
-          </div>
-          <div v-if="form.averageBarChart">
-            <template v-for="(item, index) in form.averageBarGroupSelect" :key="index">
-              <q-select :model-value="item"
-                @update:model-value="(select) => handleBarSelect(index, 'averageBarGroup', select)" multiple
-                :options="columnNameGroup" :label="`选择对比列-${index + 1}`" />
-            </template>
-          </div>
-          <div>
             <q-checkbox left-label v-model="form.maxMinBarChart" label="生成最大最小值柱状图" />
             <q-btn v-if="form.maxMinBarChart" flat rounded color="secondary"
               @click="() => handleAddBarGroup('maxMinBarGroupSelect')">添加对比组</q-btn>

@@ -19,7 +19,7 @@ watch(() => route.params.id, handleToFile)
 </script>
 
 <template>
-  <q-card class="container column no-wrap q-ml-md q-px-md q-py-xs full-height">
+  <q-card class="container q-ml-md q-px-md q-py-xs">
     <q-tabs v-model="tab" :align="'left'" dense class="text-primary shadow-2">
       <q-route-tab name="generator" label="图表生成" :to="`/task/${route.params.id}/generator`" exact />
       <!-- <q-route-tab name="file" label="数据文件" :to="`/task/${route.params.id}/file`" exact /> -->
@@ -34,6 +34,11 @@ watch(() => route.params.id, handleToFile)
 </template>
 
 <style scoped lang="scss">
+.container {
+  flex: 1;
+  max-height: calc(100vh - 80px)
+}
+
 .router {
   height: 100%;
   overflow: auto;

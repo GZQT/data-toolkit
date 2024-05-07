@@ -17,8 +17,8 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <q-page class="q-pa-md row no-wrap">
-    <q-card style="width: 10rem; min-width: 10rem;">
+  <div class="row no-wrap">
+    <q-card style="width: 10rem; ">
       <q-list dense padding class="rounded-borders text-primary full-width full-height column">
         <q-item-label header class="row justify-between items-center q-py-sm">
           <div class="text-caption">任务</div>
@@ -43,9 +43,9 @@ onMounted(async () => {
         </q-scroll-area>
       </q-list>
     </q-card>
-    <div v-if="route.params.id && route.params.id !== ''" style="flex: 1;max-height: calc(100vh - 80px)">
+    <template v-if="route.params.id && route.params.id !== ''">
       <router-view />
-    </div>
+    </template>
     <div v-else style="flex: 1; margin-top: 5rem;"
       class="col flex column full-height full-width justify-center items-center text-grey-5">
       <q-icon class="text-h1" name="credit_score" />
@@ -56,7 +56,7 @@ onMounted(async () => {
         Please select one task from left side.
       </div>
     </div>
-  </q-page>
+  </div>
 </template>
 
 <style scoped lang="scss">
