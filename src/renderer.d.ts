@@ -11,6 +11,7 @@ export interface FileApi {
   openApplicationDirectory: (dirname: string) => void
   countFiles: (dirname: string) => Promise<number>
   getCsvHeader: (file: string) => Promise<string[]>
+  openExternalLink: (url: string) => void
 }
 
 export interface KernelApi {

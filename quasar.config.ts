@@ -3,6 +3,7 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
+import { version } from 'package.json'
 import { configure } from 'quasar/wrappers'
 
 export default configure((/* ctx */) => {
@@ -25,7 +26,7 @@ export default configure((/* ctx */) => {
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
       // 'ionicons-v4',
-      // 'mdi-v7',
+      'mdi-v7',
       // 'fontawesome-v6',
       // 'eva-icons',
       // 'themify',
@@ -52,7 +53,9 @@ export default configure((/* ctx */) => {
 
       // publicPath: '/',
       // analyze: true,
-      // env: {},
+      env: {
+        APPLICATION_VERSION: version
+      },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,

@@ -152,5 +152,8 @@ contextBridge.exposeInMainWorld('FileApi', {
       })
     })
   },
-  countFiles
+  countFiles,
+  openExternalLink: (url: string) => {
+    shell.openExternal(url)
+  }
 })

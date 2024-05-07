@@ -4,12 +4,10 @@ import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
-const tab = ref('files')
+const tab = ref('generator')
 
 const handleToFile = () => {
-  if (route.params.id && route.params.id !== '') {
-    router.push({ path: `/task/${route.params.id}/generator` })
-  }
+  router.push({ path: `/task/${route.params.id}/generator` })
 }
 
 onMounted(handleToFile)
@@ -42,5 +40,6 @@ watch(() => route.params.id, handleToFile)
 .router {
   height: 100%;
   overflow: auto;
+  min-height: 500px;
 }
 </style>

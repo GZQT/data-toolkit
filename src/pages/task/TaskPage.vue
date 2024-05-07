@@ -68,6 +68,7 @@ const handleDelete = async (item: components['schemas']['TaskResponse']) => {
     router.push('/task')
   })
 }
+
 </script>
 <template>
   <div class="row no-wrap">
