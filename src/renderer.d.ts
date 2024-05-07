@@ -8,6 +8,9 @@ export interface FileApi {
   getFileCount: (file: string) => Promise<{ total: number, updatedDate?: Date }>
   selectFiles: (multiSelections: boolean) => Promise<string[] | undefined>
   openFileDirectory: (file: string) => void
+  openApplicationDirectory: (dirname: string) => void
+  countFiles: (dirname: string) => Promise<number>
+  getCsvHeader: (file: string) => Promise<string[]>
 }
 
 export interface KernelApi {

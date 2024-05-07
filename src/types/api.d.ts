@@ -5,6 +5,20 @@
 
 
 export type paths = {
+  "/task/{task_id}/generator": {
+    /** Get Generator */
+    get: operations["get_generator_task__task_id__generator_get"];
+    /** Add Generator */
+    post: operations["add_generator_task__task_id__generator_post"];
+  };
+  "/task/{task_id}/generator/{generator_id}": {
+    /** Update Generator */
+    put: operations["update_generator_task__task_id__generator__generator_id__put"];
+    /** Start Generator */
+    post: operations["start_generator_task__task_id__generator__generator_id__post"];
+    /** Update Generator */
+    delete: operations["update_generator_task__task_id__generator__generator_id__delete"];
+  };
   "/task": {
     /** Get Task */
     get: operations["get_task_task_get"];
@@ -33,6 +47,41 @@ export type webhooks = Record<string, never>;
 
 export type components = {
   schemas: {
+    /** GeneratorCreateRequest */
+    GeneratorCreateRequest: {
+      /** Name */
+      name: string;
+      /** Files */
+      files: string;
+    };
+    /** GeneratorResponse */
+    GeneratorResponse: {
+      /** Name */
+      name: string;
+      /** Id */
+      id: number;
+      /**
+       * Createddate
+       * Format: date-time
+       */
+      createdDate: string;
+      /**
+       * Updateddate
+       * Format: date-time
+       */
+      updatedDate: string;
+      /** Files */
+      files: string | null;
+      /** @default PROCESSING */
+      status?: components["schemas"]["GeneratorResultEnum"];
+      /** Output */
+      output: string | null;
+    };
+    /**
+     * GeneratorResultEnum
+     * @enum {string}
+     */
+    GeneratorResultEnum: "SUCCESS" | "PROCESSING" | "FAILED" | "WAITING";
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -77,6 +126,25 @@ export type components = {
       /** Name */
       name: string;
     };
+    /** TaskGeneratorStartRequest */
+    TaskGeneratorStartRequest: {
+      /** Averagelinechart */
+      averageLineChart: boolean;
+      /** Maxminlinechart */
+      maxMinLineChart: boolean;
+      /** Averagebarchart */
+      averageBarChart: boolean;
+      /** Maxminbarchart */
+      maxMinBarChart: boolean;
+      /** Averagedatatable */
+      averageDataTable: boolean;
+      /** Maxmindatatable */
+      maxMinDataTable: boolean;
+      /** Averagebargroup */
+      averageBarGroup: number[][];
+      /** Maxminbargroup */
+      maxMinBarGroup: number[][];
+    };
     /** TaskResponse */
     TaskResponse: {
       /** Name */
@@ -117,6 +185,127 @@ export type external = Record<string, never>;
 
 export type operations = {
 
+  /** Get Generator */
+  get_generator_task__task_id__generator_get: {
+    parameters: {
+      path: {
+        task_id: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GeneratorResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Add Generator */
+  add_generator_task__task_id__generator_post: {
+    parameters: {
+      path: {
+        task_id: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["GeneratorCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GeneratorResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Update Generator */
+  update_generator_task__task_id__generator__generator_id__put: {
+    parameters: {
+      path: {
+        task_id: number;
+        generator_id: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["GeneratorCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Start Generator */
+  start_generator_task__task_id__generator__generator_id__post: {
+    parameters: {
+      path: {
+        task_id: number;
+        generator_id: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TaskGeneratorStartRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Update Generator */
+  update_generator_task__task_id__generator__generator_id__delete: {
+    parameters: {
+      path: {
+        generator_id: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   /** Get Task */
   get_task_task_get: {
     responses: {

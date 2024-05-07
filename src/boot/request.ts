@@ -51,13 +51,18 @@ const middleware: Middleware = {
       throw new Error(`获取数据失败：${status}`)
     }
     if (status >= 500) {
-      const newBody = await res.clone().json()
-      Notify.create({
-        type: 'error',
-        message: '获取数据失败：服务器内部错误'
-      })
-      console.error(status, newBody)
-      throw new Error(`服务器错误：${newBody.detail}`)
+      try {
+        const newBody = await res.clone().json()
+        console.error(status, newBody)
+        throw new Error(`服务器错误：${newBody.detail}`)
+      } catch (e) {
+        console.error(status, e)
+      } finally {
+        Notify.create({
+          type: 'negative',
+          message: '获取数据失败：服务器内部错误'
+        })
+      }
     }
     if (status === 201) {
       Notify.create({

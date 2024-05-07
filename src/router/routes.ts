@@ -25,6 +25,10 @@ const routes: RouteRecordRaw[] = [
             component: () => import('pages/task/TaskContent.vue'),
             children: [
               {
+                path: 'generator',
+                component: () => import('pages/task/TaskGenerator.vue')
+              },
+              {
                 path: 'file',
                 component: () => import('pages/task/TaskFile.vue')
               },

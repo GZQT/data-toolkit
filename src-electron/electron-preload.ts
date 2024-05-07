@@ -30,8 +30,35 @@
 import { BrowserWindow } from '@electron/remote'
 import { contextBridge, ipcRenderer, shell } from 'electron'
 import fs from 'fs'
+import os from 'os'
 import path from 'path'
 import readline from 'readline'
+
+const countFiles = async (dir: string, inApplication = true): Promise<number> => {
+  let targetDir = dir
+  if (inApplication) {
+    targetDir = path.join(os.homedir(), 'data-toolkit', dir)
+  }
+  let totalFiles = 0
+
+  if (!fs.existsSync(targetDir)) {
+    return Promise.resolve(0)
+  }
+
+  // 读取文件夹内容
+  const items = await fs.promises.readdir(targetDir, { withFileTypes: true })
+
+  // 使用 Promise.all 并行处理所有项
+  const counts = await Promise.all(items.map(item => {
+    const fullPath = path.join(dir, item.name)
+    return item.isDirectory() ? countFiles(fullPath, inApplication) : 1
+  }))
+
+  // 累加所有返回的计数
+  totalFiles = counts.reduce((acc, num) => acc + num, 0)
+
+  return totalFiles
+}
 
 contextBridge.exposeInMainWorld('WindowsApi', {
   minimize: () => {
@@ -91,5 +118,39 @@ contextBridge.exposeInMainWorld('FileApi', {
     if (fs.existsSync(file)) {
       await shell.openPath(path.dirname(file))
     }
-  }
+  },
+  openApplicationDirectory: async (dirname: string) => {
+    const homeDirectory = os.homedir()
+    const abs = path.join(homeDirectory, 'data-toolkit', dirname)
+    if (fs.existsSync(abs)) {
+      await shell.openPath(abs)
+    }
+  },
+  getCsvHeader: async (file: string) => {
+    return new Promise((resolve, reject) => {
+      if (!fs.existsSync(file)) {
+        resolve([])
+        return
+      }
+      const fileStream = fs.createReadStream(file)
+      const rl = readline.createInterface({
+        input: fileStream,
+        crlfDelay: Infinity
+      })
+      let lines: string[] = []
+      let lineCount = 0
+      rl.on('line', (line: string) => {
+        if (lineCount === 0) {
+          lines = line.split(',').filter(item => item !== '')
+          resolve(lines)
+        }
+        lineCount++
+        fileStream.close()
+      })
+      rl.on('error', (error) => {
+        reject(error)
+      })
+    })
+  },
+  countFiles
 })
