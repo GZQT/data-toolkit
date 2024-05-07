@@ -30,7 +30,7 @@ const form = reactive<components['schemas']['TaskGeneratorStartRequest'] & FormS
   maxMinBarGroupSelect: []
 })
 const columnNameGroup = ref<SelectOption[]>([])
-
+const status = ref<components['schemas']['GeneratorResultEnum']>('PROCESSING')
 const loading = ref(false)
 
 const props = defineProps<{
@@ -55,7 +55,7 @@ const handleSubmit = async () => {
   }
 }
 
-const openDialog = (id: number, files: string[]) => {
+const openDialog = (id: number, files: string[], currentStatus: components['schemas']['GeneratorResultEnum']) => {
   dialog.value = true
   generatorId.value = id
   fileList.value = files
@@ -70,6 +70,7 @@ const openDialog = (id: number, files: string[]) => {
   form.maxMinBarGroup = []
   form.averageBarGroupSelect = []
   form.maxMinBarGroupSelect = []
+  status.value = currentStatus
 }
 
 defineExpose({
@@ -104,6 +105,9 @@ const handleBarSelect = (index: number, key: 'averageBarGroup' | 'maxMinBarGroup
   <div class="container">
     <q-dialog v-model="dialog" persistent>
       <q-card style="min-width: 350px">
+        <q-banner v-if="status === 'SUCCESS' || status !== 'PROCESSING'" inline-actions class="text-white bg-primary">
+          提示：当前任务已经 {{ status === 'SUCCESS' ? '执行过了' : '提交过了' }}，再次提交会覆盖掉上次内容
+        </q-banner>
         <q-card-section>
           <div class="text-subtitle1">
             启动任务

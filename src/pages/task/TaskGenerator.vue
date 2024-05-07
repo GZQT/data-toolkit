@@ -124,13 +124,13 @@ const handleCount = async () => {
   }
 }
 
-const handleRun = (id: number, files: string) => {
-  const fileList = files.split(GENERATOR_FILE_SPLIT)
+const handleRun = (item: components['schemas']['GeneratorResponse'] & TableExtend) => {
+  const fileList = item.files!.split(GENERATOR_FILE_SPLIT)
   if (fileList.length === 0) {
     $q.notify({ type: 'warning', message: '没有可以处理的文件' })
     return
   }
-  generatorStartDialog.value?.openDialog(id, files.split(GENERATOR_FILE_SPLIT))
+  generatorStartDialog.value?.openDialog(item.id, fileList, item.status!)
 }
 
 const handleEdit = (row: components['schemas']['GeneratorResponse'] & TableExtend) => {
@@ -180,10 +180,13 @@ const handleShowOutput = (output: string) => {
             {{ props.row.name }}
           </q-td>
           <q-td key="status" :props="props">
-            <q-chip v-if="props.row.status === 'WAITING'" color="ongoing" dense size="12px">等待开始</q-chip>
-            <q-chip v-else-if="props.row.status === 'SUCCESS'" color="positive" dense size="12px">成功</q-chip>
-            <q-chip v-else-if="props.row.status === 'FAILED'" color="negative" dense size="12px">失败</q-chip>
-            <q-chip v-else-if="props.row.status === 'PROCESSING'" color="warning" dense size="12px">进行中</q-chip>
+            <q-chip v-if="props.row.status === 'WAITING'" color="ongoing" class="text-white" size="10px">等待开始</q-chip>
+            <q-chip v-else-if="props.row.status === 'SUCCESS'" color="positive" class="text-white"
+              size="10px">成功</q-chip>
+            <q-chip v-else-if="props.row.status === 'FAILED'" color="negative" class="text-white"
+              size="10px">失败</q-chip>
+            <q-chip v-else-if="props.row.status === 'PROCESSING'" color="warning" class="text-white"
+              size="10px">进行中</q-chip>
           </q-td>
           <q-td key="total" class="cursor-pointer" :props="props" @click="props.expand = !props.expand">
             {{ props.row.files && (props.row.files.split(GENERATOR_FILE_SPLIT).length ?? 0) }}
@@ -199,7 +202,7 @@ const handleShowOutput = (output: string) => {
           </q-td>
           <q-td key="action" :props="props">
             <q-btn flat round color="secondary" icon="play_circle" size="sm" dense
-              @click="() => handleRun(props.row.id, props.row.files)" />
+              @click="() => handleRun(props.row)" />
             <q-btn flat round color="primary" icon="terminal" size="sm" dense :disable="!props.row.output"
               @click="() => handleShowOutput(props.row.output)" />
             <q-btn flat round color="primary" icon="folder" size="sm" dense
