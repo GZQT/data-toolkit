@@ -25,6 +25,12 @@ export type paths = {
     /** Add Task */
     post: operations["add_task_task_post"];
   };
+  "/task/{task_id}": {
+    /** Update Task Name */
+    put: operations["update_task_name_task__task_id__put"];
+    /** Remove Task File */
+    delete: operations["remove_task_file_task__task_id__delete"];
+  };
   "/task/{task_id}/file": {
     /** Get Task File */
     get: operations["get_task_file_task__task_id__file_get"];
@@ -76,6 +82,8 @@ export type components = {
       status?: components["schemas"]["GeneratorResultEnum"];
       /** Output */
       output: string | null;
+      /** Result */
+      result: string | null;
     };
     /**
      * GeneratorResultEnum
@@ -326,10 +334,55 @@ export type operations = {
     };
     responses: {
       /** @description Successful Response */
-      200: {
+      201: {
         content: {
           "application/json": components["schemas"]["TaskResponse"];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Update Task Name */
+  update_task_name_task__task_id__put: {
+    parameters: {
+      path: {
+        task_id: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TaskCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Remove Task File */
+  remove_task_file_task__task_id__delete: {
+    parameters: {
+      path: {
+        task_id: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
       };
       /** @description Validation Error */
       422: {
