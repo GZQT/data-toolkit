@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import createClient from 'openapi-fetch'
-import { useInterval } from 'quasar'
+import { date, useInterval, useTimeout } from 'quasar'
 import { paths } from 'src/types/api'
 import { onMounted, ref } from 'vue'
 import SettingDialog from './components/SettingDialog.vue'
 
 const { registerInterval } = useInterval()
+const { registerTimeout } = useTimeout()
 const status = ref('yellow')
 const settingDialogRef = ref<null | InstanceType<typeof SettingDialog>>(null)
+const time = ref<number>(0)
+const showTime = ref<boolean>(true)
 
 defineOptions({
   name: 'MainLayout'
 })
-
-// const leftDrawerOpen = ref(false)
 
 const handleMinimize = () => {
   if (process.env.MODE === 'electron') {
@@ -36,6 +37,7 @@ onMounted(() => {
     baseUrl: 'http://localhost:8080'
   })
   registerInterval(async () => {
+    const start = parseInt(date.formatDate(Date.now(), 'x'))
     try {
       const { data } = await client.GET('/health')
       if (data?.status === 'ok') {
@@ -47,6 +49,13 @@ onMounted(() => {
     } catch (error) {
       console.error(error)
       status.value = 'red'
+    } finally {
+      showTime.value = true
+      const end = parseInt(date.formatDate(Date.now(), 'x'))
+      time.value = end - start
+      registerTimeout(() => {
+        showTime.value = false
+      }, 3000)
     }
   }, 10000)
 })
@@ -64,7 +73,7 @@ const handleOpenSetting = () => {
         <img style="width:18px; height: 18px;" alt="logo" src="../assets/logo.png" />
 
         <div class="q-ml-md">Data Toolkit</div>
-        <q-badge rounded :color="status" />
+        <q-badge rounded :color="status" style="transition: all 1s;" />
         <q-space />
 
         <q-btn dense flat icon="settings" @click="handleOpenSetting" />
@@ -86,6 +95,10 @@ const handleOpenSetting = () => {
       <q-page padding>
         <router-view />
         <SettingDialog ref="settingDialogRef" />
+        <div v-if="time > 0" class="text-caption fixed bg-grey-7 text-white q-px-sm"
+          :style="{ bottom: 0, left: 0, opacity: showTime ? 0.5 : 0, transition: 'all 1s' }">
+          {{ time }}ms
+        </div>
       </q-page>
     </q-page-container>
   </q-layout>
