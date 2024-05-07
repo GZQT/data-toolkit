@@ -12,12 +12,18 @@ export type paths = {
     post: operations["add_generator_task__task_id__generator_post"];
   };
   "/task/{task_id}/generator/{generator_id}": {
+    /** Get Generator */
+    get: operations["get_generator_task__task_id__generator__generator_id__get"];
     /** Update Generator */
     put: operations["update_generator_task__task_id__generator__generator_id__put"];
     /** Start Generator */
     post: operations["start_generator_task__task_id__generator__generator_id__post"];
     /** Update Generator */
     delete: operations["update_generator_task__task_id__generator__generator_id__delete"];
+  };
+  "/task/{task_id}/generator/{generator_id}/clearOutput": {
+    /** Update Generator */
+    put: operations["update_generator_task__task_id__generator__generator_id__clearOutput_put"];
   };
   "/task": {
     /** Get Task */
@@ -53,6 +59,31 @@ export type webhooks = Record<string, never>;
 
 export type components = {
   schemas: {
+    /** GeneratorAllResponse */
+    GeneratorAllResponse: {
+      /** Name */
+      name: string;
+      /** Id */
+      id: number;
+      /**
+       * Createddate
+       * Format: date-time
+       */
+      createdDate: string;
+      /**
+       * Updateddate
+       * Format: date-time
+       */
+      updatedDate: string;
+      /** Files */
+      files: string | null;
+      /** @default PROCESSING */
+      status?: components["schemas"]["GeneratorResultEnum"];
+      /** Result */
+      result: string | null;
+      /** Output */
+      output: string | null;
+    };
     /** GeneratorCreateRequest */
     GeneratorCreateRequest: {
       /** Name */
@@ -80,8 +111,6 @@ export type components = {
       files: string | null;
       /** @default PROCESSING */
       status?: components["schemas"]["GeneratorResultEnum"];
-      /** Output */
-      output: string | null;
       /** Result */
       result: string | null;
     };
@@ -242,6 +271,29 @@ export type operations = {
       };
     };
   };
+  /** Get Generator */
+  get_generator_task__task_id__generator__generator_id__get: {
+    parameters: {
+      path: {
+        task_id: number;
+        generator_id: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GeneratorAllResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   /** Update Generator */
   update_generator_task__task_id__generator__generator_id__put: {
     parameters: {
@@ -298,6 +350,27 @@ export type operations = {
   update_generator_task__task_id__generator__generator_id__delete: {
     parameters: {
       path: {
+        generator_id: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Update Generator */
+  update_generator_task__task_id__generator__generator_id__clearOutput_put: {
+    parameters: {
+      path: {
+        task_id: number;
         generator_id: number;
       };
     };

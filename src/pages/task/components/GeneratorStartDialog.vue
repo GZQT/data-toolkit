@@ -106,7 +106,10 @@ const handleBarSelect = (index: number, key: 'averageBarGroup' | 'maxMinBarGroup
     <q-dialog v-model="dialog" persistent>
       <q-card style="min-width: 350px">
         <q-banner v-if="status === 'SUCCESS' || status !== 'PROCESSING'" inline-actions class="text-white bg-primary">
-          提示：当前任务已经 {{ status === 'SUCCESS' ? '执行过了' : '提交过了' }}，再次提交会覆盖掉上次内容
+          TIP：当前任务已经 {{ status === 'SUCCESS' ? '执行过了' : '提交过了' }}，再次提交会覆盖掉上次内容
+        </q-banner>
+        <q-banner v-else-if="status === 'PROCESSING'" inline-actions class="text-white bg-primary">
+          TIP：当前任务可能已经在运行了，再次提交会覆盖掉上次内容
         </q-banner>
         <q-card-section>
           <div class="text-subtitle1">

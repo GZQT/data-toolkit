@@ -156,8 +156,8 @@ const handleDelete = (row: components['schemas']['GeneratorResponse'] & TableExt
   })
 }
 
-const handleShowOutput = (output: string) => {
-  generatorOutputDialog.value?.openDialog(output)
+const handleShowOutput = (row: components['schemas']['GeneratorResponse'] & TableExtend) => {
+  generatorOutputDialog.value?.openDialog(taskId.value!, row.id)
 }
 
 </script>
@@ -201,14 +201,23 @@ const handleShowOutput = (output: string) => {
             {{ props.row.result }}
           </q-td>
           <q-td key="action" :props="props">
-            <q-btn flat round color="secondary" icon="play_circle" size="sm" dense
-              @click="() => handleRun(props.row)" />
-            <q-btn flat round color="primary" icon="terminal" size="sm" dense :disable="!props.row.output"
-              @click="() => handleShowOutput(props.row.output)" />
+            <q-btn flat round color="secondary" icon="play_circle" size="sm" dense @click="() => handleRun(props.row)">
+              <q-tooltip>开始生成</q-tooltip>
+            </q-btn>
+            <q-btn flat round color="primary" icon="terminal" size="sm" dense
+              @click="() => handleShowOutput(props.row)">
+              <q-tooltip>任务日志</q-tooltip>
+            </q-btn>
             <q-btn flat round color="primary" icon="folder" size="sm" dense
-              @click="() => handleHomeDirectoryOpenFile(props.row.name)" />
-            <q-btn flat round color="secondary" icon="edit" size="sm" dense @click="() => handleEdit(props.row)" />
-            <q-btn flat round color="red" icon="delete" size="sm" dense @click="() => handleDelete(props.row)" />
+              @click="() => handleHomeDirectoryOpenFile(props.row.name)">
+              <q-tooltip>查看图表</q-tooltip>
+            </q-btn>
+            <q-btn flat round color="secondary" icon="edit" size="sm" dense @click="() => handleEdit(props.row)">
+              <q-tooltip>编辑</q-tooltip>
+            </q-btn>
+            <q-btn flat round color="red" icon="delete" size="sm" dense @click="() => handleDelete(props.row)">
+              <q-tooltip>删除</q-tooltip>
+            </q-btn>
           </q-td>
         </q-tr>
         <q-tr v-show="props.expand" :props="props">
