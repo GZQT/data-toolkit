@@ -53,8 +53,8 @@ const handleData = async () => {
   } finally {
     loading.table = false
     loading.refresh = false
+    loading.count = false
   }
-  handleCount()
 }
 
 onMounted(() => {
@@ -106,6 +106,7 @@ const handleCount = async () => {
     return
   }
   loading.count = true
+  const lastTaskId = _.cloneDeep(taskId.value)
   try {
     const data = _.cloneDeep(taskGeneratorData.value)
     for (const index in data) {
@@ -118,8 +119,11 @@ const handleCount = async () => {
         total += (await window.FileApi.getFileCount(fileList[fileIndex])).total
       }
       data[index].dataTotal = total
-      taskGeneratorData.value = data
       data[index].chartTotal = await window.FileApi.countFiles(data[index].name) ?? 0
+      if (lastTaskId !== taskId.value) {
+        return
+      }
+      taskGeneratorData.value = data
     }
   } finally {
     loading.count = false
@@ -171,8 +175,9 @@ const handleShowOutput = (row: components['schemas']['GeneratorResponse'] & Tabl
     </FileSelectDialog>
     <GeneratorStartDialog ref="generatorStartDialog" :task-id="taskId" />
     <GeneratorOutputDialog ref="generatorOutputDialog" />
-    <q-table class="container-table" flat bordered :rows="taskGeneratorData" :columns="columns" row-key="id"
-      :pagination="{ rowsPerPage: 10 }" :filter="filter" :loading="loading.table" table-header-class="sticky-head">
+    <q-table class="container-table container-table-sticky-head" flat bordered :rows="taskGeneratorData"
+      :columns="columns" row-key="id" :pagination="{ rowsPerPage: 10 }" :filter="filter" :loading="loading.table"
+      table-header-class="sticky-head">
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td key="id" class="cursor-pointer" :props="props" @click="props.expand = !props.expand">
@@ -258,5 +263,6 @@ const handleShowOutput = (row: components['schemas']['GeneratorResponse'] & Tabl
 <style scoped lang="scss">
 .container-table {
   height: calc(100vh - 140px);
+
 }
 </style>

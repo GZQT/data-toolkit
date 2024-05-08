@@ -34,6 +34,12 @@ body.body--light {
   top: 0;
 }
 
+.container-table-sticky-head {
+  &.q-table--loading thead tr:last-child th {
+    top: 3px
+  }
+}
+
 .body--light {
   .text-base {
     color: #1D1D1D
