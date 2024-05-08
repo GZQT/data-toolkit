@@ -5,7 +5,7 @@ import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
 import { handleHomeDirectoryOpenFile, handleOpenFile } from 'src/utils/action'
 import { GENERATOR_FILE_SPLIT } from 'src/utils/constant'
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import FileSelectDialog from './components/FileSelectDialog.vue'
 import GeneratorOutputDialog from './components/GeneratorOutputDialog.vue'
@@ -21,11 +21,11 @@ const taskGeneratorData = ref<(components['schemas']['GeneratorResponse'] & Tabl
 const columns: QTableProps['columns'] = [
   { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
   { name: 'name', label: '批次', field: 'name', align: 'left', sortable: true },
-  { name: 'status', label: '状态', field: 'status', align: 'left', sortable: true },
-  { name: 'total', label: '文件数', field: 'total', align: 'left', sortable: true },
-  { name: 'chartTotal', label: '图表数', field: 'total', align: 'left', sortable: true },
-  { name: 'dataTotal', label: '数据行数', field: 'total', align: 'left', sortable: true },
-  { name: 'result', label: '执行结果', field: 'result', align: 'left', sortable: true },
+  { name: 'status', label: '状态', field: 'status', align: 'left' },
+  { name: 'total', label: '文件数', field: 'total', align: 'left' },
+  { name: 'chartTotal', label: '图表数', field: 'total', align: 'left' },
+  { name: 'dataTotal', label: '数据行数', field: 'total', align: 'left' },
+  { name: 'result', label: '执行结果', field: 'result', align: 'left' },
   { name: 'action', label: '操作', field: 'name', align: 'center' }
 ]
 
@@ -60,6 +60,8 @@ const handleData = async () => {
 onMounted(() => {
   handleData()
 })
+
+watch(() => route.params.id, handleData)
 
 const handleAdd = () => {
   fileSelectDialog.value?.openDialog(null, [])
@@ -176,8 +178,10 @@ const handleShowOutput = (row: components['schemas']['GeneratorResponse'] & Tabl
           <q-td key="id" class="cursor-pointer" :props="props" @click="props.expand = !props.expand">
             {{ props.row.id }}
           </q-td>
-          <q-td key="name" class="cursor-pointer" :props="props" @click="props.expand = !props.expand">
+          <q-td key="name" class="cursor-pointer ellipsis" style="max-width: 240px;" :props="props"
+            @click="props.expand = !props.expand">
             {{ props.row.name }}
+            <q-tooltip>{{ props.row.name }}</q-tooltip>
           </q-td>
           <q-td key="status" :props="props">
             <q-chip v-if="props.row.status === 'WAITING'" color="ongoing" class="text-white" size="10px">等待开始</q-chip>

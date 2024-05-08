@@ -21,12 +21,14 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/task/TaskPage.vue'),
         children: [
           {
-            path: ':id?',
+            path: ':id',
             component: () => import('pages/task/TaskContent.vue'),
             children: [
               {
                 path: '',
-                component: () => import('pages/task/TaskGenerator.vue')
+                redirect: to => {
+                  return { path: `/task/${to.params.id}/generator` }
+                }
               },
               {
                 path: 'generator',

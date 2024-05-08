@@ -1,18 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const router = useRouter()
 const tab = ref('generator')
-
-const handleToFile = () => {
-  router.push({ path: `/task/${route.params.id}/generator` })
-}
-
-onMounted(handleToFile)
-
-watch(() => route.params.id, handleToFile)
 
 </script>
 
@@ -39,7 +30,6 @@ watch(() => route.params.id, handleToFile)
 
 .router {
   height: 100%;
-  overflow: auto;
   min-height: 500px;
 }
 </style>

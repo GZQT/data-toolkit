@@ -2,7 +2,7 @@
 import { QScrollArea, useInterval, useTimeout } from 'quasar'
 import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const dialog = ref(false)
 const id = ref<number>(0)
@@ -75,6 +75,20 @@ const openDialog = (taskIdValue: number, idValue: number) => {
 }
 
 defineExpose({ openDialog })
+
+const status = computed(() => {
+  if (!generator.value) {
+    return 'red'
+  }
+  if (generator.value.status === 'FAILED') {
+    return 'red'
+  }
+  if (generator.value.status === 'SUCCESS') {
+    return 'green'
+  }
+  return 'yellow'
+})
+
 </script>
 
 <template>
@@ -82,8 +96,9 @@ defineExpose({ openDialog })
     <q-dialog v-model="dialog" maximized position="right" @hide="handleClose">
       <q-card class="bg-dark" style="width: 40rem;">
         <q-card-section class="full-height full-width overflow-hidden column">
-          <div class="text-white row">
+          <div class="text-white row items-center">
             <div class="text-h6">任务日志</div>
+            <q-badge rounded :color="status" class="q-ml-sm" style="width: 12px;height: 12px;transition: all 1s;" />
             <q-space />
             <q-btn flat round icon="close" @click="dialog = false" />
           </div>

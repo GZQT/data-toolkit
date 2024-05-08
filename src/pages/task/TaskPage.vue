@@ -72,7 +72,7 @@ const handleDelete = async (item: components['schemas']['TaskResponse']) => {
 </script>
 <template>
   <div class="row no-wrap">
-    <q-card style="width: 10rem; ">
+    <q-card style="width: 10rem;min-width: 10rem; ">
       <q-list dense padding class="rounded-borders text-primary full-width full-height column">
         <q-item-label header class="row justify-between items-center q-py-sm">
           <div class="text-caption">任务</div>
