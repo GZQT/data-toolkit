@@ -1,6 +1,6 @@
 <script setup lang="tsx">
 import _ from 'lodash'
-import { QChip, QTableProps, date, useQuasar } from 'quasar'
+import { QChip, QTableProps, date, useInterval, useQuasar } from 'quasar'
 import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
 import { handleHomeDirectoryOpenFile, handleOpenFile } from 'src/utils/action'
@@ -21,6 +21,8 @@ export interface TableExtend {
 }
 export type GeneratorType = components['schemas']['GeneratorResponse'] & TableExtend
 
+const { registerInterval, removeInterval } = useInterval()
+const refreshTime = ref<number>(5)
 const taskGeneratorData = ref<(GeneratorType)[]>([])
 const columns: QTableProps['columns'] = [
   { name: 'id', label: 'ID', field: 'id', align: 'left' },
@@ -66,6 +68,7 @@ const handleData = async () => {
 
 onMounted(() => {
   handleData()
+  registerInterval(handleData, refreshTime.value * 1000)
 })
 
 watch(() => route.params.id, handleData)
@@ -183,6 +186,15 @@ const handleGeneratorBar = () => {
   generatorStartBarDialog.value?.openDialog(selected.value)
 }
 
+const handleAutoRefresh = (time: number) => {
+  refreshTime.value = time
+  if (time < 0) {
+    removeInterval()
+    return
+  }
+  registerInterval(handleData, time * 1000)
+}
+
 </script>
 
 <template>
@@ -277,6 +289,27 @@ const handleGeneratorBar = () => {
         </q-input>
         <q-space />
         <div class="row q-gutter-md">
+          <q-btn-dropdown color="primary" size="sm" outline :label="`自动刷新(${refreshTime > 0 ? refreshTime : '-'}s)`">
+            <q-list>
+              <q-item clickable v-close-popup @click="handleAutoRefresh(-1)">
+                <q-item-section>
+                  <q-item-label>不刷新</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-close-popup @click="handleAutoRefresh(5)">
+                <q-item-section>
+                  <q-item-label>5 秒</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-close-popup @click="handleAutoRefresh(10)">
+                <q-item-section>
+                  <q-item-label>10 秒</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
           <q-btn color="secondary" outline label="生成对比柱状图" :disable="selected.length < 2" @click="handleGeneratorBar"
             size="sm">
             <q-tooltip anchor="top middle" self="center middle">你需要先选择至少两行才可以进行进行此操作</q-tooltip>

@@ -38,7 +38,9 @@ const getErrorMessage = (body: Record<string, unknown>) => {
 
 const middleware: Middleware = {
   onRequest: async (req) => {
-    LoadingBar.start()
+    if (req.method !== 'GET') {
+      LoadingBar.start()
+    }
     return req
   },
   onResponse: async (res: Response) => {
