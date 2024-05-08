@@ -26,3 +26,19 @@ export const barStyle: Partial<CSSStyleDeclaration> = {
   width: '8px',
   opacity: '0.2'
 }
+
+export const whiteThumbStyle: Partial<CSSStyleDeclaration> = {
+  right: '4px',
+  borderRadius: '7px',
+  backgroundColor: '#fff',
+  width: '4px',
+  opacity: '0.75'
+}
+
+export const whiteBarStyle: Partial<CSSStyleDeclaration> = {
+  right: '2px',
+  borderRadius: '9px',
+  backgroundColor: '#fff',
+  width: '8px',
+  opacity: '0.2'
+}

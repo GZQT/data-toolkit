@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import _ from 'lodash'
 import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
 import { reactive, ref } from 'vue'
@@ -76,29 +75,6 @@ const openDialog = (id: number, files: string[], currentStatus: components['sche
 defineExpose({
   openDialog
 })
-
-const handleAddBarGroup = async (key: 'averageBarGroupSelect' | 'maxMinBarGroupSelect') => {
-  if (columnNameGroup.value.length === 0) {
-    const filePath = fileList.value[0]
-    const lines = await window.FileApi.getCsvHeader(filePath)
-
-    columnNameGroup.value = lines.map((item, index) => ({
-      label: item,
-      value: index
-    }))
-  }
-  form[key].push([])
-}
-
-const handleBarSelect = (index: number, key: 'averageBarGroup' | 'maxMinBarGroup', value: SelectOption[]) => {
-  const data = _.cloneDeep(form[`${key}Select`])
-  _.fill(data, value, index, index + 1)
-  form[`${key}Select`] = data
-  form[key] = _.map(data, innerArray =>
-    _.map(innerArray, obj => obj.value)
-  )
-}
-
 </script>
 
 <template>
@@ -124,18 +100,6 @@ const handleBarSelect = (index: number, key: 'averageBarGroup' | 'maxMinBarGroup
           <div>
             <q-checkbox left-label v-model="form.averageDataTable" label="生成平均值数据表格" />
             <q-checkbox left-label v-model="form.maxMinDataTable" label="生成最大最小值数据表格" />
-          </div>
-          <div>
-            <q-checkbox left-label v-model="form.maxMinBarChart" label="生成最大最小值柱状图" />
-            <q-btn v-if="form.maxMinBarChart" flat rounded color="secondary"
-              @click="() => handleAddBarGroup('maxMinBarGroupSelect')">添加对比组</q-btn>
-          </div>
-          <div v-if="form.maxMinBarChart">
-            <template v-for="(item, index) in form.maxMinBarGroupSelect" :key="index">
-              <q-select :model-value="item"
-                @update:model-value="(select) => handleBarSelect(index, 'maxMinBarGroup', select)" multiple
-                :options="columnNameGroup" :label="`选择对比列-${index + 1}`" />
-            </template>
           </div>
         </q-card-section>
         <q-card-actions :align="'right'" class="text-primary">

@@ -9,6 +9,7 @@ import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import FileSelectDialog from './components/FileSelectDialog.vue'
 import GeneratorOutputDialog from './components/GeneratorOutputDialog.vue'
+import GeneratorStartBarDialog from './components/GeneratorStartBarDialog.vue'
 import GeneratorStartDialog from './components/GeneratorStartDialog.vue'
 import ShowChartDialog from './components/ShowChartDialog.vue'
 
@@ -18,10 +19,11 @@ export interface TableExtend {
   dataTotal?: number
   dirFiles?: string[]
 }
+export type GeneratorType = components['schemas']['GeneratorResponse'] & TableExtend
 
-const taskGeneratorData = ref<(components['schemas']['GeneratorResponse'] & TableExtend)[]>([])
+const taskGeneratorData = ref<(GeneratorType)[]>([])
 const columns: QTableProps['columns'] = [
-  { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
+  { name: 'id', label: 'ID', field: 'id', align: 'left' },
   { name: 'name', label: '批次', field: 'name', align: 'left', sortable: true },
   { name: 'status', label: '状态', field: 'status', align: 'left' },
   { name: 'total', label: '文件数', field: 'total', align: 'left' },
@@ -38,6 +40,8 @@ const fileSelectDialog = ref<null | InstanceType<typeof FileSelectDialog>>(null)
 const generatorStartDialog = ref<null | InstanceType<typeof GeneratorStartDialog>>(null)
 const generatorOutputDialog = ref<null | InstanceType<typeof GeneratorOutputDialog>>(null)
 const showChartDialog = ref<null | InstanceType<typeof ShowChartDialog>>(null)
+const generatorStartBarDialog = ref<null | InstanceType<typeof GeneratorStartBarDialog>>(null)
+const selected = ref<(GeneratorType)[]>([])
 const filter = ref('')
 const name = ref('')
 const loading = reactive({
@@ -135,7 +139,7 @@ const handleCount = async () => {
   }
 }
 
-const handleRun = (item: components['schemas']['GeneratorResponse'] & TableExtend) => {
+const handleRun = (item: GeneratorType) => {
   const fileList = item.files!.split(GENERATOR_FILE_SPLIT)
   if (fileList.length === 0) {
     $q.notify({ type: 'warning', message: '没有可以处理的文件' })
@@ -144,7 +148,7 @@ const handleRun = (item: components['schemas']['GeneratorResponse'] & TableExten
   generatorStartDialog.value?.openDialog(item.id, fileList, item.status!)
 }
 
-const handleEdit = (row: components['schemas']['GeneratorResponse'] & TableExtend) => {
+const handleEdit = (row: GeneratorType) => {
   if (!row.files) {
     $q.notify({ type: 'negative', message: '当前数据不存在任何文件，似乎是错误数据' })
     return
@@ -153,7 +157,7 @@ const handleEdit = (row: components['schemas']['GeneratorResponse'] & TableExten
   name.value = row.name
 }
 
-const handleDelete = (row: components['schemas']['GeneratorResponse'] & TableExtend) => {
+const handleDelete = (row: GeneratorType) => {
   $q.dialog({
     title: '确认移除吗',
     message: `此操作将会移除 ${row.name} 所有数据但不会移除已经生成的图表文件（如果已生成过）。`,
@@ -167,12 +171,16 @@ const handleDelete = (row: components['schemas']['GeneratorResponse'] & TableExt
   })
 }
 
-const handleShowOutput = (row: components['schemas']['GeneratorResponse'] & TableExtend) => {
+const handleShowOutput = (row: GeneratorType) => {
   generatorOutputDialog.value?.openDialog(taskId.value!, row.id)
 }
 
-const handleShowChart = (row: components['schemas']['GeneratorResponse'] & TableExtend) => {
+const handleShowChart = (row: GeneratorType) => {
   showChartDialog.value?.openDialog(row)
+}
+
+const handleGeneratorBar = () => {
+  generatorStartBarDialog.value?.openDialog(selected.value)
 }
 
 </script>
@@ -184,19 +192,24 @@ const handleShowChart = (row: components['schemas']['GeneratorResponse'] & Table
     </FileSelectDialog>
     <GeneratorStartDialog ref="generatorStartDialog" :task-id="taskId" />
     <GeneratorOutputDialog ref="generatorOutputDialog" />
+    <GeneratorStartBarDialog ref="generatorStartBarDialog" :task-id="taskId" />
     <ShowChartDialog ref="showChartDialog" />
-    <q-table class="container-table container-table-sticky-head" flat bordered :rows="taskGeneratorData"
-      :columns="columns" row-key="id" :pagination="{ rowsPerPage: 10 }" :filter="filter" :loading="loading.table"
-      table-header-class="sticky-head">
+    <q-table class="container-table container-table-sticky-head" v-model:selected="selected" flat bordered
+      :rows="taskGeneratorData" selection="multiple" :columns="columns" row-key="id" :pagination="{ rowsPerPage: 10 }"
+      :filter="filter" :loading="loading.table" table-header-class="sticky-head">
+
       <template v-slot:body="props">
         <q-tr :props="props">
+          <q-td>
+            <q-checkbox v-model="props.selected" color="primary" />
+          </q-td>
           <q-td key="id" class="cursor-pointer" :props="props" @click="props.expand = !props.expand">
             {{ props.row.id }}
           </q-td>
           <q-td key="name" class="cursor-pointer ellipsis" style="max-width: 240px;" :props="props"
             @click="props.expand = !props.expand">
             {{ props.row.name }}
-            <q-tooltip>{{ props.row.name }}</q-tooltip>
+            <q-tooltip anchor="top middle" self="center middle">{{ props.row.name }}</q-tooltip>
           </q-td>
           <q-td key="status" :props="props">
             <q-chip v-if="props.row.status === 'WAITING'" color="ongoing" class="text-white" size="10px">等待开始</q-chip>
@@ -218,26 +231,27 @@ const handleShowChart = (row: components['schemas']['GeneratorResponse'] & Table
           <q-td key="dataTotal" :props="props">
             {{ props.row.dataTotal }}
           </q-td>
-          <q-td key="result" :props="props">
+          <q-td key="result" class="ellipsis" :props="props" style="max-width: 140px;">
             {{ props.row.result }}
+            <q-tooltip anchor="top middle" self="center middle" max-width="400px">{{ props.row.result }}</q-tooltip>
           </q-td>
           <q-td key="action" :props="props">
             <q-btn flat round color="secondary" icon="play_circle" size="sm" dense @click="() => handleRun(props.row)">
-              <q-tooltip>开始生成</q-tooltip>
+              <q-tooltip anchor="top middle" self="center middle">开始生成</q-tooltip>
             </q-btn>
             <q-btn flat round color="primary" icon="terminal" size="sm" dense
               @click="() => handleShowOutput(props.row)">
-              <q-tooltip>任务日志</q-tooltip>
+              <q-tooltip anchor="top middle" self="center middle">任务日志</q-tooltip>
             </q-btn>
             <q-btn flat round color="primary" icon="folder" size="sm" dense
               @click="() => handleHomeDirectoryOpenFile(props.row.name)">
-              <q-tooltip>查看图表</q-tooltip>
+              <q-tooltip anchor="top middle" self="center middle">查看图表</q-tooltip>
             </q-btn>
             <q-btn flat round color="secondary" icon="edit" size="sm" dense @click="() => handleEdit(props.row)">
-              <q-tooltip>编辑</q-tooltip>
+              <q-tooltip anchor="top middle" self="center middle">编辑</q-tooltip>
             </q-btn>
             <q-btn flat round color="red" icon="delete" size="sm" dense @click="() => handleDelete(props.row)">
-              <q-tooltip>删除</q-tooltip>
+              <q-tooltip anchor="top middle" self="center middle">删除</q-tooltip>
             </q-btn>
           </q-td>
         </q-tr>
@@ -263,6 +277,10 @@ const handleShowChart = (row: components['schemas']['GeneratorResponse'] & Table
         </q-input>
         <q-space />
         <div class="row q-gutter-md">
+          <q-btn color="secondary" outline label="生成对比柱状图" :disable="selected.length < 2" @click="handleGeneratorBar"
+            size="sm">
+            <q-tooltip anchor="top middle" self="center middle">你需要先选择至少两行才可以进行进行此操作</q-tooltip>
+          </q-btn>
           <q-btn color="primary" outline label="加载计数" :loading="loading.count" @click="handleCount" size="sm" />
           <q-btn color="primary" outline label="刷新" :loading="loading.refresh" @click="handleData" size="sm" />
           <q-btn color="primary" outline label="添加" @click="handleAdd" size="sm" />

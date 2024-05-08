@@ -11,6 +11,10 @@ const status = ref('yellow')
 const settingDialogRef = ref<null | InstanceType<typeof SettingDialog>>(null)
 const time = ref<number>(0)
 const showTime = ref<boolean>(true)
+const client = ref(
+  createClient<paths>({
+    baseUrl: 'http://localhost:8080'
+  }))
 
 defineOptions({
   name: 'MainLayout'
@@ -32,32 +36,32 @@ const handleCloseApp = () => {
   }
 }
 
-onMounted(() => {
-  const client = createClient<paths>({
-    baseUrl: 'http://localhost:8080'
-  })
-  registerInterval(async () => {
-    const start = parseInt(date.formatDate(Date.now(), 'x'))
-    try {
-      const { data } = await client.GET('/health')
-      if (data?.status === 'ok') {
-        status.value = 'green'
-      } else {
-        status.value = 'red'
-        console.error(data)
-      }
-    } catch (error) {
-      console.error(error)
+const checkHealth = async () => {
+  const start = parseInt(date.formatDate(Date.now(), 'x'))
+  try {
+    const { data } = await client.value.GET('/health')
+    if (data?.status === 'ok') {
+      status.value = 'green'
+    } else {
       status.value = 'red'
-    } finally {
-      showTime.value = true
-      const end = parseInt(date.formatDate(Date.now(), 'x'))
-      time.value = end - start
-      registerTimeout(() => {
-        showTime.value = false
-      }, 3000)
+      console.error(data)
     }
-  }, 10000)
+  } catch (error) {
+    console.error(error)
+    status.value = 'red'
+  } finally {
+    showTime.value = true
+    const end = parseInt(date.formatDate(Date.now(), 'x'))
+    time.value = end - start
+    registerTimeout(() => {
+      showTime.value = false
+    }, 3000)
+  }
+}
+
+onMounted(() => {
+  checkHealth()
+  registerInterval(checkHealth, 10000)
 })
 
 const handleOpenSetting = () => {

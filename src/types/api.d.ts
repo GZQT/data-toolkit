@@ -25,6 +25,10 @@ export type paths = {
     /** Update Generator */
     put: operations["update_generator_task__task_id__generator__generator_id__clearOutput_put"];
   };
+  "/task/{task_id}/generate/barChart": {
+    /** Start Bar Chart */
+    post: operations["start_bar_chart_task__task_id__generate_barChart_post"];
+  };
   "/task": {
     /** Get Task */
     get: operations["get_task_task_get"];
@@ -59,6 +63,15 @@ export type webhooks = Record<string, never>;
 
 export type components = {
   schemas: {
+    /** BarChartGeneratorStartRequest */
+    BarChartGeneratorStartRequest: {
+      /** Generatorids */
+      generatorIds: number[];
+      /** Chartname */
+      chartName: string | null;
+      /** Comparegroup */
+      compareGroup: number[][][];
+    };
     /** GeneratorAllResponse */
     GeneratorAllResponse: {
       /** Name */
@@ -372,6 +385,31 @@ export type operations = {
       path: {
         task_id: number;
         generator_id: number;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Start Bar Chart */
+  start_bar_chart_task__task_id__generate_barChart_post: {
+    parameters: {
+      path: {
+        task_id: number;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BarChartGeneratorStartRequest"];
       };
     };
     responses: {

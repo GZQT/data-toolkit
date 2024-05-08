@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { components } from 'src/types/api'
 import { handleOpenFile } from 'src/utils/action'
-import { isImage } from 'src/utils/constant'
+import { isImage, whiteBarStyle, whiteThumbStyle } from 'src/utils/constant'
 import { computed, ref } from 'vue'
 import { TableExtend } from '../TaskGenerator.vue'
 
@@ -20,29 +20,6 @@ const imageFiles = computed(() => {
   return data.value.dirFiles
     .filter(item => isImage(item))
 })
-
-const othersFiles = computed(() => {
-  if (!data.value || !data.value.dirFiles) {
-    return []
-  }
-  return data.value.dirFiles.filter(item => !isImage(item))
-})
-
-const thumbStyle: Partial<CSSStyleDeclaration> = {
-  right: '4px',
-  borderRadius: '7px',
-  backgroundColor: '#fff',
-  width: '4px',
-  opacity: '0.75'
-}
-
-const barStyle: Partial<CSSStyleDeclaration> = {
-  right: '2px',
-  borderRadius: '9px',
-  backgroundColor: '#fff',
-  width: '8px',
-  opacity: '0.2'
-}
 
 defineExpose({
   openDialog
@@ -63,7 +40,7 @@ defineExpose({
 
         <q-card-section class="full-width overflow-hidden column" style="flex: 1;">
           <div class="text-h6">{{ data?.name }} 已存在图表信息</div>
-          <q-scroll-area ref="scrollAreaRef" class="q-mt-md " :thumb-style="thumbStyle" :bar-style="barStyle"
+          <q-scroll-area class="q-mt-md " :thumb-style="whiteThumbStyle" :bar-style="whiteBarStyle"
             style="flex: 1; width: 100%;">
             <div class="row justify-evenly q-gutter-sm">
               <q-intersection v-for="(item) in imageFiles" :key="item" transition="scale"

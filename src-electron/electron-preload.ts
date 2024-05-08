@@ -113,7 +113,9 @@ contextBridge.exposeInMainWorld('FileApi', {
     const homeDirectory = os.homedir()
     const abs = path.join(homeDirectory, 'data-toolkit', dirname)
     if (fs.existsSync(abs)) {
-      await shell.openPath(abs)
+      await shell.openPath(path.join(homeDirectory, 'data-toolkit', dirname))
+    } else {
+      await shell.openPath(path.join(homeDirectory, 'data-toolkit'))
     }
   },
   getCsvHeader: async (file: string) => {
