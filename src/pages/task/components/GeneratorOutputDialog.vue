@@ -3,18 +3,26 @@ import { QScrollArea, useInterval, useTimeout } from 'quasar'
 import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
 import { barStyle, thumbStyle } from 'src/utils/constant'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const dialog = ref(false)
 const id = ref<number>(0)
+const more = ref<string>('.')
 const taskId = ref<number>(0)
 const generator = ref<components['schemas']['GeneratorAllResponse'] | undefined>()
 const scrollAreaRef = ref<null | InstanceType<typeof QScrollArea>>(null)
 const { registerInterval, removeInterval } = useInterval()
+const { registerInterval: registerMore } = useInterval()
+const { registerTimeout } = useTimeout()
 
-const {
-  registerTimeout
-} = useTimeout()
+onMounted(() => {
+  registerMore(() => {
+    if (more.value.length > 6) {
+      more.value = ''
+    }
+    more.value += '.'
+  }, 500)
+})
 
 const getData = async () => {
   if (id.value <= 0) {
@@ -51,10 +59,11 @@ const handleClear = async () => {
   await getData()
 }
 
-const openDialog = (taskIdValue: number, idValue: number) => {
+const openDialog = async (taskIdValue: number, idValue: number) => {
   id.value = idValue
   taskId.value = taskIdValue
   dialog.value = true
+  await getData()
   registerTimeout(handleToButton, 100)
   registerInterval(getData, 3000)
 }
@@ -72,6 +81,12 @@ const status = computed(() => {
     return 'green'
   }
   return 'yellow'
+})
+
+watch(() => generator.value?.status, () => {
+  if (generator.value?.status !== 'PROCESSING') {
+    removeInterval()
+  }
 })
 
 </script>
@@ -93,6 +108,8 @@ const status = computed(() => {
               <div class="text-no-wrap text-grey-4" v-for="(item, index) in generator.output.split('\n')"
                 :key="`row-${index}`">
                 {{ item }}
+              </div>
+              <div v-if="generator.status === 'PROCESSING'" class="text-no-wrap text-grey-4 text-subtitle2">{{ more }}
               </div>
             </template>
             <div v-else class="text-no-wrap text-grey-4">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import _ from 'lodash'
-import { useQuasar } from 'quasar'
+import { date, useQuasar } from 'quasar'
 import { client } from 'src/boot/request'
 import { GENERATOR_FILE_SPLIT, barStyle, thumbStyle } from 'src/utils/constant'
 import { computed, ref } from 'vue'
@@ -81,7 +81,7 @@ const handleSubmit = () => {
   $q.dialog({
     title: '输入图表名称',
     message: '生成出来的图表名称',
-    prompt: { model: '最大最小值对比图', type: 'text' },
+    prompt: { model: date.formatDate(Date.now(), 'YYYYMMDDHHmmss_') + '最大最小值对比图', type: 'text' },
     cancel: { outline: true },
     ok: { outline: true },
     persistent: true
@@ -118,7 +118,10 @@ const handleSubmit = () => {
           <q-btn outline :disable="selectionCount < 2" color="secondary" size="sm" label="添加" @click="handleAdd">
             <q-tooltip v-if="selectionCount < 2">至少选择两列才可以进行此操作</q-tooltip>
           </q-btn>
-          <q-btn outline class="q-ml-md" color="primary" size="sm" label="完成" @click="handleSubmit" />
+          <q-btn outline :disable="compareGroup.length === 0" class="q-ml-md" color="primary" size="sm" label="完成"
+            @click="handleSubmit">
+            <q-tooltip v-if="compareGroup.length === 0">至少有一个对比组才可以进行此操作</q-tooltip>
+          </q-btn>
         </q-card-section>
         <q-card-section class="q-my-none q-py-none row items-center" v-if="compareGroup.length > 0">
           <div>已选择</div>

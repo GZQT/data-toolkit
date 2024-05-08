@@ -52,12 +52,26 @@ const loading = reactive({
   count: false
 })
 
+const checkNewState = (data: (GeneratorType)[], status: components['schemas']['GeneratorResultEnum']) => {
+  return taskGeneratorData.value.filter(item => item.status === status).length < (data.filter(item => item.status === status).length ?? 0) &&
+    taskGeneratorData.value.length > 0
+}
+
 const handleData = async () => {
   taskId.value = Number(route.params.id as string)
   try {
     loading.table = true
     loading.refresh = true
     const { data } = await client.GET('/task/{task_id}/generator', { params: { path: { task_id: taskId.value } } })
+    if (!data) {
+      taskGeneratorData.value = []
+      return
+    }
+    if (checkNewState(data, 'SUCCESS')) {
+      $q.notify({ type: 'positive', message: '有新的任务完成啦~ 快去看看吧' })
+    } else if (checkNewState(data, 'FAILED')) {
+      $q.notify({ type: 'warning', message: '有新的任务失败了，快去检查下吧' })
+    }
     taskGeneratorData.value = data ?? []
   } finally {
     loading.table = false
