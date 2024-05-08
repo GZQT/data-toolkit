@@ -9,7 +9,7 @@ export interface FileApi {
   selectFiles: (multiSelections: boolean) => Promise<string[] | undefined>
   openFileDirectory: (file: string) => void
   openApplicationDirectory: (dirname: string) => void
-  countFiles: (dirname: string) => Promise<number>
+  getApplicationDirectoryFiles: (dirname: string) => string[]
   getCsvHeader: (file: string) => Promise<string[]>
   openExternalLink: (url: string) => void
 }

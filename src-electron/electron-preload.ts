@@ -34,30 +34,20 @@ import os from 'os'
 import path from 'path'
 import readline from 'readline'
 
-const countFiles = async (dir: string, inApplication = true): Promise<number> => {
-  let targetDir = dir
-  if (inApplication) {
-    targetDir = path.join(os.homedir(), 'data-toolkit', dir)
+const getAllFiles = (dirPath: string, arrayOfFiles: string[] = []): string[] => {
+  if (!fs.existsSync(dirPath)) {
+    return []
   }
-  let totalFiles = 0
-
-  if (!fs.existsSync(targetDir)) {
-    return Promise.resolve(0)
-  }
-
-  // 读取文件夹内容
-  const items = await fs.promises.readdir(targetDir, { withFileTypes: true })
-
-  // 使用 Promise.all 并行处理所有项
-  const counts = await Promise.all(items.map(item => {
-    const fullPath = path.join(dir, item.name)
-    return item.isDirectory() ? countFiles(fullPath, inApplication) : 1
-  }))
-
-  // 累加所有返回的计数
-  totalFiles = counts.reduce((acc, num) => acc + num, 0)
-
-  return totalFiles
+  const files = fs.readdirSync(dirPath)
+  files.forEach(file => {
+    const filePath = path.join(dirPath, file)
+    if (fs.statSync(filePath).isDirectory()) {
+      arrayOfFiles = getAllFiles(filePath, arrayOfFiles)
+    } else {
+      arrayOfFiles.push(filePath)
+    }
+  })
+  return arrayOfFiles
 }
 
 contextBridge.exposeInMainWorld('WindowsApi', {
@@ -152,7 +142,11 @@ contextBridge.exposeInMainWorld('FileApi', {
       })
     })
   },
-  countFiles,
+  getApplicationDirectoryFiles: (dirname: string): string[] => {
+    const homeDirectory = os.homedir()
+    const abs = path.join(homeDirectory, 'data-toolkit', dirname)
+    return getAllFiles(abs)
+  },
   openExternalLink: (url: string) => {
     shell.openExternal(url)
   }

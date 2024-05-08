@@ -10,11 +10,13 @@ import { useRoute } from 'vue-router'
 import FileSelectDialog from './components/FileSelectDialog.vue'
 import GeneratorOutputDialog from './components/GeneratorOutputDialog.vue'
 import GeneratorStartDialog from './components/GeneratorStartDialog.vue'
+import ShowChartDialog from './components/ShowChartDialog.vue'
 
-interface TableExtend {
+export interface TableExtend {
   total?: number
   chartTotal?: number
   dataTotal?: number
+  dirFiles?: string[]
 }
 
 const taskGeneratorData = ref<(components['schemas']['GeneratorResponse'] & TableExtend)[]>([])
@@ -35,6 +37,7 @@ const taskId = ref<number>(0)
 const fileSelectDialog = ref<null | InstanceType<typeof FileSelectDialog>>(null)
 const generatorStartDialog = ref<null | InstanceType<typeof GeneratorStartDialog>>(null)
 const generatorOutputDialog = ref<null | InstanceType<typeof GeneratorOutputDialog>>(null)
+const showChartDialog = ref<null | InstanceType<typeof ShowChartDialog>>(null)
 const filter = ref('')
 const name = ref('')
 const loading = reactive({
@@ -119,7 +122,9 @@ const handleCount = async () => {
         total += (await window.FileApi.getFileCount(fileList[fileIndex])).total
       }
       data[index].dataTotal = total
-      data[index].chartTotal = await window.FileApi.countFiles(data[index].name) ?? 0
+      const dirFiles = window.FileApi.getApplicationDirectoryFiles(data[index].name)
+      data[index].chartTotal = dirFiles.length
+      data[index].dirFiles = dirFiles
       if (lastTaskId !== taskId.value) {
         return
       }
@@ -166,6 +171,10 @@ const handleShowOutput = (row: components['schemas']['GeneratorResponse'] & Tabl
   generatorOutputDialog.value?.openDialog(taskId.value!, row.id)
 }
 
+const handleShowChart = (row: components['schemas']['GeneratorResponse'] & TableExtend) => {
+  showChartDialog.value?.openDialog(row)
+}
+
 </script>
 
 <template>
@@ -175,6 +184,7 @@ const handleShowOutput = (row: components['schemas']['GeneratorResponse'] & Tabl
     </FileSelectDialog>
     <GeneratorStartDialog ref="generatorStartDialog" :task-id="taskId" />
     <GeneratorOutputDialog ref="generatorOutputDialog" />
+    <ShowChartDialog ref="showChartDialog" />
     <q-table class="container-table container-table-sticky-head" flat bordered :rows="taskGeneratorData"
       :columns="columns" row-key="id" :pagination="{ rowsPerPage: 10 }" :filter="filter" :loading="loading.table"
       table-header-class="sticky-head">
@@ -201,7 +211,9 @@ const handleShowOutput = (row: components['schemas']['GeneratorResponse'] & Tabl
             {{ props.row.files && (props.row.files.split(GENERATOR_FILE_SPLIT).length ?? 0) }}
           </q-td>
           <q-td key="chartTotal" :props="props">
-            {{ props.row.chartTotal }}
+            <div class="cursor-pointer" v-if="props.row.chartTotal >= 0" @click="handleShowChart(props.row)">
+              {{ props.row.chartTotal }}
+            </div>
           </q-td>
           <q-td key="dataTotal" :props="props">
             {{ props.row.dataTotal }}

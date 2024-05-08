@@ -2,6 +2,7 @@
 import { QScrollArea, useInterval, useTimeout } from 'quasar'
 import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
+import { barStyle, thumbStyle } from 'src/utils/constant'
 import { computed, ref, watch } from 'vue'
 
 const dialog = ref(false)
@@ -27,22 +28,6 @@ const getData = async () => {
 }
 
 watch(id, getData)
-
-const thumbStyle: Partial<CSSStyleDeclaration> = {
-  right: '4px',
-  borderRadius: '7px',
-  backgroundColor: '#027be3',
-  width: '4px',
-  opacity: '0.75'
-}
-
-const barStyle: Partial<CSSStyleDeclaration> = {
-  right: '2px',
-  borderRadius: '9px',
-  backgroundColor: '#027be3',
-  width: '8px',
-  opacity: '0.2'
-}
 
 const handleClose = () => {
   removeInterval()
