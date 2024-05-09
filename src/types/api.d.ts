@@ -200,8 +200,44 @@ export type components = {
     TaskGeneratorStartRequest: {
       /** Averagelinechart */
       averageLineChart: boolean;
+      /**
+       * Averagelinechartcolumnindex
+       * @default []
+       */
+      averageLineChartColumnIndex?: number[];
+      /**
+       * Averagelinecharttimerange
+       * @default 10T
+       */
+      averageLineChartTimeRange?: string;
+      /** Averagelinechartxlabel */
+      averageLineChartXLabel: string;
+      /** Averagelinechartylabel */
+      averageLineChartYLabel: string;
+      /** Averagelinechartxrotation */
+      averageLineChartXRotation: number;
+      /** Averagelinechartname */
+      averageLineChartName: string[];
       /** Maxminlinechart */
       maxMinLineChart: boolean;
+      /**
+       * Maxminlinechartcolumnindex
+       * @default []
+       */
+      maxMinLineChartColumnIndex?: number[];
+      /**
+       * Maxminlinecharttimerange
+       * @default 10T
+       */
+      maxMinLineChartTimeRange?: string;
+      /** Maxminlinechartxlabel */
+      maxMinLineChartXLabel: string;
+      /** Maxminlinechartylabel */
+      maxMinLineChartYLabel: string;
+      /** Maxminlinechartxrotation */
+      maxMinLineChartXRotation: number;
+      /** Maxminlinechartname */
+      maxMinLineChartName: string[];
       /** Averagebarchart */
       averageBarChart: boolean;
       /** Maxminbarchart */
