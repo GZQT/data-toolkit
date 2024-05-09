@@ -58,6 +58,7 @@ const checkNewState = (data: (GeneratorType)[], status: components['schemas']['G
 }
 
 const handleData = async () => {
+  const lastTask = taskId.value
   taskId.value = Number(route.params.id as string)
   try {
     loading.table = true
@@ -67,10 +68,12 @@ const handleData = async () => {
       taskGeneratorData.value = []
       return
     }
-    if (checkNewState(data, 'SUCCESS')) {
-      $q.notify({ type: 'positive', message: '有新的任务完成啦~ 快去看看吧' })
-    } else if (checkNewState(data, 'FAILED')) {
-      $q.notify({ type: 'warning', message: '有新的任务失败了，快去检查下吧' })
+    if (lastTask === taskId.value) {
+      if (checkNewState(data, 'SUCCESS')) {
+        $q.notify({ type: 'positive', message: '有新的任务完成啦~ 快去看看吧' })
+      } else if (checkNewState(data, 'FAILED')) {
+        $q.notify({ type: 'warning', message: '有新的任务失败了，快去检查下吧' })
+      }
     }
     taskGeneratorData.value = data ?? []
   } finally {
