@@ -1,10 +1,11 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import _ from 'lodash'
-import { date, useQuasar } from 'quasar'
+import { useQuasar } from 'quasar'
 import { client } from 'src/boot/request'
 import { GENERATOR_FILE_SPLIT, barStyle, thumbStyle } from 'src/utils/constant'
 import { computed, ref } from 'vue'
 import { GeneratorType } from '../TaskGenerator.vue'
+import GeneratorStartBarFormDialog from './GeneratorStartBarFormDialog.vue'
 
 interface GeneratorColumns {
   columns?: string[]
@@ -79,19 +80,24 @@ const handleRemoveResult = (item: number[][]) => {
 
 const handleSubmit = () => {
   $q.dialog({
-    title: '输入图表名称',
-    message: '生成出来的图表名称',
-    prompt: { model: date.formatDate(Date.now(), 'YYYYMMDDHHmmss_') + '最大最小值对比图', type: 'text' },
-    cancel: { outline: true },
-    ok: { outline: true },
-    persistent: true
-  }).onOk(async name => {
+    component: GeneratorStartBarFormDialog
+  }).onOk(async (form: {
+    chartName: string,
+    xLabel: string,
+    yLabel: string,
+    xRotation: number,
+    width: number
+  }) => {
     await client.POST('/task/{task_id}/generate/barChart', {
       params: { path: { task_id: props.taskId } },
       body: {
-        chartName: name,
+        chartName: form.chartName,
         compareGroup: compareGroup.value,
-        generatorIds: data.value.map(item => item.id)
+        generatorIds: data.value.map(item => item.id),
+        xLabel: form.xLabel,
+        yLabel: form.yLabel,
+        xRotation: form.xRotation,
+        width: form.width
       }
     })
     dialog.value = false

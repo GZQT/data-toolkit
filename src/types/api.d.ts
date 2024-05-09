@@ -71,6 +71,26 @@ export type components = {
       chartName: string | null;
       /** Comparegroup */
       compareGroup: number[][][];
+      /**
+       * Xlabel
+       * @default 测点
+       */
+      xLabel?: string | null;
+      /**
+       * Ylabel
+       * @default 值
+       */
+      yLabel?: string | null;
+      /**
+       * Xrotation
+       * @default -45
+       */
+      xRotation?: number | null;
+      /**
+       * Width
+       * @default 0.35
+       */
+      width?: number;
     };
     /** GeneratorAllResponse */
     GeneratorAllResponse: {
