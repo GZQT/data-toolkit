@@ -1,3 +1,5 @@
+import { components } from './api'
+
 export interface GeneratorStartLineDialogForm {
   chartColumnIndex: number[]
   chartTimeRange: string
@@ -5,4 +7,7 @@ export interface GeneratorStartLineDialogForm {
   chartYLabel: string
   chartXRotation: number
   chartName: string[]
+  chartLineWidth: number
+  chartFill: components['schemas']['ChartFillEnum'] | null,
+  chartShowGrid: boolean
 }

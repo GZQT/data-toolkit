@@ -21,7 +21,10 @@ const form = reactive<GeneratorStartLineDialogForm>({
   chartXLabel: '时间',
   chartYLabel: '值',
   chartXRotation: 90,
-  chartName: []
+  chartName: [],
+  chartFill: 'NONE',
+  chartShowGrid: true,
+  chartLineWidth: 1
 })
 
 const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent()
@@ -46,11 +49,20 @@ onMounted(() => {
   form.chartName = props.data.chartName
 })
 
+const handleCheckFileName = (file?: string) => {
+  if (!file || file.trim() === '') {
+    return '这个是必填字段'
+  }
+  if (/[“*<>?\\\\/|:]/.test(file)) {
+    return '不能包含特殊字符'
+  }
+  return true
+}
+
 const handleSubmit = () => {
-  const invalidCharRegex = /[“*<>?\\\\/|:]/
   for (const index in form.chartName) {
-    if (invalidCharRegex.test(form.chartName[index])) {
-      $q.notify({ type: 'warning', message: `操作失败，第${index + 1}个图表名称${form.chartName[index]}包含特殊字符，无法生成` })
+    if (handleCheckFileName(form.chartName[index]) !== true) {
+      $q.notify({ type: 'warning', message: `操作失败，第${index + 1}个图表名称${form.chartName[index]}为空或者包含特殊字符，无法生成` })
       return
     }
   }
@@ -132,18 +144,48 @@ const handleCopy = async (content: string) => {
                 <q-slider v-model="form.chartXRotation" :min="-90" :max="90" :step="1" label />
               </div>
               <q-list bordered class="rounded-borders q-mt-md">
-                <q-expansion-item label="配置每一列的生成的折线图名称" :caption="`您可以不配置此项，默认情况下折现图名称为 列名称+时程曲线图。`">
+                <q-expansion-item group="config" label="其他配置" :caption="`对折线图的其他配置`">
+                  <q-separator />
+                  <q-card>
+                    <q-card-section>
+                      <div>线条宽度 （{{ form.chartLineWidth }}）</div>
+                      <q-slider class="q-mx-xs" v-model="form.chartLineWidth" :min="0.05" :max="5" :step="0.05" label />
+                      <q-toggle v-model="form.chartShowGrid" color="primary" label="折线图是否显示网格背景" />
+                      <div>在区间内数据缺失时数据填充方式</div>
+                      <div class="row">
+                        <q-radio v-model="form.chartFill" val="NONE" label="不进行填充">
+                          <q-tooltip anchor="top middle" self="center middle">不进行任何处理，折线可能会出现断点的情况</q-tooltip>
+                        </q-radio>
+                        <q-radio v-model="form.chartFill" val="FORWARD_FILL" label="向前填充">
+                          <q-tooltip anchor="top middle"
+                            self="center middle">在数据缺失时，会直接使用前一个存在数据的值，折线可能会呈现阶梯状</q-tooltip>
+                        </q-radio>
+                        <q-radio v-model="form.chartFill" val="BACKWARD_FILL" label="向后填充">
+                          <q-tooltip anchor="top middle"
+                            self="center middle">在数据缺失时，会直接使用后一个存在数据的值，折线可能会呈现阶梯状</q-tooltip>
+                        </q-radio>
+                        <q-radio v-model="form.chartFill" val="LINE" label="线性填充">
+                          <q-tooltip anchor="top middle" self="center middle">直接将缺失数据两段进行连接，折线可能会出现明显棱角的情况</q-tooltip>
+                        </q-radio>
+                      </div>
+                    </q-card-section>
+                  </q-card>
+                </q-expansion-item>
+                <q-separator inset />
+                <q-expansion-item group="config" label="配置每一列的生成的折线图名称"
+                  :caption="`您可以不配置此项，默认情况下折现图名称为 ${form.chartColumnIndex.length === 0 ? '时程曲线图' : '列名称+时程曲线图'}。`">
                   <q-separator />
                   <q-card>
                     <q-card-section class="q-mt-none">
                       <div class="text-red-5" style="opacity: 0.7;">不包含以下任何字符：“、*、&lt;、&gt;、?、\、/、|、：</div>
                       <template v-if="form.chartColumnIndex.length === 0">
                         <q-input class="q-mt-none q-pt-none" v-model="allChartName" label="所有图表名称"
-                          hint="未选择特定列，将会生成所有列，这里将会配置所有图表名称" />
+                          hint="未选择特定列，将会生成所有列，这里将会配置所有图表名称" :rules="[val => handleCheckFileName(val)]" />
                       </template>
                       <template v-else>
-                        <q-input v-for="(chartName, index) in form.chartName" class="q-mt-none q-pt-none"
+                        <q-input v-for="(_, index) in form.chartName" class="q-mt-none q-pt-none"
                           :key="`chart-name-${index}`" v-model="form.chartName[index]"
+                          :rules="[val => handleCheckFileName(val)]"
                           :label="`${columns[form.chartColumnIndex[index]]} 的图表名称`">
                           <template v-slot:append>
                             <q-btn flat dense icon="content_copy"

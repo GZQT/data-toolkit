@@ -23,6 +23,9 @@ const form = reactive<components['schemas']['TaskGeneratorStartRequest']>({
   averageLineChartYLabel: '值',
   averageLineChartXRotation: 90,
   averageLineChartName: [],
+  averageLineChartLineWidth: 1,
+  averageLineChartFill: 'NONE',
+  averageLineChartShowGrid: true,
 
   maxMinLineChart: true,
   maxMinLineChartColumnIndex: [],
@@ -31,6 +34,9 @@ const form = reactive<components['schemas']['TaskGeneratorStartRequest']>({
   maxMinLineChartYLabel: '值',
   maxMinLineChartXRotation: 90,
   maxMinLineChartName: [],
+  maxMinLineChartLineWidth: 1,
+  maxMinLineChartFill: 'NONE',
+  maxMinLineChartShowGrid: true,
 
   averageBarChart: false,
   maxMinBarChart: false,
@@ -80,6 +86,9 @@ const openDialog = async (id: number, files: string[], currentStatus: components
   form.averageLineChartYLabel = '值'
   form.averageLineChartXRotation = 90
   form.averageLineChartName = []
+  form.averageLineChartLineWidth = 1
+  form.averageLineChartFill = 'NONE'
+  form.averageLineChartShowGrid = true
 
   form.maxMinLineChart = false
   form.maxMinLineChartColumnIndex = []
@@ -88,6 +97,9 @@ const openDialog = async (id: number, files: string[], currentStatus: components
   form.maxMinLineChartYLabel = '值'
   form.maxMinLineChartXRotation = 90
   form.maxMinLineChartName = []
+  form.maxMinLineChartLineWidth = 1
+  form.maxMinLineChartFill = 'NONE'
+  form.maxMinLineChartShowGrid = true
 
   form.averageBarChart = false
   form.maxMinBarChart = false
@@ -122,7 +134,10 @@ const handleConfig = (config: ConfigChartType) => {
         chartXLabel: form[`${config}ChartXLabel`],
         chartYLabel: form[`${config}ChartYLabel`],
         chartXRotation: form[`${config}ChartXRotation`],
-        chartName: form[`${config}ChartName`]
+        chartName: form[`${config}ChartName`],
+        chartLineWidth: form[`${config}ChartLineWidth`],
+        chartFill: form[`${config}ChartFill`],
+        chartShowGrid: form[`${config}ChartShowGrid`]
       }
     }
   }).onOk((data: GeneratorStartLineDialogForm & { unit: string }) => {
@@ -132,6 +147,9 @@ const handleConfig = (config: ConfigChartType) => {
     form[`${config}ChartYLabel`] = data.chartYLabel
     form[`${config}ChartXRotation`] = data.chartXRotation
     form[`${config}ChartName`] = data.chartName
+    form[`${config}ChartLineWidth`] = data.chartLineWidth
+    form[`${config}ChartFill`] = data.chartFill
+    form[`${config}ChartShowGrid`] = data.chartShowGrid
   }).onCancel(() => { })
 }
 

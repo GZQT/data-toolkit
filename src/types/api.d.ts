@@ -29,6 +29,10 @@ export type paths = {
     /** Start Bar Chart */
     post: operations["start_bar_chart_task__task_id__generate_barChart_post"];
   };
+  "/task/image/preview/line": {
+    /** Preview Line Image */
+    post: operations["preview_line_image_task_image_preview_line_post"];
+  };
   "/task": {
     /** Get Task */
     get: operations["get_task_task_get"];
@@ -92,6 +96,11 @@ export type components = {
        */
       width?: number;
     };
+    /**
+     * ChartFillEnum
+     * @enum {string}
+     */
+    ChartFillEnum: "FORWARD_FILL" | "BACKWARD_FILL" | "NONE" | "LINE" | "TIME";
     /** GeneratorAllResponse */
     GeneratorAllResponse: {
       /** Name */
@@ -162,6 +171,50 @@ export type components = {
       /** Status */
       status: string;
     };
+    /** PreviewImageRequest */
+    PreviewImageRequest: {
+      /**
+       * Chartxlabel
+       * @default X 轴
+       */
+      chartXLabel?: string;
+      /**
+       * Chartylabel
+       * @default Y 轴
+       */
+      chartYLabel?: string;
+      /**
+       * Charttimerange
+       * @default 10T
+       */
+      chartTimeRange?: string;
+      /**
+       * Chartxrotation
+       * @default 0
+       */
+      chartXRotation?: number;
+      /**
+       * Chartname
+       * @default 示例图
+       */
+      chartName?: string;
+      /**
+       * Chartlinewidth
+       * @default 1
+       */
+      chartLineWidth?: number;
+      /**
+       * Chartdatanumber
+       * @default 1000
+       */
+      chartDataNumber?: number;
+      chartFill?: components["schemas"]["ChartFillEnum"] | null;
+      /**
+       * Chartshowgrid
+       * @default true
+       */
+      chartShowGrid?: boolean;
+    };
     /** TaskCreateRequest */
     TaskCreateRequest: {
       /** Name */
@@ -218,6 +271,17 @@ export type components = {
       averageLineChartXRotation: number;
       /** Averagelinechartname */
       averageLineChartName: string[];
+      averageLineChartFill?: components["schemas"]["ChartFillEnum"] | null;
+      /**
+       * Averagelinechartlinewidth
+       * @default 1
+       */
+      averageLineChartLineWidth?: number;
+      /**
+       * Averagelinechartshowgrid
+       * @default true
+       */
+      averageLineChartShowGrid?: boolean;
       /** Maxminlinechart */
       maxMinLineChart: boolean;
       /**
@@ -238,6 +302,17 @@ export type components = {
       maxMinLineChartXRotation: number;
       /** Maxminlinechartname */
       maxMinLineChartName: string[];
+      maxMinLineChartFill?: components["schemas"]["ChartFillEnum"] | null;
+      /**
+       * Maxminlinechartlinewidth
+       * @default 1
+       */
+      maxMinLineChartLineWidth?: number;
+      /**
+       * Maxminlinechartshowgrid
+       * @default true
+       */
+      maxMinLineChartShowGrid?: boolean;
       /** Averagebarchart */
       averageBarChart: boolean;
       /** Maxminbarchart */
@@ -472,6 +547,28 @@ export type operations = {
       /** @description Successful Response */
       204: {
         content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Preview Line Image */
+  preview_line_image_task_image_preview_line_post: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PreviewImageRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": unknown;
+        };
       };
       /** @description Validation Error */
       422: {
