@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useQuasar } from 'quasar'
 import { components } from 'src/types/api'
 import { handleOpenFile } from 'src/utils/action'
 import { isImage, whiteBarStyle, whiteThumbStyle } from 'src/utils/constant'
 import { computed, ref } from 'vue'
 import { TableExtend } from '../TaskGenerator.vue'
+import PreviewChartDialog from './PreviewChartDialog.vue'
 
+const $q = useQuasar()
 const dialog = ref(false)
 const data = ref<(components['schemas']['GeneratorResponse'] & TableExtend)>()
 
@@ -25,6 +28,23 @@ defineExpose({
   openDialog
 })
 
+const handlePreview = (file: string) => {
+  $q.dialog({
+    component: PreviewChartDialog,
+    componentProps: {
+      file
+    }
+  })
+}
+
+const getFileNameFromPath = (filePath: string): string => {
+  const separator = filePath.includes('/') ? '/' : '\\'
+  const parts = filePath.split(separator)
+  const fileName = parts.pop()!
+
+  return fileName
+}
+
 </script>
 
 <template>
@@ -40,15 +60,21 @@ defineExpose({
 
         <q-card-section class="full-width overflow-hidden column" style="flex: 1;">
           <div class="text-h6">{{ data?.name }} 已存在图表信息</div>
-          <q-scroll-area class="q-mt-md " :thumb-style="whiteThumbStyle" :bar-style="whiteBarStyle"
+          <q-scroll-area class="q-mt-md" :thumb-style="whiteThumbStyle" :bar-style="whiteBarStyle"
             style="flex: 1; width: 100%;">
-            <div class="row justify-evenly q-gutter-sm">
+            <div class="chart-area">
               <q-intersection v-for="(item) in imageFiles" :key="item" transition="scale"
-                style="width: 400px; height: 200px;">
-                <div style="width: 400px; height: 200px;">
-                  <q-img class="full-width full-height cursor-pointer"
-                    :src="item.replace(/#/g, '%23').replace(/\s/g, '%20')" width="100%" height="100%" fit="fill"
-                    @click="handleOpenFile(item)" />
+                style="width: 380px; height: 200px;">
+                <div>
+                  <q-img class="full-width full-height " :src="item.replace(/#/g, '%23').replace(/\s/g, '%20')"
+                    width="100%" height="100%" fit="fill" @click="handlePreview(item)">
+                    <div class="absolute-bottom  text-center ellipsis cursor-pointer" @click="handleOpenFile(item)">
+                      {{ getFileNameFromPath(item) }}
+                      <q-tooltip>
+                        {{ getFileNameFromPath(item) }}
+                      </q-tooltip>
+                    </div>
+                  </q-img>
                 </div>
               </q-intersection>
             </div>
@@ -59,4 +85,17 @@ defineExpose({
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.chart-area {
+  display: grid;
+  grid-gap: 10px;
+  grid-auto-flow: dense;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: $breakpoint-lg-max) {
+  .chart-area {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+</style>

@@ -31,5 +31,9 @@
       ""
     ],
     "description": "Vue empty template"
+  },
+  "Quasar dialog custom component": {
+    "prefix": "dialog-quasar",
+    "body": "<script setup lang=\"ts\">\n\nimport { useDialogPluginComponent } from 'quasar'\n\nconst props = defineProps<{}>()\n\ndefineEmits([\n  ...useDialogPluginComponent.emits\n])\n\nconst { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()\n\nconst handleOk = () => {\n  onDialogOK()\n}\nconst handleCancel = () => {\n  onDialogCancel()\n}\n</script>\n\n<template>\n\n  <q-dialog ref=\"dialogRef\" @hide=\"onDialogHide\">\n    <q-card class=\"q-dialog-plugin\">\n      <q-card-section>\n\n      </q-card-section>\n      <q-card-actions :align=\"'right'\">\n        <q-btn color=\"primary\" label=\"OK\" @click=\"handleOk\" />\n        <q-btn color=\"primary\" label=\"Cancel\" @click=\"handleCancel\" />\n      </q-card-actions>\n    </q-card>\n  </q-dialog>\n</template>\n\n<style scoped lang=\"scss\"></style>\n"
   }
 }
