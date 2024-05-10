@@ -19,6 +19,7 @@
   "dependencies": {
     "@electron/remote": "^2.1.2",
     "@quasar/extras": "^1.16.11",
+    "find-process": "^1.4.7",
     "lodash": "^4.17.21",
     "openapi-fetch": "^0.9.5",
     "pinia": "^2.1.7",

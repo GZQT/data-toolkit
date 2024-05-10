@@ -42,11 +42,14 @@ const timeUnitList = [
 
 onMounted(() => {
   form.chartColumnIndex = props.data.chartColumnIndex
-  form.chartTimeRange = props.data.chartTimeRange
+  form.chartTimeRange = `${parseInt(props.data.chartTimeRange)}`
   form.chartXLabel = props.data.chartXLabel
   form.chartYLabel = props.data.chartYLabel
   form.chartXRotation = props.data.chartXRotation
   form.chartName = props.data.chartName
+  form.chartFill = props.data.chartFill
+  form.chartShowGrid = props.data.chartShowGrid
+  form.chartLineWidth = props.data.chartLineWidth
 })
 
 const handleCheckFileName = (file?: string) => {

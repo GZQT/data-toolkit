@@ -134,6 +134,7 @@ contextBridge.exposeInMainWorld('FileApi', {
       rl.on('line', (line: string) => {
         if (lineCount === 0) {
           lines = line.split(',').filter(item => item !== '')
+            .map(item => item.replaceAll('\'', '').replaceAll('"', ''))
           resolve(lines)
         }
         lineCount++

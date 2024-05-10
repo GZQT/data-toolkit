@@ -81,7 +81,7 @@ const openDialog = async (id: number, files: string[], currentStatus: components
   form.averageLineChart = false
 
   form.averageLineChartColumnIndex = []
-  form.averageLineChartTimeRange = '10'
+  form.averageLineChartTimeRange = '10T'
   form.averageLineChartXLabel = '时间'
   form.averageLineChartYLabel = '值'
   form.averageLineChartXRotation = 90
@@ -92,7 +92,7 @@ const openDialog = async (id: number, files: string[], currentStatus: components
 
   form.maxMinLineChart = false
   form.maxMinLineChartColumnIndex = []
-  form.maxMinLineChartTimeRange = '10'
+  form.maxMinLineChartTimeRange = '10T'
   form.maxMinLineChartXLabel = '时间'
   form.maxMinLineChartYLabel = '值'
   form.maxMinLineChartXRotation = 90

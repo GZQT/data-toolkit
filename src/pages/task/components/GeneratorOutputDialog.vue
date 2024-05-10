@@ -111,7 +111,8 @@ watch(() => generator.value?.status, () => {
               <pre class="text-no-wrap text-grey-4" style="white-space: pre">
                 {{ generator.output.replaceAll("\n", '\r\n') }}
               </pre>
-              <div v-if="generator.status === 'PROCESSING'" class="text-no-wrap text-grey-4 text-subtitle2">{{ more }}
+              <div v-if="generator.status === 'PROCESSING'" class="text-no-wrap text-grey-4 text-subtitle2 q-mb-lg">{{
+                more }}
               </div>
             </template>
             <div v-else class="text-no-wrap text-grey-4">

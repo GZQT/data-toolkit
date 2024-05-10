@@ -1,5 +1,6 @@
 import { enable, initialize } from '@electron/remote/main/index.js'
 import { BrowserWindow, app, dialog, ipcMain } from 'electron'
+import find from 'find-process'
 import os from 'os'
 import path from 'path'
 import treeKill from 'tree-kill'
@@ -116,10 +117,14 @@ ipcMain.handle('FileApi:selectFiles', async (_, multiSelections: boolean = true)
 
 app.whenReady().then(createWindow)
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
   // see  https://github.com/nodejs/help/issues/4050
   if (kernelProcess && kernelProcess.pid) {
     treeKill(kernelProcess.pid)
+  }
+  const list = await find('name', 'application.exe')
+  for (const process of list) {
+    treeKill(process.pid)
   }
   if (platform !== 'darwin') {
     app.quit()

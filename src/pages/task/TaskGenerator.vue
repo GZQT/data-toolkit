@@ -327,9 +327,9 @@ const handleAutoRefresh = (time: number) => {
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <q-btn color="secondary" outline label="生成对比柱状图" :disable="selected.length < 2" @click="handleGeneratorBar"
+          <q-btn color="secondary" outline label="生成对比柱状图" :disable="selected.length < 1" @click="handleGeneratorBar"
             size="sm">
-            <q-tooltip anchor="top middle" self="center middle">你需要先选择至少两行才可以进行进行此操作</q-tooltip>
+            <q-tooltip anchor="top middle" self="center middle">你需要先选择至少一行才可以进行进行此操作</q-tooltip>
           </q-btn>
           <q-btn color="primary" outline label="加载计数" :loading="loading.count" @click="handleCount" size="sm" />
           <q-btn color="primary" outline label="刷新" :loading="loading.refresh" @click="handleData" size="sm" />
