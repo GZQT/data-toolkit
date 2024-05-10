@@ -14,6 +14,7 @@ const scrollAreaRef = ref<null | InstanceType<typeof QScrollArea>>(null)
 const { registerInterval, removeInterval } = useInterval()
 const { registerInterval: registerMore } = useInterval()
 const { registerTimeout } = useTimeout()
+const autoToBottom = ref(true)
 
 onMounted(() => {
   registerMore(() => {
@@ -32,7 +33,9 @@ const getData = async () => {
     params: { path: { task_id: taskId.value, generator_id: id.value } }
   })
   generator.value = data
-  handleToButton()
+  if (autoToBottom.value) {
+    handleToBottom()
+  }
 }
 
 watch(id, getData)
@@ -45,7 +48,7 @@ const handleToTop = () => {
   scrollAreaRef.value?.setScrollPosition('vertical', 0, 500)
 }
 
-const handleToButton = () => {
+const handleToBottom = () => {
   const scroll = scrollAreaRef.value?.getScroll()
   if (scroll) {
     scrollAreaRef.value?.setScrollPosition('vertical', scroll.verticalSize, 500)
@@ -64,7 +67,7 @@ const openDialog = async (taskIdValue: number, idValue: number) => {
   taskId.value = taskIdValue
   dialog.value = true
   await getData()
-  registerTimeout(handleToButton, 100)
+  registerTimeout(handleToBottom, 100)
   registerInterval(getData, 3000)
 }
 
@@ -105,10 +108,9 @@ watch(() => generator.value?.status, () => {
           <q-scroll-area ref="scrollAreaRef" class="q-mt-md" :thumb-style="thumbStyle" :bar-style="barStyle"
             style="flex: 1; width: 100%;">
             <template v-if="generator && generator.output">
-              <div class="text-no-wrap text-grey-4" v-for="(item, index) in generator.output.split('\n')"
-                :key="`row-${index}`">
-                {{ item }}
-              </div>
+              <pre class="text-no-wrap text-grey-4" style="white-space: pre">
+                {{ generator.output.replaceAll("\n", '\r\n') }}
+              </pre>
               <div v-if="generator.status === 'PROCESSING'" class="text-no-wrap text-grey-4 text-subtitle2">{{ more }}
               </div>
             </template>
@@ -124,9 +126,10 @@ watch(() => generator.value?.status, () => {
             <q-btn flat round color="grey-8" icon="keyboard_double_arrow_up" @click="handleToTop">
               <q-tooltip>回到顶部</q-tooltip>
             </q-btn>
-            <q-btn flat round color="grey-8" icon="keyboard_double_arrow_down" @click="handleToButton">
+            <q-btn flat round color="grey-8" icon="keyboard_double_arrow_down" @click="handleToBottom">
               <q-tooltip>回到底部</q-tooltip>
             </q-btn>
+            <q-toggle class="text-grey-8" v-model="autoToBottom" label="自动滚动" />
             <q-space />
             <q-btn outline color="red-5" label="清除" @click="handleClear" />
           </div>
@@ -136,4 +139,8 @@ watch(() => generator.value?.status, () => {
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+pre {
+  font-family: "Roboto", "-apple-system", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+</style>
