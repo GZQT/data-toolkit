@@ -1,0 +1,5 @@
+### 生成图片
+POST {{host}}/task/image/preview/line
+Content-Type: application/json
+
+{}

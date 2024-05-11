@@ -1,0 +1,25 @@
+### 添加 task
+< {%
+    const longUUID = $random.uuid.repeat(+$random.integer(1, 5))
+    request.variables.set("taskName", longUUID)
+%}
+POST {{host}}/task
+Content-Type: application/json
+
+{
+  "name": "{{taskName}}"
+}
+
+### 获取 task 列表
+GET {{host}}/task
+
+
+### 新增 task file
+POST {{host}}/task/1/file
+Content-Type: application/json
+
+{
+  "names": [
+    "test"
+  ]
+}

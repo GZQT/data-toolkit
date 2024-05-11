@@ -5,7 +5,8 @@
     "vue.volar",
     "wayou.vscode-todo-highlight",
     "gitlab.gitlab-workflow",
-    "Zignd.html-css-class-completion"
+    "Zignd.html-css-class-completion",
+    "seatonjiang.gitmoji-vscode"
   ],
   "unwantedRecommendations": [
     "octref.vetur",

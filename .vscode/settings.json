@@ -12,5 +12,7 @@
   "typescript.format.semicolons": "remove",
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
   "typescript.tsdk": "node_modules/typescript/lib",
-  "cSpell.words": ["pinia"]
+  "cSpell.words": [
+    "pinia"
+  ]
 }

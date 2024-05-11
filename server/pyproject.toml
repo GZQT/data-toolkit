@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "server"
+version = "0.1.0"
+description = ""
+authors = ["李中月 <lizhongyue248@163.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12,<3.13,>=3.8"
+requests = "^2.31.0"
+pandas = "^2.2.2"
+matplotlib = "^3.8.4"
+openpyxl = "^3.1.2"
+pymysql = "^1.1.0"
+dbutils = "^3.1.0"
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.29.0"}
+pyinstaller = "^6.6.0"
+sqlalchemy = "^2.0.30"
+httpx = "^0.27.0"
+pytest = "^8.2.0"
+fastapi-camelcase = "^2.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
