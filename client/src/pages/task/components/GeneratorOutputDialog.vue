@@ -132,7 +132,9 @@ watch(() => generator.value?.status, () => {
             </q-btn>
             <q-toggle class="text-grey-8" v-model="autoToBottom" label="自动滚动" />
             <q-space />
-            <q-btn outline color="red-5" label="清除" @click="handleClear" />
+            <q-btn outline :disable="generator?.status === 'PROCESSING'" color="red-5" label="清除" @click="handleClear">
+              <q-tooltip v-if="generator?.status === 'PROCESSING'">任务正在进行中，无法进行此操作</q-tooltip>
+            </q-btn>
           </div>
         </q-card-section>
       </q-card>

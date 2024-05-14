@@ -46,6 +46,7 @@ const generatorStartBarDialog = ref<null | InstanceType<typeof GeneratorStartBar
 const selected = ref<(GeneratorType)[]>([])
 const filter = ref('')
 const name = ref('')
+const generatorFile = ref<Record<number, TableExtend>>({})
 const loading = reactive({
   table: false,
   refresh: false,
@@ -75,7 +76,19 @@ const handleData = async () => {
         $q.notify({ type: 'warning', message: '有新的任务失败了，快去检查下吧' })
       }
     }
-    taskGeneratorData.value = data ?? []
+    taskGeneratorData.value = (data ?? []).map(item => {
+      const generatorItem = item as GeneratorType
+      const file = generatorFile.value[item.id]
+
+      if (file === undefined) {
+        return generatorItem
+      }
+      generatorItem.chartTotal = file.chartTotal
+      generatorItem.total = file.total
+      generatorItem.dataTotal = file.dataTotal
+      generatorItem.dirFiles = file.dirFiles
+      return generatorItem
+    })
   } finally {
     loading.table = false
     loading.refresh = false
@@ -135,7 +148,8 @@ const handleCount = async () => {
   loading.count = true
   const lastTaskId = _.cloneDeep(taskId.value)
   try {
-    const data = _.cloneDeep(taskGeneratorData.value)
+    const data = taskGeneratorData.value
+    const countData: Record<number, TableExtend> = {}
     for (const index in data) {
       if (!data[index].files) {
         continue
@@ -145,19 +159,34 @@ const handleCount = async () => {
       for (const fileIndex in fileList) {
         total += (await window.FileApi.getFileCount(fileList[fileIndex])).total
       }
-      data[index].dataTotal = total
+      countData[data[index].id] = {}
+      countData[data[index].id].dataTotal = total
       const dirFiles = window.FileApi.getApplicationDirectoryFiles(data[index].name)
-      data[index].chartTotal = dirFiles.length
-      data[index].dirFiles = dirFiles
+      countData[data[index].id].chartTotal = dirFiles.length
+      countData[data[index].id].dirFiles = dirFiles
       if (lastTaskId !== taskId.value) {
         return
       }
-      taskGeneratorData.value = data
     }
+    generatorFile.value = countData
   } finally {
     loading.count = false
   }
 }
+
+watch(generatorFile, () => {
+  taskGeneratorData.value = (taskGeneratorData.value ?? []).map(generatorItem => {
+    const file = generatorFile.value[generatorItem.id]
+    if (file === undefined) {
+      return generatorItem
+    }
+    generatorItem.chartTotal = file.chartTotal
+    generatorItem.total = file.total
+    generatorItem.dataTotal = file.dataTotal
+    generatorItem.dirFiles = file.dirFiles
+    return generatorItem
+  })
+})
 
 const handleRun = (item: GeneratorType) => {
   const fileList = item.files!.split(GENERATOR_FILE_SPLIT)
@@ -253,12 +282,12 @@ const handleAutoRefresh = (time: number) => {
             {{ props.row.files && (props.row.files.split(GENERATOR_FILE_SPLIT).length ?? 0) }}
           </q-td>
           <q-td key="chartTotal" :props="props">
-            <div class="cursor-pointer" v-if="props.row.chartTotal >= 0" @click="handleShowChart(props.row)">
-              {{ props.row.chartTotal }}
+            <div class="cursor-pointer" @click="handleShowChart(props.row)">
+              {{ props.row.chartTotal ?? '未加载' }}
             </div>
           </q-td>
           <q-td key="dataTotal" :props="props">
-            {{ props.row.dataTotal }}
+            {{ props.row.dataTotal ?? '未加载' }}
           </q-td>
           <q-td key="result" class="ellipsis" :props="props" style="max-width: 140px;">
             {{ props.row.result }}
@@ -331,7 +360,7 @@ const handleAutoRefresh = (time: number) => {
             size="sm">
             <q-tooltip anchor="top middle" self="center middle">你需要先选择至少一行才可以进行进行此操作</q-tooltip>
           </q-btn>
-          <q-btn color="primary" outline label="加载计数" :loading="loading.count" @click="handleCount" size="sm" />
+          <q-btn color="primary" outline label="统计图表" :loading="loading.count" @click="handleCount" size="sm" />
           <q-btn color="primary" outline label="刷新" :loading="loading.refresh" @click="handleData" size="sm" />
           <q-btn color="primary" outline label="添加" @click="handleAdd" size="sm" />
         </div>

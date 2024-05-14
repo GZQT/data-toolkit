@@ -41,6 +41,15 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         super().__init__(generator, db, '平均值数据统计.xlsx')
         self.request = request
         self.columns_index = []
+        self.line_chart_line_width = 1
+        self.line_chart_time_range = "10min"
+        self.line_chart_x_label = "时间"
+        self.line_chart_y_label = "值"
+        self.line_chart_show_grid = True
+        self.line_chart_x_rotation = 90
+        self.line_chart_fill = None
+        self.line_chart_name = "时程曲线图"
+        self.type = "最大最小值"
 
     def draw_line_chart(self, sub_dir):
         path = os.path.join(self.dir, sub_dir)
@@ -59,8 +68,39 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
             self.write_log()
         return self
 
-    @abstractmethod
     def _draw_line_chart(self, path, line_key, index):
+        if index >= len(self.line_chart_name):
+            chart_name = f"{self.type}时程曲线图"
+        else:
+            chart_name = self.line_chart_name[index]
+        logger.info(f"开始生成{self.type}图 {chart_name}")
+        file_path = f'{os.path.join(path, line_key + chart_name).replace("/", "-")}.png'
+        self.output += f"[{get_now_date()}] {os.path.basename(file_path)} 生成中...\n"
+        np_datum = np.array(self.data[line_key])
+        df = pd.DataFrame({'time': self.times, 'data': np_datum})
+        df.set_index('time', inplace=True)
+        plt.figure(figsize=(10, 5))
+        self._resampled_plot(df)
+        date_format = mdates.DateFormatter('%Y%m%d')
+        plt.gca().xaxis.set_major_formatter(date_format)
+        plt.title(chart_name)
+        plt.xlabel(self.line_chart_x_label)
+        plt.ylabel(self.line_chart_y_label)
+        plt.legend()
+        plt.grid(self.line_chart_show_grid)
+        rotation = self.line_chart_x_rotation
+        if rotation < 0:
+            plt.xticks(rotation=rotation, ha='left')
+        elif rotation > 0:
+            plt.xticks(rotation=rotation, ha='right')
+        plt.tight_layout()
+        plt.savefig(file_path)
+        plt.close()
+        logger.info(f"生成完毕 {chart_name}")
+        self.output += f"[{get_now_date()}] {os.path.basename(file_path)} 生成成功\n"
+
+    @abstractmethod
+    def _resampled_plot(self, df):
         pass
 
 
@@ -76,44 +116,25 @@ class AverageLineChartGenerator(AbstractLineChatGenerator, ABC):
             self.columns_index = self.request.average_line_chart_column_index
             self.output += f"[{get_now_date()}] 平均值生成列 {self.columns_index}"
             logger.info(f"{generator.name} 平均值生成列 {self.columns_index}")
+        self.line_chart_line_width = self.request.average_line_chart_line_width
+        self.line_chart_time_range = self.request.average_line_chart_time_range
+        self.line_chart_x_label = self.request.average_line_chart_x_label
+        self.line_chart_y_label = self.request.average_line_chart_y_label
+        self.line_chart_show_grid = self.request.average_line_chart_show_grid
+        self.line_chart_x_rotation = self.request.average_line_chart_x_rotation
+        self.line_chart_name = self.request.average_line_chart_name
+        self.line_chart_fill = self.request.average_line_chart_fill
+        self.type = "平均值"
 
     def draw_line_chart(self, sub_dir="平均值折线图"):
         super().draw_line_chart(sub_dir)
         return self
 
-    def _draw_line_chart(self, path, line_key, index):
-        if index >= len(self.request.average_line_chart_name):
-            chart_name = "平均值时程曲线图"
-        else:
-            chart_name = self.request.average_line_chart_name[index]
-        logger.info(f"开始生成平均值图 {chart_name}")
-        file_path = f'{os.path.join(path, line_key + chart_name).replace("/", "-")}.png'
-        self.output += f"[{get_now_date()}] {os.path.basename(file_path)} 生成中...\n"
-        np_datum = np.array(self.data[line_key])
-        df = pd.DataFrame({'time': self.times, 'data': np_datum})
-        df.set_index('time', inplace=True)
-        plt.figure(figsize=(10, 5))
-        resampled = df.resample(self.request.average_line_chart_time_range).mean()
-        resampled = fill_data(self.request.average_line_chart_fill, resampled)
+    def _resampled_plot(self, df):
+        resampled = df.resample(self.line_chart_time_range).agg(['min', 'max'])
+        resampled = fill_data(self.line_chart_fill, resampled)
         plt.plot(resampled.index, resampled['data'], label='平均值', marker='',
                  linewidth=self.request.average_line_chart_line_width)
-        date_format = mdates.DateFormatter('%Y%m%d')
-        plt.gca().xaxis.set_major_formatter(date_format)
-        plt.title(chart_name)
-        plt.xlabel(self.request.average_line_chart_x_label)
-        plt.ylabel(self.request.average_line_chart_y_label)
-        plt.legend()
-        plt.grid(self.request.average_line_chart_show_grid)
-        rotation = self.request.average_line_chart_x_rotation
-        if rotation < 0:
-            plt.xticks(rotation=rotation, ha='left')
-        elif rotation > 0:
-            plt.xticks(rotation=rotation, ha='right')
-        plt.tight_layout()
-        plt.savefig(file_path)
-        plt.close()
-        logger.info(f"生成完毕 {chart_name}")
-        self.output += f"[{get_now_date()}] {os.path.basename(file_path)} 生成成功\n"
 
 
 class MaxMinLineChartGenerator(AbstractLineChatGenerator, ABC):
@@ -128,42 +149,24 @@ class MaxMinLineChartGenerator(AbstractLineChatGenerator, ABC):
             self.columns_index = self.request.max_min_line_chart_column_index
             self.output += f"[{get_now_date()}] 最大最小值生成列 {self.columns_index}"
             logger.info(f"{generator.name} 最大最小值生成列 {self.columns_index}")
+        self.line_chart_line_width = self.request.max_min_line_chart_line_width
+        self.line_chart_time_range = self.request.max_min_line_chart_time_range
+        self.line_chart_x_label = self.request.max_min_line_chart_x_label
+        self.line_chart_y_label = self.request.max_min_line_chart_y_label
+        self.line_chart_show_grid = self.request.max_min_line_chart_show_grid
+        self.line_chart_x_rotation = self.request.max_min_line_chart_x_rotation
+        self.line_chart_name = self.request.max_min_line_chart_name
+        self.line_chart_fill = self.request.max_min_line_chart_fill
+        self.type = "最大最小值"
 
     def draw_line_chart(self, sub_dir="最大最小值折线图"):
         super().draw_line_chart(sub_dir)
         return self
 
-    def _draw_line_chart(self, path, line_key, index):
-        if index >= len(self.request.max_min_line_chart_name):
-            chart_name = "最大最小值时程曲线图"
-        else:
-            chart_name = self.request.max_min_line_chart_name[index]
-        logger.info(f"开始生成最大最小值图 {chart_name}")
-        file_path = f'{os.path.join(path, line_key + chart_name).replace("/", "-")}.png'
-        self.output += f"[{get_now_date()}] {os.path.basename(file_path)} 生成中...\n"
-        np_datum = np.array(self.data[line_key])
-        df = pd.DataFrame({'time': self.times, 'data': np_datum})
-        df.set_index('time', inplace=True)
-        plt.figure(figsize=(10, 5))
-        resampled = df.resample(self.request.max_min_line_chart_time_range).agg(['min', 'max'])
+    def _resampled_plot(self, df):
+        resampled = df.resample(self.line_chart_time_range).agg(['min', 'max'])
+        resampled = fill_data(self.line_chart_fill, resampled)
         plt.plot(resampled.index, resampled['data']['min'], label='最小值', marker='',
-                 linewidth=self.request.max_min_line_chart_line_width)
+                 linewidth=self.line_chart_line_width)
         plt.plot(resampled.index, resampled['data']['max'], label='最大值', marker='',
-                 linewidth=self.request.max_min_line_chart_line_width)
-        date_format = mdates.DateFormatter('%Y%m%d')
-        plt.gca().xaxis.set_major_formatter(date_format)
-        plt.title(chart_name)
-        plt.xlabel(self.request.max_min_line_chart_x_label)
-        plt.ylabel(self.request.max_min_line_chart_y_label)
-        plt.legend()
-        plt.grid(self.request.max_min_line_chart_show_grid)
-        rotation = self.request.max_min_line_chart_x_rotation
-        if rotation < 0:
-            plt.xticks(rotation=rotation, ha='left')
-        elif rotation > 0:
-            plt.xticks(rotation=rotation, ha='right')
-        plt.tight_layout()
-        plt.savefig(file_path)
-        plt.close()
-        logger.info(f"生成完毕 {chart_name}")
-        self.output += f"[{get_now_date()}] {os.path.basename(file_path)} 生成成功\n"
+                 linewidth=self.line_chart_line_width)
