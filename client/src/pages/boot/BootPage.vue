@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useInterval, useQuasar } from 'quasar'
+import Logo from 'src/assets/logo.png'
 import { client } from 'src/boot/request'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -39,7 +40,7 @@ onMounted(async () => {
 <template>
   <div class="container row justify-center items-center">
     <div id="bg" class="row no-wrap justify-center items-center" style="width: 100%;height: 100%;color: white;">
-      <img style="width:24vh;align-self: center;" alt="logo" src="../../assets/logo.png" />
+      <img style="width:24vh;align-self: center;" alt="logo" :src="Logo" />
       <div class="q-ml-lg text-h4 text-grey-6 text-italic">贵州黔通工程技术有限公司</div>
     </div>
     <div style="position: absolute;bottom: 0;width: 100%;">
