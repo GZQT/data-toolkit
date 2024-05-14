@@ -68,8 +68,7 @@ const handleDeleteFile = (item: string) => {
   $q.dialog({
     title: '确认移除吗',
     message: `当前文件： ${item}`,
-    cancel: true,
-    persistent: true
+    cancel: true
   }).onOk(() => {
     const names = _.cloneDeep(editItem.value.name)
     _.pull(names, item)
@@ -95,7 +94,7 @@ const handleSave = async () => {
 
 <template>
   <div class="container">
-    <q-dialog v-model="editDialog" persistent>
+    <q-dialog v-model="editDialog">
       <q-card style="min-width: 350px">
         <q-card-section>
           <div class="text-subtitle1">

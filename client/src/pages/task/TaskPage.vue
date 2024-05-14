@@ -20,8 +20,7 @@ const handleAddTask = () => {
     title: '添加任务',
     message: '请输入任务名称',
     prompt: { model: '', type: 'text' },
-    cancel: true,
-    persistent: true
+    cancel: true
   }).onOk(async (data) => {
     await client.POST('/task', {
       body: { name: data }
@@ -57,7 +56,6 @@ const handleDelete = async (item: components['schemas']['TaskResponse']) => {
     message: `你确认删除 ${item.name} 吗？<div class="text-weight-bolder text-red">注：此操作不可逆，与之关联的数据都会被删除，已生成的图表不会删除</div>`,
     cancel: { color: 'primary', outline: true },
     ok: { color: 'negative', outline: true },
-    persistent: true,
     html: true,
     focus: 'cancel'
   }).onOk(async () => {

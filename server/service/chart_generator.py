@@ -9,7 +9,8 @@ from dto.generator import TaskGeneratorStartRequest, GeneratorResultEnum, BarCha
 from schema.task import TaskGenerator
 from service.abstract_chat_generator import AbstractChatGenerator
 from service.bar_chart_generator import MaxMinBarChartGenerator, draw_compare_bar_chart
-from service.line_chart_generator import AverageLineChartGenerator, MaxMinLineChartGenerator
+from service.line_chart_generator import AverageLineChartGenerator, MaxMinLineChartGenerator, \
+    RootMeanSquareLineChartGenerator
 from utils import get_now_date
 
 
@@ -31,11 +32,15 @@ def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest,
     try:
         average_generator: AbstractChatGenerator | None = None
         max_min_generator: AbstractChatGenerator | None = None
+        root_mean_square_generator: AbstractChatGenerator | None = None
 
-        if request.average_line_chart:
+        if request.average_line_chart.generate:
             average_generator = AverageLineChartGenerator(generator, request, db).draw_line_chart()
             generator.output = average_generator.output
-        if request.max_min_line_chart:
+        if request.root_mean_square_line_chart.generate:
+            average_generator = RootMeanSquareLineChartGenerator(generator, request, db).draw_line_chart()
+            generator.output = average_generator.output
+        if request.max_min_line_chart.generate:
             max_min_generator = MaxMinLineChartGenerator(generator, request, db).draw_line_chart()
             generator.output = max_min_generator.output
         if request.max_min_bar_chart:
@@ -53,6 +58,12 @@ def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest,
             else:
                 max_min_generator = MaxMinLineChartGenerator(generator, request, db).generate_table()
             generator.output = max_min_generator.output
+        if request.root_mean_square_data_table:
+            if root_mean_square_generator is not None:
+                root_mean_square_generator = root_mean_square_generator.generate_table()
+            else:
+                root_mean_square_generator = MaxMinLineChartGenerator(generator, request, db).generate_table()
+            generator.output = root_mean_square_generator.output
         generator.output += f"\n[{get_now_date()}] 任务完成"
         db.query(TaskGenerator).filter_by(id=generator.id).update({
             TaskGenerator.status: GeneratorResultEnum.SUCCESS,

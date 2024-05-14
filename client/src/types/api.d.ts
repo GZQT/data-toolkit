@@ -171,6 +171,40 @@ export type components = {
       /** Status */
       status: string;
     };
+    /** LineChartRequest */
+    LineChartRequest: {
+      /** Generate */
+      generate: boolean;
+      /**
+       * Columnindex
+       * @default []
+       */
+      columnIndex?: number[];
+      /**
+       * Timerange
+       * @default 10T
+       */
+      timeRange?: string;
+      /** Xlabel */
+      xLabel: string;
+      /** Ylabel */
+      yLabel: string;
+      /** Xrotation */
+      xRotation: number;
+      /** Name */
+      name: string[];
+      fill?: components["schemas"]["ChartFillEnum"] | null;
+      /**
+       * Linewidth
+       * @default 1
+       */
+      lineWidth?: number;
+      /**
+       * Showgrid
+       * @default true
+       */
+      showGrid?: boolean;
+    };
     /** PreviewImageRequest */
     PreviewImageRequest: {
       /**
@@ -251,68 +285,9 @@ export type components = {
     };
     /** TaskGeneratorStartRequest */
     TaskGeneratorStartRequest: {
-      /** Averagelinechart */
-      averageLineChart: boolean;
-      /**
-       * Averagelinechartcolumnindex
-       * @default []
-       */
-      averageLineChartColumnIndex?: number[];
-      /**
-       * Averagelinecharttimerange
-       * @default 10T
-       */
-      averageLineChartTimeRange?: string;
-      /** Averagelinechartxlabel */
-      averageLineChartXLabel: string;
-      /** Averagelinechartylabel */
-      averageLineChartYLabel: string;
-      /** Averagelinechartxrotation */
-      averageLineChartXRotation: number;
-      /** Averagelinechartname */
-      averageLineChartName: string[];
-      averageLineChartFill?: components["schemas"]["ChartFillEnum"] | null;
-      /**
-       * Averagelinechartlinewidth
-       * @default 1
-       */
-      averageLineChartLineWidth?: number;
-      /**
-       * Averagelinechartshowgrid
-       * @default true
-       */
-      averageLineChartShowGrid?: boolean;
-      /** Maxminlinechart */
-      maxMinLineChart: boolean;
-      /**
-       * Maxminlinechartcolumnindex
-       * @default []
-       */
-      maxMinLineChartColumnIndex?: number[];
-      /**
-       * Maxminlinecharttimerange
-       * @default 10T
-       */
-      maxMinLineChartTimeRange?: string;
-      /** Maxminlinechartxlabel */
-      maxMinLineChartXLabel: string;
-      /** Maxminlinechartylabel */
-      maxMinLineChartYLabel: string;
-      /** Maxminlinechartxrotation */
-      maxMinLineChartXRotation: number;
-      /** Maxminlinechartname */
-      maxMinLineChartName: string[];
-      maxMinLineChartFill?: components["schemas"]["ChartFillEnum"] | null;
-      /**
-       * Maxminlinechartlinewidth
-       * @default 1
-       */
-      maxMinLineChartLineWidth?: number;
-      /**
-       * Maxminlinechartshowgrid
-       * @default true
-       */
-      maxMinLineChartShowGrid?: boolean;
+      averageLineChart: components["schemas"]["LineChartRequest"];
+      maxMinLineChart: components["schemas"]["LineChartRequest"];
+      rootMeanSquareLineChart: components["schemas"]["LineChartRequest"];
       /** Averagebarchart */
       averageBarChart: boolean;
       /** Maxminbarchart */
@@ -321,6 +296,8 @@ export type components = {
       averageDataTable: boolean;
       /** Maxmindatatable */
       maxMinDataTable: boolean;
+      /** Rootmeansquaredatatable */
+      rootMeanSquareDataTable: boolean;
       /** Averagebargroup */
       averageBarGroup: number[][];
       /** Maxminbargroup */

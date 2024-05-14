@@ -1,13 +1,13 @@
 import { components } from './api'
 
 export interface GeneratorStartLineDialogForm {
-  chartColumnIndex: number[]
-  chartTimeRange: string
-  chartXLabel: string
-  chartYLabel: string
-  chartXRotation: number
-  chartName: string[]
-  chartLineWidth: number
-  chartFill: components['schemas']['ChartFillEnum'] | null,
-  chartShowGrid: boolean
+  columnIndex: number[]
+  timeRange: string
+  xLabel: string
+  yLabel: string
+  xRotation: number
+  name: string[]
+  lineWidth: number
+  fill: components['schemas']['ChartFillEnum'] | null,
+  showGrid: boolean
 }

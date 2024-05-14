@@ -108,7 +108,7 @@ const handleSubmit = () => {
 
 <template>
   <div class="container">
-    <q-dialog v-model="dialog" persistent transition-show="flip-down" transition-hide="flip-up">
+    <q-dialog v-model="dialog" transition-show="flip-down" transition-hide="flip-up">
       <q-card class="column no-wrap" :style="{ width: data.length * 400 + 'px', maxWidth: '90vw' }">
         <q-bar class="bg-primary text-white">
           <div>生成柱状对比图</div>

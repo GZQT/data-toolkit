@@ -44,33 +44,29 @@ class GeneratorCreateRequest(GeneratorBase):
     files: str
 
 
-class TaskGeneratorStartRequest(CamelModel):
-    average_line_chart: bool
-    average_line_chart_column_index: List[int] = []
-    average_line_chart_time_range: str = '10T'
-    average_line_chart_x_label: str
-    average_line_chart_y_label: str
-    average_line_chart_x_rotation: float
-    average_line_chart_name: List[str]
-    average_line_chart_fill: ChartFillEnum | None = None
-    average_line_chart_line_width: float = 1
-    average_line_chart_show_grid: bool = True
+class LineChartRequest(CamelModel):
+    generate: bool
+    column_index: List[int] = []
+    time_range: str = '10T'
+    x_label: str
+    y_label: str
+    x_rotation: float
+    name: List[str]
+    fill: ChartFillEnum | None = None
+    line_width: float = 1
+    show_grid: bool = True
 
-    max_min_line_chart: bool
-    max_min_line_chart_column_index: List[int] = []
-    max_min_line_chart_time_range: str = '10T'
-    max_min_line_chart_x_label: str
-    max_min_line_chart_y_label: str
-    max_min_line_chart_x_rotation: float
-    max_min_line_chart_name: List[str]
-    max_min_line_chart_fill: ChartFillEnum | None = None
-    max_min_line_chart_line_width: float = 1
-    max_min_line_chart_show_grid: bool = True
+
+class TaskGeneratorStartRequest(CamelModel):
+    average_line_chart: LineChartRequest
+    max_min_line_chart: LineChartRequest
+    root_mean_square_line_chart: LineChartRequest
 
     average_bar_chart: bool
     max_min_bar_chart: bool
     average_data_table: bool
     max_min_data_table: bool
+    root_mean_square_data_table: bool
     average_bar_group: List[List[int]]
     max_min_bar_group: List[List[int]]
 
