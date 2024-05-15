@@ -6,7 +6,8 @@
     "wayou.vscode-todo-highlight",
     "gitlab.gitlab-workflow",
     "Zignd.html-css-class-completion",
-    "seatonjiang.gitmoji-vscode"
+    "seatonjiang.gitmoji-vscode",
+    "ms-azuretools.vscode-docker"
   ],
   "unwantedRecommendations": [
     "octref.vetur",

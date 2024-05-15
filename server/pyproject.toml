@@ -22,6 +22,11 @@ pytest = "^8.2.0"
 fastapi-camelcase = "^2.0.0"
 
 
+[[tool.poetry.source]]
+name = "mirrors"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+priority = "default"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
