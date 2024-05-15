@@ -106,11 +106,12 @@ watch(() => generator.value?.status, () => {
             <q-btn flat round icon="close" @click="dialog = false" />
           </div>
           <q-scroll-area ref="scrollAreaRef" class="q-mt-md" :thumb-style="thumbStyle" :bar-style="barStyle"
-            style="flex: 1; width: 100%;">
+            style="flex: 1; width: 100%;" id="output-scroll-area">
             <template v-if="generator && generator.output">
-              <pre class="text-no-wrap text-grey-4" style="white-space: pre">
-                {{ generator.output.replaceAll("\n", '\r\n') }}
-              </pre>
+              <q-virtual-scroll scroll-target="#output-scroll-area > .scroll" class="text-no-wrap text-grey-4"
+                :items="generator.output.split('\n')" v-slot="{ item, index }" :virtual-scroll-item-size="32">
+                <div :key="`line-${index}`">{{ item }}</div>
+              </q-virtual-scroll>
               <div v-if="generator.status === 'PROCESSING'" class="text-no-wrap text-grey-4 text-subtitle2 q-mb-lg">{{
                 more }}
               </div>
