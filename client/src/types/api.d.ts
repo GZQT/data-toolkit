@@ -126,12 +126,24 @@ export type components = {
       /** Output */
       output: string | null;
     };
+    /** GeneratorConfigRequest */
+    GeneratorConfigRequest: {
+      /** Converters */
+      converters: components["schemas"]["GeneratorDataConverterRequest"][];
+    };
     /** GeneratorCreateRequest */
     GeneratorCreateRequest: {
       /** Name */
       name: string;
       /** Files */
       files: string;
+    };
+    /** GeneratorDataConverterRequest */
+    GeneratorDataConverterRequest: {
+      /** Columnkey */
+      columnKey: string;
+      /** Expression */
+      expression: string;
     };
     /** GeneratorResponse */
     GeneratorResponse: {
@@ -288,6 +300,7 @@ export type components = {
       averageLineChart: components["schemas"]["LineChartRequest"];
       maxMinLineChart: components["schemas"]["LineChartRequest"];
       rootMeanSquareLineChart: components["schemas"]["LineChartRequest"];
+      config?: components["schemas"]["GeneratorConfigRequest"] | null;
       /** Averagebarchart */
       averageBarChart: boolean;
       /** Maxminbarchart */

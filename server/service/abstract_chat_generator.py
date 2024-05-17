@@ -1,4 +1,5 @@
 import os
+from abc import abstractmethod
 from datetime import datetime
 
 import numpy as np
@@ -8,43 +9,22 @@ from sqlalchemy.orm import Session
 
 from constant import GENERATOR_FILE_SEPARATOR, ROOT_DIRECTORY, CSV_SUFFIX
 from schema.task import TaskGenerator
+from service.load_csv_file import LoadCsvFile
 from utils import get_csv_data_file, get_now_date
 
 
 class AbstractChatGenerator:
 
-    def __init__(self, generator: TaskGenerator, db: Session, excel_name: str):
+    def __init__(self, data: LoadCsvFile, generator: TaskGenerator, db: Session, excel_name: str):
         self.files = generator.files.split(GENERATOR_FILE_SEPARATOR)
         self.db = db
         self.generator = generator
         self.output = '' if generator.output is None else generator.output
-        self.data = {}
-        self.times = []
+        self.keys = data.keys
+        self.data = data.data
+        self.times = data.times
         self.dir = os.path.join(ROOT_DIRECTORY, generator.name)
         self.excel_name = excel_name
-        self.keys = []
-        self._load_data()
-
-    def _load_data(self):
-        for file in self.files:
-            if not file.endswith(CSV_SUFFIX):
-                self.output += f"[{get_now_date()}] 文件 {os.path.basename(file)} 不是 csv 类型\n"
-                continue
-            self.output += f"[{get_now_date()}] 正在处理文件 {os.path.basename(file)}...\n"
-            for item in get_csv_data_file(file):
-                for key in item:
-                    self.keys.append(key)
-                    value = 0 if item[key] is None else item[key]
-                    if key == 'id' or key.startswith('Unnamed'):
-                        continue
-                    elif key == 'col0' or key == 'time':
-                        self.times.append(datetime.strptime(value, "%Y-%m-%d-%H-%M-%S.%f"))
-                    elif key in self.data:
-                        self.data[key].append(value)
-                    else:
-                        self.data[key] = [value]
-            self.output += f"[{get_now_date()}] 文件 {os.path.basename(file)} 处理完毕\n"
-            self.write_log()
 
     def write_log(self):
         self.db.query(TaskGenerator).filter_by(id=self.generator.id).update({
@@ -87,15 +67,21 @@ class AbstractChatGenerator:
         table_result = []
         # 获取到数据
         for table_key in self.data.keys():
-            table_value = self.data[table_key]
-            max_value = max(table_value)
-            min_value = min(table_value)
+            if table_key == "time" or table_key == 'col0':
+                continue
+            table_value = self._table_data_resampled(self.data[table_key])
+            max_time = table_value.idxmax()
+            min_time = table_value.idxmin()
             table_result.append({
                 "编号": table_key,
-                "最大值数值": max_value,
-                "最大值时间": self.times[table_value.index(max_value)],
-                "最小值数值": min_value,
-                "最小值时间": self.times[table_value.index(min_value)],
-                "变化量": max_value - min_value
+                "最大值数值": table_value.loc[max_time],
+                "最大值时间": max_time,
+                "最小值数值": table_value.loc[max_time],
+                "最小值时间": min_time,
+                "变化量": table_value.loc[max_time] - table_value.loc[max_time]
             })
         return table_result
+
+    @abstractmethod
+    def _table_data_resampled(self, df):
+        return df

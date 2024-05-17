@@ -8,6 +8,7 @@ from constant import ROOT_DIRECTORY
 from dto.generator import TaskGeneratorStartRequest, BarChartGeneratorStartRequest
 from schema.task import TaskGenerator
 from service.abstract_chat_generator import AbstractChatGenerator
+from service.load_csv_file import LoadCsvFile
 from utils import get_now_date
 
 plt.rcParams['font.sans-serif'] = ['SimHei']
@@ -15,8 +16,8 @@ plt.rcParams['axes.unicode_minus'] = False
 
 
 class MaxMinBarChartGenerator(AbstractChatGenerator, ABC):
-    def __init__(self, generator: TaskGenerator, db: Session):
-        super().__init__(generator, db, '最大最小值数据统计.xlsx')
+    def __init__(self, data: LoadCsvFile, generator: TaskGenerator, db: Session):
+        super().__init__(data, generator, db, '最大最小值数据统计.xlsx')
         self.output += f"[{get_now_date()}] 开始生成最大最小值柱状图"
 
     def draw_bar_chart(self, bar_group, sub_dir="最大最小值柱状图"):

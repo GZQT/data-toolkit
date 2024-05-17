@@ -71,7 +71,7 @@ def start_generator(task_id: int, generator_id: int,
     if generator is None or generator.files is None:
         return
     background_tasks.add_task(generate_chart, generator, request, db)
-    logger.info(f"已添加柱状图图生成任务，参数为 {generator_id} {request.__dict__}")
+    logger.info(f"已添加图生成任务，参数为 {generator_id} {request.__dict__}")
 
 
 @router.post("/{task_id}/generate/barChart", status_code=204)

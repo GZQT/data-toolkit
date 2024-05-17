@@ -45,6 +45,7 @@ CUSTOM_LOGGING_CONFIG: dict[str, Any] = {
             "mode": "a+",
             "maxBytes": 10 * 1024 * 1024,
             "backupCount": 0,
+            "encoding": "utf-8"
         },
         "default": {
             "formatter": "default",

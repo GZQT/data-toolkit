@@ -23,6 +23,13 @@ class ChartFillEnum(Enum):
     TIME = 'TIME'
 
 
+class GeneratorDataActionEnum(Enum):
+    PLUS = 'PLUS'
+    SUBTRACT = 'SUBTRACT'
+    MULTIPLY = "MULTIPLY"
+    DIVIDE = "DIVIDE"
+
+
 class GeneratorBase(CamelModel):
     name: str
 
@@ -57,10 +64,20 @@ class LineChartRequest(CamelModel):
     show_grid: bool = True
 
 
+class GeneratorDataConverterRequest(CamelModel):
+    column_key: str
+    expression: str
+
+
+class GeneratorConfigRequest(CamelModel):
+    converters: List[GeneratorDataConverterRequest]
+
+
 class TaskGeneratorStartRequest(CamelModel):
     average_line_chart: LineChartRequest
     max_min_line_chart: LineChartRequest
     root_mean_square_line_chart: LineChartRequest
+    config: GeneratorConfigRequest | None = None
 
     average_bar_chart: bool
     max_min_bar_chart: bool

@@ -11,6 +11,7 @@ from constant import logger
 from dto.generator import TaskGeneratorStartRequest, ChartFillEnum
 from schema.task import TaskGenerator
 from service.abstract_chat_generator import AbstractChatGenerator
+from service.load_csv_file import LoadCsvFile
 from utils import get_now_date
 
 plt.rcParams['font.sans-serif'] = ['SimHei']
@@ -37,12 +38,13 @@ def fill_data(fill_method, resampled):
 
 
 class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
-    def __init__(self, generator: TaskGenerator, db: Session, request: TaskGeneratorStartRequest, excel_name: str):
-        super().__init__(generator, db, '平均值数据统计.xlsx')
+    def __init__(self, data: LoadCsvFile, generator: TaskGenerator, db: Session, request: TaskGeneratorStartRequest,
+                 excel_name: str):
         self.line_chart = request.average_line_chart
         self.request = request
         self.columns_index = []
         self.type = "平均值"
+        super().__init__(data, generator, db, excel_name)
 
     def draw_line_chart(self, sub_dir):
         path = os.path.join(self.dir, sub_dir)
@@ -62,16 +64,17 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         return self
 
     def _draw_line_chart(self, path, line_key, index):
+        if line_key == 'time' or line_key == 'col0':
+            return
         if index >= len(self.line_chart.name):
             chart_name = f"{self.type}时程曲线图"
         else:
             chart_name = self.line_chart.name[index]
-        logger.info(f"开始生成{self.type}图 {chart_name}")
         file_path = f'{os.path.join(path, line_key + chart_name).replace("/", "-")}.png'
         self.output += f"[{get_now_date()}] {os.path.basename(file_path)} 生成中...\n"
-        np_datum = np.array(self.data[line_key])
-        df = pd.DataFrame({'time': self.times, 'data': np_datum})
-        df.set_index('time', inplace=True)
+        # np_datum = np.array(self.data[line_key])
+        # df = pd.DataFrame({'time': self.times, 'data': np_datum})
+        df = self.data[line_key]
         plt.figure(figsize=(10, 5))
         self._resampled_plot(df)
         date_format = mdates.DateFormatter('%Y%m%d')
@@ -89,7 +92,7 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         plt.tight_layout()
         plt.savefig(file_path)
         plt.close()
-        logger.info(f"生成完毕 {chart_name}")
+        logger.info(f"生成完毕 {line_key} {self.type}图{chart_name}")
         self.output += f"[{get_now_date()}] {os.path.basename(file_path)} 生成成功\n"
 
     @abstractmethod
@@ -111,8 +114,8 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
 
 
 class AverageLineChartGenerator(AbstractLineChatGenerator, ABC):
-    def __init__(self, generator: TaskGenerator, request: TaskGeneratorStartRequest, db: Session):
-        super().__init__(generator, db, request, '平均值数据统计.xlsx')
+    def __init__(self, data: LoadCsvFile, generator: TaskGenerator, request: TaskGeneratorStartRequest, db: Session):
+        super().__init__(data, generator, db, request, '平均值数据统计.xlsx')
         super()._init(self.request.average_line_chart, "平均值")
 
     def draw_line_chart(self, sub_dir="平均值折线图"):
@@ -120,15 +123,18 @@ class AverageLineChartGenerator(AbstractLineChatGenerator, ABC):
         return self
 
     def _resampled_plot(self, df):
-        resampled = df.resample(self.line_chart.time_range).mean()
-        resampled = fill_data(self.line_chart.fill, resampled)
-        plt.plot(resampled.index, resampled['data'], label='平均值', marker='',
+        resampled = self._table_data_resampled(df)
+        plt.plot(resampled.index, resampled, label='平均值', marker='',
                  linewidth=self.line_chart.line_width)
+
+    def _table_data_resampled(self, df):
+        resampled = df.resample(self.line_chart.time_range).mean()
+        return fill_data(self.line_chart.fill, resampled)
 
 
 class MaxMinLineChartGenerator(AbstractLineChatGenerator, ABC):
-    def __init__(self, generator: TaskGenerator, request: TaskGeneratorStartRequest, db: Session):
-        super().__init__(generator, db, request, '最大最小值数据统计.xlsx')
+    def __init__(self, data: LoadCsvFile, generator: TaskGenerator, request: TaskGeneratorStartRequest, db: Session):
+        super().__init__(data, generator, db, request, '最大最小值数据统计.xlsx')
         super()._init(self.request.max_min_line_chart, "最大最小值")
 
     def draw_line_chart(self, sub_dir="最大最小值折线图"):
@@ -136,17 +142,20 @@ class MaxMinLineChartGenerator(AbstractLineChatGenerator, ABC):
         return self
 
     def _resampled_plot(self, df):
+        resampled = self._table_data_resampled(df)
+        plt.plot(resampled.index, resampled['min'], label='最小值', marker='',
+                 linewidth=self.line_chart.line_width)
+        plt.plot(resampled.index, resampled['max'], label='最大值', marker='',
+                 linewidth=self.line_chart.line_width)
+
+    def _table_data_resampled(self, df):
         resampled = df.resample(self.line_chart.time_range).agg(['min', 'max'])
-        resampled = fill_data(self.line_chart.fill, resampled)
-        plt.plot(resampled.index, resampled['data']['min'], label='最小值', marker='',
-                 linewidth=self.line_chart.line_width)
-        plt.plot(resampled.index, resampled['data']['max'], label='最大值', marker='',
-                 linewidth=self.line_chart.line_width)
+        return fill_data(self.line_chart.fill, resampled)
 
 
 class RootMeanSquareLineChartGenerator(AbstractLineChatGenerator, ABC):
-    def __init__(self, generator: TaskGenerator, request: TaskGeneratorStartRequest, db: Session):
-        super().__init__(generator, db, request, '均方根数据统计.xlsx')
+    def __init__(self, data: LoadCsvFile, generator: TaskGenerator, request: TaskGeneratorStartRequest, db: Session):
+        super().__init__(data, generator, db, request, '均方根数据统计.xlsx')
         super()._init(self.request.root_mean_square_line_chart, "均方根")
 
     def draw_line_chart(self, sub_dir="均方根折线图"):
@@ -154,10 +163,13 @@ class RootMeanSquareLineChartGenerator(AbstractLineChatGenerator, ABC):
         return self
 
     def _resampled_plot(self, df):
-        resampled = df.resample(self.line_chart.time_range).apply(self._rms)
-        resampled = fill_data(self.line_chart.fill, resampled)
-        plt.plot(resampled.index, resampled['data'], label='均方根', marker='',
+        resampled = self._table_data_resampled(df)
+        plt.plot(resampled.index, resampled, label='均方根', marker='',
                  linewidth=self.line_chart.line_width)
+
+    def _table_data_resampled(self, df):
+        resampled = df.resample(self.line_chart.time_range).apply(self._rms)
+        return fill_data(self.line_chart.fill, resampled)
 
     @staticmethod
     def _rms(series):

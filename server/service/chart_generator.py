@@ -11,16 +11,17 @@ from service.abstract_chat_generator import AbstractChatGenerator
 from service.bar_chart_generator import MaxMinBarChartGenerator, draw_compare_bar_chart
 from service.line_chart_generator import AverageLineChartGenerator, MaxMinLineChartGenerator, \
     RootMeanSquareLineChartGenerator
+from service.load_csv_file import LoadCsvFile
 from utils import get_now_date
 
 
 def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest, db: Session):
     if generator.output is None:
         generator.output = \
-            f"[{get_now_date()}] 任务开始，接收到的参数为 \n{generator.__dict__}\n{request.__dict__}\n"
+            f"[{get_now_date()}] 任务开始，接收到的参数为 \n{request.__dict__}\n"
     else:
         generator.output += \
-            f"\n[{get_now_date()}] 任务开始，接收到的参数为 \n{generator.__dict__}\n{request.__dict__}\n"
+            f"\n[{get_now_date()}] 任务开始，接收到的参数为 \n{request.__dict__}\n"
     db.query(TaskGenerator).filter_by(id=generator.id).update({
         TaskGenerator.status: GeneratorResultEnum.PROCESSING,
         TaskGenerator.output: generator.output,
@@ -29,40 +30,43 @@ def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest,
     })
     db.commit()
 
+
     try:
+        data = LoadCsvFile(generator.files).load_data(request.config)
+        generator.output += data.output
         average_generator: AbstractChatGenerator | None = None
         max_min_generator: AbstractChatGenerator | None = None
         root_mean_square_generator: AbstractChatGenerator | None = None
-
         if request.average_line_chart.generate:
-            average_generator = AverageLineChartGenerator(generator, request, db).draw_line_chart()
+            average_generator = AverageLineChartGenerator(data, generator, request, db).draw_line_chart()
             generator.output = average_generator.output
         if request.root_mean_square_line_chart.generate:
-            average_generator = RootMeanSquareLineChartGenerator(generator, request, db).draw_line_chart()
+            average_generator = RootMeanSquareLineChartGenerator(data, generator, request, db).draw_line_chart()
             generator.output = average_generator.output
         if request.max_min_line_chart.generate:
-            max_min_generator = MaxMinLineChartGenerator(generator, request, db).draw_line_chart()
+            max_min_generator = MaxMinLineChartGenerator(data, generator, request, db).draw_line_chart()
             generator.output = max_min_generator.output
         if request.max_min_bar_chart:
-            max_min_generator = MaxMinBarChartGenerator(generator, db).draw_bar_chart(request.max_min_bar_group)
+            max_min_generator = MaxMinBarChartGenerator(data, generator, db).draw_bar_chart(request.max_min_bar_group)
             generator.output = max_min_generator.output
         if request.average_data_table:
             if average_generator is not None:
                 average_generator.generate_table()
             else:
-                average_generator = AverageLineChartGenerator(generator, request, db).generate_table()
+                average_generator = AverageLineChartGenerator(data, generator, request, db).generate_table()
             generator.output = average_generator.output
         if request.max_min_data_table:
             if max_min_generator is not None:
                 max_min_generator = max_min_generator.generate_table()
             else:
-                max_min_generator = MaxMinLineChartGenerator(generator, request, db).generate_table()
+                max_min_generator = MaxMinLineChartGenerator(data, generator, request, db).generate_table()
             generator.output = max_min_generator.output
         if request.root_mean_square_data_table:
             if root_mean_square_generator is not None:
                 root_mean_square_generator = root_mean_square_generator.generate_table()
             else:
-                root_mean_square_generator = MaxMinLineChartGenerator(generator, request, db).generate_table()
+                root_mean_square_generator =\
+                    RootMeanSquareLineChartGenerator(data, generator, request, db).generate_table()
             generator.output = root_mean_square_generator.output
         generator.output += f"\n[{get_now_date()}] 任务完成"
         db.query(TaskGenerator).filter_by(id=generator.id).update({
@@ -75,7 +79,7 @@ def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest,
 
     except Exception as e:
         traceback.print_exc()
-        logger.warning(f"生成对比失败 {generator.__dict__}")
+        logger.warning(f"生成失败 {generator.name}")
         logger.exception(e)
         db.query(TaskGenerator).filter_by(id=generator.id).update({
             TaskGenerator.status: GeneratorResultEnum.FAILED,
@@ -103,12 +107,14 @@ def generate_bar_chart(generators: List[TaskGenerator], request: BarChartGenerat
             else:
                 generator.output += log
             logger.info(f"{generator.name} 开始进行表格数据处理")
+            data = LoadCsvFile(generator.files).load_data()
+            generator.output += data.output
             db.query(TaskGenerator).filter_by(id=generator.id).update({
                 TaskGenerator.output: generator.output,
                 TaskGenerator.updated_date: datetime.now()
             })
             db.commit()
-            chart_generator = MaxMinBarChartGenerator(generator, db)
+            chart_generator = MaxMinBarChartGenerator(data, generator, db)
             max_min_bar_chart_generator.append(chart_generator)
             max_min_data_table.append(chart_generator.get_table_data())
             generator.output += f"\n[{get_now_date()}] 表格数据处理完毕，等待生成对比图"

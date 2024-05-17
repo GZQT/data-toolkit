@@ -41,3 +41,7 @@ def get_csv_data_file(file):
         return df.to_dict(orient='records')
     except Exception as e:
         print(f"{file} 文件读取出错:", e)
+
+
+def is_number(variable):
+    return isinstance(variable, (int, float))

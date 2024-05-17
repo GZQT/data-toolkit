@@ -113,7 +113,7 @@ const handleCopy = async (content: string) => {
             <div class="text-tip">请选择要生成的列（不选则为全部生成）</div>
             <q-scroll-area class="full-height">
               <q-list class="q-my-sm" bordered separator v-if="columns.length > 0">
-                <q-item dense v-for="(column, index) in columns" :key="column">
+                <q-item :dense="true" v-for="(column, index) in columns" :key="column">
                   <q-item-section>
                     <q-checkbox v-model="form.columnIndex" dense
                       :disable="column === 'time' || column === 'col0' || column === 'id'" :val="index"
@@ -132,7 +132,7 @@ const handleCopy = async (content: string) => {
                     <q-menu auto-close>
                       <q-list style="width:100px">
                         <q-item v-for="unit in timeUnitList" :key="unit.value" :active="timeUnit === unit.value"
-                          clickable @click="timeUnit = unit.value">
+                          :clickable="true" @click="timeUnit = unit.value">
                           {{ unit.label }}
                         </q-item>
                       </q-list>
@@ -188,7 +188,7 @@ const handleCopy = async (content: string) => {
                       <template v-else>
                         <q-input v-for="(_, index) in form.name" class="q-mt-none q-pt-none"
                           :key="`chart-name-${index}`" v-model="form.name[index]"
-                          :rules="[val => handleCheckFileName(val)]"
+                          :rules="[(val?: string) => handleCheckFileName(val)]"
                           :label="`${columns[form.columnIndex[index]]} 的图表名称`">
                           <template v-slot:append>
                             <q-btn flat dense icon="content_copy" @click="handleCopy(columns[form.columnIndex[index]])">

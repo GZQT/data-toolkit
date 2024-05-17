@@ -5,6 +5,7 @@ import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
 import { GeneratorStartLineDialogForm } from 'src/types/generator'
 import { computed, reactive, ref } from 'vue'
+import GeneratorStartConfigDialog from './GeneratorStartConfigDialog.vue'
 import GeneratorStartLineDialog from './GeneratorStartLineDialog.vue'
 
 interface SelectOption {
@@ -38,7 +39,10 @@ const form = reactive<components['schemas']['TaskGeneratorStartRequest']>({
   maxMinDataTable: false,
   rootMeanSquareDataTable: false,
   averageBarGroup: [],
-  maxMinBarGroup: []
+  maxMinBarGroup: [],
+  config: {
+    converters: []
+  }
 })
 export type ConfigChartType = 'average' | 'maxMin' | 'rootMeanSquare'
 const columnNameGroup = ref<SelectOption[]>([])
@@ -78,6 +82,9 @@ const openDialog = async (id: number, files: string[], currentStatus: components
   form.rootMeanSquareLineChart = _.cloneDeep(defaultLineChartParam)
   form.averageBarGroup = []
   form.maxMinBarGroup = []
+  form.config = {
+    converters: []
+  }
   status.value = currentStatus
   const file = files[0]
   columns.value = await window.FileApi.getCsvHeader(file)
@@ -115,6 +122,18 @@ const handleConfig = (config: ConfigChartType) => {
     form[`${config}LineChart`].fill = data.fill
     form[`${config}LineChart`].showGrid = data.showGrid
   }).onCancel(() => { })
+}
+
+const handleConfigDialog = () => {
+  $q.dialog({
+    component: GeneratorStartConfigDialog,
+    componentProps: {
+      columns: columns.value,
+      data: form.config
+    }
+  }).onOk((config: components['schemas']['GeneratorConfigRequest']) => {
+    form.config = config
+  })
 }
 
 </script>
@@ -170,8 +189,10 @@ const handleConfig = (config: ConfigChartType) => {
               icon="settings" @click="handleConfig('rootMeanSquare')" />
           </div>
         </q-card-section>
-        <q-card-actions :align="'right'" class="text-primary">
-          <q-btn outline label="取消" v-close-popup @click="dialog = false" />
+        <q-card-actions class="flex text-primary">
+          <q-btn outline label="数据预处理" color="secondary" @click="handleConfigDialog" />
+          <q-space />
+          <q-btn outline label="取消" v-close-popup />
           <q-btn outline label="确认" :loading="loading" @click="handleSubmit" />
         </q-card-actions>
       </q-card>

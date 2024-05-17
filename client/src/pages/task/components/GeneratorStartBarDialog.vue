@@ -131,8 +131,8 @@ const handleSubmit = () => {
         </q-card-section>
         <q-card-section class="q-my-none q-py-none row items-center" v-if="compareGroup.length > 0">
           <div>已选择</div>
-          <q-chip removable class="q-ml-sm row" v-for="(item, index) in compareGroup" :key="`params-${index}`" dense
-            @remove="handleRemoveResult(item)">
+          <q-chip :removable="true" class="q-ml-sm row" v-for="(item, index) in compareGroup" :key="`params-${index}`"
+            :dense="true" @remove="handleRemoveResult(item)">
             <template v-for="(dataItem, dataIndex) in item" :key="`dataItem-${dataIndex}`">
               <div v-if="dataItem.length > 0">
                 第{{ dataIndex }}表{{ dataItem.join() }}列
@@ -147,7 +147,7 @@ const handleSubmit = () => {
             <div><b>{{ item.name }}</b> 所包含的列</div>
             <q-scroll-area :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 500px;" class="q-mt-sm">
               <q-list bordered separator v-if="item.columns">
-                <q-item dense v-for="(column, index) in item.columns" :key="column">
+                <q-item :dense="true" v-for="(column, index) in item.columns" :key="column">
                   <q-item-section>
                     <q-checkbox dense v-model="selection[itemIndex]"
                       :disable="column === 'time' || column === 'col0' || column === 'id'" :val="index"
