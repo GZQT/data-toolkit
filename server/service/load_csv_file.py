@@ -1,12 +1,11 @@
 import os
-from datetime import datetime
-from typing import List, Callable
 
-import pandas as pd
 import numexpr as ne
+import pandas as pd
+
 from constant import GENERATOR_FILE_SEPARATOR, CSV_SUFFIX
-from dto.generator import GeneratorConfigRequest, GeneratorDataConverterRequest, GeneratorDataActionEnum
-from utils import get_now_date, get_csv_data_file
+from dto.generator import GeneratorConfigRequest
+from utils import get_now_date
 
 
 class LoadCsvFile:
@@ -49,8 +48,6 @@ class LoadCsvFile:
         应用表达式到数据框的列，并生成安全列名映射
         """
         key_converters = {converter.column_key: converter.expression for converter in generator_config.converters}
-
-        # 生成安全列名映射
 
         # 生成安全列名映射
         safe_columns = {col: f'c{i}' for i, col in enumerate(combined_df.columns)}

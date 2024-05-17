@@ -4,7 +4,7 @@ import { useQuasar } from 'quasar'
 import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
 import { GeneratorStartLineDialogForm } from 'src/types/generator'
-import { computed, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import GeneratorStartConfigDialog from './GeneratorStartConfigDialog.vue'
 import GeneratorStartLineDialog from './GeneratorStartLineDialog.vue'
 
@@ -33,18 +33,20 @@ const form = reactive<components['schemas']['TaskGeneratorStartRequest']>({
   averageLineChart: _.cloneDeep(defaultLineChartParam),
   maxMinLineChart: _.cloneDeep(defaultLineChartParam),
   rootMeanSquareLineChart: _.cloneDeep(defaultLineChartParam),
+  rawLineChart: _.cloneDeep(defaultLineChartParam),
   averageBarChart: false,
   maxMinBarChart: false,
   averageDataTable: false,
   maxMinDataTable: false,
   rootMeanSquareDataTable: false,
+  rawDataTable: false,
   averageBarGroup: [],
   maxMinBarGroup: [],
   config: {
     converters: []
   }
 })
-export type ConfigChartType = 'average' | 'maxMin' | 'rootMeanSquare'
+export type ConfigChartType = 'average' | 'maxMin' | 'rootMeanSquare' | 'raw'
 const columnNameGroup = ref<SelectOption[]>([])
 const status = ref<components['schemas']['GeneratorResultEnum']>('PROCESSING')
 const loading = ref(false)
@@ -77,6 +79,7 @@ const openDialog = async (id: number, files: string[], currentStatus: components
   generatorId.value = id
   fileList.value = files
   columnNameGroup.value = []
+  form.rawLineChart = _.cloneDeep(defaultLineChartParam)
   form.averageLineChart = _.cloneDeep(defaultLineChartParam)
   form.maxMinLineChart = _.cloneDeep(defaultLineChartParam)
   form.rootMeanSquareLineChart = _.cloneDeep(defaultLineChartParam)
@@ -94,15 +97,6 @@ defineExpose({
   openDialog
 })
 
-const averageLineChartColumnLength = computed(() => {
-  return form.averageLineChart.columnIndex?.length ?? 0
-})
-const maxMinLineChartColumnLength = computed(() => {
-  return form.maxMinLineChart.columnIndex?.length ?? 0
-})
-const rootMeanSquareLineChartColumnLength = computed(() => {
-  return form.rootMeanSquareLineChart.columnIndex?.length ?? 0
-})
 const handleConfig = (config: ConfigChartType) => {
   currentConfig.value = config
   $q.dialog({
@@ -136,6 +130,14 @@ const handleConfigDialog = () => {
   })
 }
 
+const chartList: { name: ConfigChartType, label: string }[] =
+  [
+    { name: 'raw', label: '原始值' },
+    { name: 'average', label: '平均值' },
+    { name: 'maxMin', label: '最值' },
+    { name: 'rootMeanSquare', label: '均方根' }
+  ]
+
 </script>
 
 <template>
@@ -156,37 +158,17 @@ const handleConfigDialog = () => {
           <q-btn flat round size="sm" icon="close" @click="dialog = false" />
         </q-card-section>
         <q-card-section class="q-pt-none">
-          <div class="flex items-center">
-            <q-checkbox left-label v-model="form.averageDataTable" label="生成平均值数据表格" />
-            <q-checkbox left-label v-model="form.averageLineChart.generate" label="生成平均值折线图" />
+          <div class="flex items-center" v-for="chart in chartList" :key="`chart-${chart.label}`">
+            <q-checkbox left-label v-model="form[`${chart.name}DataTable`]" :label="`生成值${chart.label}数据表格`" />
+            <q-checkbox left-label v-model="form[`${chart.name}LineChart`].generate" :label="`生成值${chart.label}折线图`" />
             <q-space />
             <div class="text-tip q-mr-xs">
-              {{ (averageLineChartColumnLength ?? 0) > 0 ? `已配置 ${averageLineChartColumnLength} 列` : '默认生成全部列' }}
-            </div>
-            <q-btn :disable="!form.averageLineChart.generate" color="secondary" flat round size="sm" icon="settings"
-              @click="handleConfig('average')" />
-          </div>
-          <div class="flex items-center">
-            <q-checkbox left-label v-model="form.maxMinDataTable" label="生成最值数据表格" />
-            <q-checkbox left-label v-model="form.maxMinLineChart.generate" label="生成最值折线图" />
-            <q-space />
-            <div class="text-tip q-mr-xs">
-              {{ (maxMinLineChartColumnLength ?? 0) > 0 ? `已配置 ${maxMinLineChartColumnLength} 列` : '默认生成全部列' }}
-            </div>
-            <q-btn :disable="!form.maxMinLineChart.generate" color="secondary" flat round size="sm" icon="settings"
-              @click="handleConfig('maxMin')" />
-          </div>
-          <div class="flex items-center">
-            <q-checkbox left-label v-model="form.rootMeanSquareDataTable" label="生成均方根数据表格" />
-            <q-checkbox left-label v-model="form.rootMeanSquareLineChart.generate" label="生成均方根折线图" />
-            <q-space />
-            <div class="text-tip q-mr-xs">
-              {{ (rootMeanSquareLineChartColumnLength ?? 0) > 0
-                ? `已配置 ${rootMeanSquareLineChartColumnLength} 列`
+              {{ (form[`${chart.name}LineChart`].columnIndex?.length ?? 0) > 0
+                ? `已配置 ${(form[`${chart.name}LineChart`].columnIndex?.length ?? 0)} 列`
                 : '默认生成全部列' }}
             </div>
-            <q-btn :disable="!form.rootMeanSquareLineChart.generate" color="secondary" flat round size="sm"
-              icon="settings" @click="handleConfig('rootMeanSquare')" />
+            <q-btn :disable="!form[`${chart.name}LineChart`].generate" color="secondary" flat round size="sm"
+              icon="settings" @click="handleConfig(chart.name)" />
           </div>
         </q-card-section>
         <q-card-actions class="flex text-primary">

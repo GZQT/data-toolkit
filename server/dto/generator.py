@@ -77,6 +77,7 @@ class TaskGeneratorStartRequest(CamelModel):
     average_line_chart: LineChartRequest
     max_min_line_chart: LineChartRequest
     root_mean_square_line_chart: LineChartRequest
+    raw_line_chart: LineChartRequest
     config: GeneratorConfigRequest | None = None
 
     average_bar_chart: bool
@@ -84,6 +85,7 @@ class TaskGeneratorStartRequest(CamelModel):
     average_data_table: bool
     max_min_data_table: bool
     root_mean_square_data_table: bool
+    raw_data_table: bool
     average_bar_group: List[List[int]]
     max_min_bar_group: List[List[int]]
 

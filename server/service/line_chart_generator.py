@@ -71,7 +71,6 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         else:
             chart_name = self.line_chart.name[index]
         file_path = f'{os.path.join(path, line_key + chart_name).replace("/", "-")}.png'
-        self.output += f"[{get_now_date()}] {os.path.basename(file_path)} 生成中...\n"
         # np_datum = np.array(self.data[line_key])
         # df = pd.DataFrame({'time': self.times, 'data': np_datum})
         df = self.data[line_key]
@@ -174,3 +173,22 @@ class RootMeanSquareLineChartGenerator(AbstractLineChatGenerator, ABC):
     @staticmethod
     def _rms(series):
         return np.sqrt(np.mean(np.square(series)))
+
+
+class RawLineChartGenerator(AbstractLineChatGenerator, ABC):
+
+    def __init__(self, data: LoadCsvFile, generator: TaskGenerator, request: TaskGeneratorStartRequest, db: Session):
+        super().__init__(data, generator, db, request, '原始值数据统计.xlsx')
+        super()._init(self.request.root_mean_square_line_chart, "")
+
+    def draw_line_chart(self, sub_dir="原始值折线图"):
+        super().draw_line_chart(sub_dir)
+        return self
+
+    def _resampled_plot(self, df, line_key=None):
+        resampled = self._table_data_resampled(df)
+        plt.plot(resampled.index, resampled, label='数值', marker='',
+                 linewidth=self.line_chart.line_width)
+
+    def _table_data_resampled(self, df):
+        return fill_data(self.line_chart.fill, df)

@@ -300,6 +300,7 @@ export type components = {
       averageLineChart: components["schemas"]["LineChartRequest"];
       maxMinLineChart: components["schemas"]["LineChartRequest"];
       rootMeanSquareLineChart: components["schemas"]["LineChartRequest"];
+      rawLineChart: components["schemas"]["LineChartRequest"];
       config?: components["schemas"]["GeneratorConfigRequest"] | null;
       /** Averagebarchart */
       averageBarChart: boolean;
@@ -311,6 +312,8 @@ export type components = {
       maxMinDataTable: boolean;
       /** Rootmeansquaredatatable */
       rootMeanSquareDataTable: boolean;
+      /** Rawdatatable */
+      rawDataTable: boolean;
       /** Averagebargroup */
       averageBarGroup: number[][];
       /** Maxminbargroup */
