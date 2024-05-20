@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import createClient from 'openapi-fetch'
 import { date, useInterval, useTimeout } from 'quasar'
+import Logo from 'src/assets/logo.png'
 import { paths } from 'src/types/api'
 import { onMounted, ref } from 'vue'
 import SettingDialog from './components/SettingDialog.vue'
@@ -74,7 +75,7 @@ const handleOpenSetting = () => {
     <q-header elevated>
       <q-bar class="q-electron-drag bg-primary">
         <!-- <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" /> -->
-        <img style="width:18px; height: 18px;" alt="logo" src="../assets/logo.png" />
+        <img style="width:18px; height: 18px;" alt="logo" :src="Logo" />
 
         <div class="q-ml-md">Data Toolkit</div>
         <q-badge rounded :color="status" style="transition: all 1s;" />

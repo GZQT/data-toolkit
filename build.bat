@@ -5,7 +5,7 @@ cd server
 
 REM 使用 PyInstaller 打包 application.py
 poetry.exe install
-poetry.exe run pyinstaller.exe --onefile application.py >nul 2>&1
+poetry.exe run pyinstaller.exe --onefile application.py -p . >nul 2>&1
 
 cd ..
 
