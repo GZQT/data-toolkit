@@ -86,7 +86,7 @@ const middleware: Middleware = {
 }
 
 const client = createClient<paths>({
-  baseUrl: 'http://localhost:8080'
+  baseUrl: 'http://localhost:18764'
 })
 client.use(middleware)
 // "async" is optional;

@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='启动 web 后端服务', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--host', '-H', help='监听的主机地址', default="127.0.0.1", type=str)
-    parser.add_argument('--port', '-P', help='监听的主机端口', default=8080, type=int)
+    parser.add_argument('--port', '-P', help='监听的主机端口', default=18764, type=int)
     parser.add_argument('--reload', '-R', help='是否重新加载', default=False, type=bool)
     args = parser.parse_args()
 

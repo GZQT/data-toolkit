@@ -2,7 +2,6 @@
 *.zip
 *.rar
 *.csv
-*.png
 *.xlsx
 ### sqllite
 *.db
@@ -54,6 +53,10 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+
+.nyc_output
+coverage/
+!client/src/assets
 
 # Translations
 *.mo
