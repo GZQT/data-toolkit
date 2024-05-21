@@ -51,7 +51,9 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         if not os.path.exists(path):
             os.makedirs(path)
         for index, line_key in enumerate(self.data.keys()):
-            if len(self.columns_index) > 0 and self.keys.index(line_key) not in self.columns_index:
+            positions = np.where(self.keys == line_key)
+            position = positions[0][0] if positions[0].size > 0 else -1
+            if len(self.columns_index) > 0 and position not in self.columns_index:
                 self.output += f"[{get_now_date()}] {line_key} 需要跳过"
                 logger.info(f"{line_key} 折线图需要跳过")
             elif len(self.data[line_key]) != len(self.times):
