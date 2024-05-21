@@ -47,6 +47,8 @@ class LoadCsvFile:
         """
         应用表达式到数据框的列，并生成安全列名映射
         """
+        if generator_config is None:
+            return
         key_converters = {converter.column_key: converter.expression for converter in generator_config.converters}
 
         # 生成安全列名映射

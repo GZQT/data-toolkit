@@ -20,7 +20,7 @@ class AbstractChatGenerator:
         self.db = db
         self.generator = generator
         self.output = '' if generator.output is None else generator.output
-        self.keys = data.keys
+        self.keys = data.data.keys()
         self.data = data.data
         self.times = data.times
         self.dir = os.path.join(ROOT_DIRECTORY, generator.name)
