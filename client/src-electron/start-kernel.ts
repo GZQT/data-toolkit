@@ -5,7 +5,7 @@ import path from 'path'
 
 const localServer = 'http://127.0.0.1'
 const confDir = path.join(app.getPath('home'), '.config', 'data-toolkit')
-const kernelPort = 8080
+const kernelPort = 18764
 const appDir = path.dirname(app.getAppPath())
 if (!fs.existsSync(confDir)) {
   fs.mkdirSync(confDir, { recursive: true })

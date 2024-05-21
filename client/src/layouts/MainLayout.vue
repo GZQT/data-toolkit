@@ -15,7 +15,7 @@ const time = ref<number>(0)
 const showTime = ref<boolean>(true)
 const client = ref(
   createClient<paths>({
-    baseUrl: 'http://localhost:8080'
+    baseUrl: 'http://localhost:18764'
   }))
 
 defineOptions({
