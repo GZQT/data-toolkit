@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { QTableProps, date, useQuasar } from 'quasar'
 import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
+import { isElectron } from 'src/utils/action'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -77,6 +78,9 @@ const handleEdit = (row: components['schemas']['TaskFileResponse'] & { total?: n
 }
 
 const handleSelect = () => {
+  if (!isElectron()) {
+    return
+  }
   window.FileApi.selectFiles(isAdd.value)
     .then((pathList) => {
       if (!pathList) {
@@ -176,19 +180,21 @@ const handleDeleteItem = (item: components['schemas']['TaskFileResponse']) => {
 }
 
 const handleLoadCount = () => {
-  if (loading.row) {
+  if (loading.row || !isElectron()) {
     return
   }
   loading.row = true
   const promiseList = []
   const data = _.cloneDeep(taskFileData.value)
   for (const index in data) {
-    const promise = window.FileApi.getFileCount(data[index].name)
-      .then(file => {
-        data[index].total = file.total
-        data[index].fileUpdatedDate = file.updatedDate
-      })
-    promiseList.push(promise)
+    if (isElectron()) {
+      const promise = window.FileApi.getFileCount(data[index].name)
+        .then(file => {
+          data[index].total = file.total
+          data[index].fileUpdatedDate = file.updatedDate
+        })
+      promiseList.push(promise)
+    }
   }
   Promise.all(promiseList)
     .then(() => { taskFileData.value = data })
@@ -196,7 +202,9 @@ const handleLoadCount = () => {
 }
 
 const handleOpenFile = (file: string) => {
-  window.FileApi.openFileDirectory(file)
+  if (isElectron()) {
+    window.FileApi.openFileDirectory(file)
+  }
 }
 
 </script>

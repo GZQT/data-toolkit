@@ -7,6 +7,7 @@ import { GeneratorStartLineDialogForm } from 'src/types/generator'
 import { reactive, ref } from 'vue'
 import GeneratorStartConfigDialog from './GeneratorStartConfigDialog.vue'
 import GeneratorStartLineDialog from './GeneratorStartLineDialog.vue'
+import { isElectron } from 'src/utils/action'
 
 interface SelectOption {
   label: string
@@ -90,6 +91,9 @@ const openDialog = async (id: number, files: string[], currentStatus: components
   }
   status.value = currentStatus
   const file = files[0]
+  if (!isElectron()) {
+    return
+  }
   columns.value = await window.FileApi.getCsvHeader(file)
 }
 
@@ -164,8 +168,8 @@ const chartList: { name: ConfigChartType, label: string }[] =
             <q-space />
             <div class="text-tip q-mr-xs">
               {{ (form[`${chart.name}LineChart`].columnIndex?.length ?? 0) > 0
-                ? `已配置 ${(form[`${chart.name}LineChart`].columnIndex?.length ?? 0)} 列`
-                : '默认生成全部列' }}
+              ? `已配置 ${(form[`${chart.name}LineChart`].columnIndex?.length ?? 0)} 列`
+              : '默认生成全部列' }}
             </div>
             <q-btn :disable="!form[`${chart.name}LineChart`].generate" color="secondary" flat round size="sm"
               icon="settings" @click="handleConfig(chart.name)" />

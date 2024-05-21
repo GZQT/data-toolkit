@@ -6,6 +6,7 @@ import { GENERATOR_FILE_SPLIT, barStyle, thumbStyle } from 'src/utils/constant'
 import { computed, ref } from 'vue'
 import { GeneratorType } from '../TaskGenerator.vue'
 import GeneratorStartBarFormDialog from './GeneratorStartBarFormDialog.vue'
+import { isElectron } from 'src/utils/action'
 
 interface GeneratorColumns {
   columns?: string[]
@@ -34,6 +35,9 @@ const selection = ref<number[][]>([])
 const compareGroup = ref<number[][][]>([])
 
 const openDialog = async (list: GeneratorType[]) => {
+  if (!isElectron()) {
+    return
+  }
   loading.value = true
   try {
     dialog.value = true

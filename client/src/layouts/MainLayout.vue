@@ -5,6 +5,7 @@ import Logo from 'src/assets/logo.png'
 import { paths } from 'src/types/api'
 import { onMounted, ref } from 'vue'
 import SettingDialog from './components/SettingDialog.vue'
+import { isElectron } from 'src/utils/action'
 
 const { registerInterval } = useInterval()
 const { registerTimeout } = useTimeout()
@@ -22,17 +23,17 @@ defineOptions({
 })
 
 const handleMinimize = () => {
-  if (process.env.MODE === 'electron') {
+  if (isElectron()) {
     window.WindowsApi.minimize()
   }
 }
 const handleToggleMaximize = () => {
-  if (process.env.MODE === 'electron') {
+  if (isElectron()) {
     window.WindowsApi.toggleMaximize()
   }
 }
 const handleCloseApp = () => {
-  if (process.env.MODE === 'electron') {
+  if (isElectron()) {
     window.WindowsApi.close()
   }
 }

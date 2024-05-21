@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
-import { handleBrowser } from 'src/utils/action'
+import { handleBrowser, isElectron } from 'src/utils/action'
 import { ref } from 'vue'
 
 const $q = useQuasar()
@@ -8,8 +8,6 @@ const version = process.env.APPLICATION_VERSION
 const dialog = ref(false)
 
 const openDialog = () => {
-  console.log()
-
   dialog.value = true
 }
 
@@ -22,7 +20,9 @@ const handleUpdateTheme = (item: boolean | 'auto') => {
 }
 
 const handleOpenHome = () => {
-  window.FileApi.openApplicationDirectory('')
+  if (isElectron()) {
+    window.FileApi.openApplicationDirectory('')
+  }
 }
 
 </script>
@@ -30,7 +30,7 @@ const handleOpenHome = () => {
 <template>
   <div class="container">
     <q-dialog v-model="dialog" position="right" maximized>
-      <q-card class="column full-height" style="width: 300px">
+      <q-card class="column full-height" style="width: 300px" data-cy="dialog-card">
         <q-card-section class="row">
           <div class="text-h6">设置</div>
           <q-space />
@@ -41,8 +41,8 @@ const handleOpenHome = () => {
           <div> 版本：{{ version }} </div>
           <div class="row items-center">
             <div>主题：</div>
-            <q-btn-toggle class="text-primary" size="12px" style="border: 1px solid" uno-caps unelevated
-              :model-value="$q.dark.mode" toggle-color="primary" :options="[
+            <q-btn-toggle data-cy="theme-toggle" class="text-primary" size="12px" style="border: 1px solid" uno-caps
+              unelevated :model-value="$q.dark.mode" toggle-color="primary" :options="[
                 { label: '明亮', value: false },
                 { label: '系统', value: 'auto' },
                 { label: '黑暗', value: true }

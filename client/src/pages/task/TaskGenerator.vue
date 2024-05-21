@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { QChip, QTableProps, date, useInterval, useQuasar } from 'quasar'
 import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
-import { handleHomeDirectoryOpenFile, handleOpenFile } from 'src/utils/action'
+import { handleHomeDirectoryOpenFile, handleOpenFile, isElectron } from 'src/utils/action'
 import { GENERATOR_FILE_SPLIT } from 'src/utils/constant'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -142,7 +142,7 @@ const handleFileSelect = async (id: number | null, files: string[]) => {
 }
 
 const handleCount = async () => {
-  if (taskGeneratorData.value.length === 0) {
+  if (taskGeneratorData.value.length === 0 || !isElectron()) {
     return
   }
   loading.count = true

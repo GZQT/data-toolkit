@@ -8,13 +8,17 @@
   "private": true,
   "scripts": {
     "lint": "eslint --fix --ext .js,.ts,.vue ./",
-    "test": "echo \"No test specified\" && exit 0",
+    "test": "echo \"See package.json => scripts for available tests.\" && exit 0",
     "dev": "quasar dev",
     "dev:electron": "quasar dev -m electron",
     "dev:electron:kernel": "RUN_SERVER=true quasar dev -m electron",
     "build": "quasar build",
     "build:electron": "quasar build -m electron",
-    "generate:types": "npx openapi-typescript http://127.0.0.1:8080/openapi.json -o ./src/types/api.d.ts --enum -t"
+    "generate:types": "npx openapi-typescript http://127.0.0.1:8080/openapi.json -o ./src/types/api.d.ts --enum -t",
+    "test:e2e": "cross-env NODE_ENV=test start-test \"quasar dev\" http-get://127.0.0.1:3001 \"cypress open --e2e\"",
+    "test:e2e:ci": "cross-env NODE_ENV=test start-test \"quasar dev\" http-get://127.0.0.1:3001 \"cypress run --e2e\"",
+    "test:component": "cross-env NODE_ENV=test cypress open --component",
+    "test:component:ci": "cross-env NODE_ENV=test cypress run --component"
   },
   "dependencies": {
     "@electron/remote": "^2.1.2",
@@ -31,6 +35,7 @@
   "devDependencies": {
     "@electron/packager": "^18.3.2",
     "@quasar/app-vite": "^2.0.0-beta.14",
+    "@quasar/quasar-app-extension-testing-e2e-cypress": "^6.1.0",
     "@types/lodash": "^4.17.1",
     "@types/node": "^20.12.11",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -48,7 +53,9 @@
     "openapi-typescript": "^6.7.5",
     "typescript": "~5.3.3",
     "vite-plugin-checker": "^0.6.4",
-    "vue-tsc": "^1.8.27"
+    "vue-tsc": "^1.8.27",
+    "cypress": "^13.6.6",
+    "eslint-plugin-cypress": "^2.15.1"
   },
   "engines": {
     "node": "^24 || ^22 || ^20 || ^18",

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import _ from 'lodash'
 import { useQuasar } from 'quasar'
+import { isElectron } from 'src/utils/action'
 import { computed, ref } from 'vue'
 
 interface EditItem {
@@ -36,6 +37,9 @@ defineExpose({ openDialog })
 const emit = defineEmits<FileSelectEmit>()
 
 const handleSelect = () => {
+  if (!isElectron()) {
+    return
+  }
   window.FileApi.selectFiles(isAdd.value)
     .then((pathList) => {
       if (!pathList) {

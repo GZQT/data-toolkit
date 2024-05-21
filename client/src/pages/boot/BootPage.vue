@@ -2,6 +2,7 @@
 import { useInterval, useQuasar } from 'quasar'
 import Logo from 'src/assets/logo.png'
 import { client } from 'src/boot/request'
+import { isElectron } from 'src/utils/action'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -14,11 +15,13 @@ const {
 } = useInterval()
 
 onMounted(async () => {
-  const result = await window.KernelApi.start()
-  if (result === true) {
-    tip.value = '内核加载完成！'
-  } else {
-    tip.value = result as string
+  if (isElectron()) {
+    const result = await window.KernelApi.start()
+    if (result === true) {
+      tip.value = '内核加载完成！'
+    } else {
+      tip.value = result as string
+    }
   }
 
   registerInterval(async () => {
