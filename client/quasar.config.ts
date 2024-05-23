@@ -94,8 +94,7 @@ export default configure((/* ctx */) => {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
-      config: {
-      },
+      config: {},
 
       // iconSet: 'material-icons', // Quasar icon set
       lang: 'zh-CN', // Quasar language pack
@@ -215,13 +214,32 @@ export default configure((/* ctx */) => {
       builder: {
         // https://www.electron.build/configuration/configuration
         appId: 'data-toolkit',
+        productName: 'Data Toolkit',
         extraResources: [
           {
             from: 'src-electron/application.exe',
             to: 'appearance/application.exe',
             filter: '!**/{.DS_Store}'
           }
-        ]
+        ],
+        publish: {
+          provider: 'generic',
+          url: 'https://36.134.229.254:5244/d/dist/data-toolkit'
+        },
+        win: {
+          artifactName: `$\{productName} Setup ${version}.$\{ext}`,
+          verifyUpdateCodeSignature: false,
+          target: [{
+            target: 'nsis',
+            arch: ['x64']
+          }]
+        },
+        nsis: {
+          createDesktopShortcut: true,
+          createStartMenuShortcut: true,
+          allowToChangeInstallationDirectory: true,
+          oneClick: false
+        }
       },
       unPackagedInstallParams: ['install', '--prod', '--no-frozen-lockfile']
     },

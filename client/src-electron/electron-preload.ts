@@ -33,6 +33,7 @@ import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import readline from 'readline'
+import { ProgressInfo } from 'electron-updater'
 
 const getAllFiles = (dirPath: string, arrayOfFiles: string[] = []): string[] => {
   if (!fs.existsSync(dirPath)) {
@@ -70,6 +71,15 @@ contextBridge.exposeInMainWorld('WindowsApi', {
 
 contextBridge.exposeInMainWorld('KernelApi', {
   start: () => ipcRenderer.invoke('KernelApi:start')
+})
+
+contextBridge.exposeInMainWorld('ApplicationApi', {
+  onUpdateProgress: (func: (info: ProgressInfo) => void) => {
+    ipcRenderer.on('updateProgress', (_, info) => func(info))
+  },
+  checkUpdate: () => ipcRenderer.invoke('ApplicationApi:checkUpdate'),
+  downloadUpdate: () => ipcRenderer.invoke('ApplicationApi:downloadUpdate'),
+  installUpdateApp: () => ipcRenderer.invoke('ApplicationApi:installUpdateApp')
 })
 
 contextBridge.exposeInMainWorld('FileApi', {
@@ -151,6 +161,6 @@ contextBridge.exposeInMainWorld('FileApi', {
     return getAllFiles(abs)
   },
   openExternalLink: (url: string) => {
-    shell.openExternal(url)
+    void shell.openExternal(url)
   }
 })

@@ -6,6 +6,7 @@ import path from 'path'
 import treeKill from 'tree-kill'
 import { fileURLToPath } from 'url'
 import { initKernel, kernelProcess } from './start-kernel'
+import { cancelDownload, checkUpdate, downloadUpdate, installUpdateApp, setWindow } from './auto-update'
 
 // https://quasar.dev/quasar-cli-vite/developing-electron-apps/frameless-electron-window#setting-frameless-window
 initialize()
@@ -17,11 +18,8 @@ const currentDir = fileURLToPath(new URL('.', import.meta.url))
 let mainWindow: BrowserWindow | undefined
 
 const createWindow = () => {
-  /**
-   * Initial window options
-   */
   mainWindow = new BrowserWindow({
-    icon: path.resolve(currentDir, 'icons/icon.png'), // tray icon
+    icon: path.resolve(currentDir, 'icons/icon.png'),
     width: 1200,
     height: 720,
     minWidth: 1200,
@@ -39,21 +37,8 @@ const createWindow = () => {
       )
     }
   })
-
   enable(mainWindow.webContents)
-
-  // net.fetch(getServer() + '/api/system/getNetwork', { method: 'POST' }).then((response) => {
-  //   return response.json()
-  // }).then((response) => {
-  //   setProxy(`${response.data.proxy.scheme}://${response.data.proxy.host}:${response.data.proxy.port}`, mainWindow!.webContents).then(() => {
-  //     加载主界面
-  //     mainWindow!.loadURL(getServer() + '/stage/build/app/index.html?v=' + new Date().getTime())
-  //     console.log('代理设置成功')
-  //   })
-  // })
-
   mainWindow.webContents.session.setSpellCheckerLanguages(['en-US'])
-
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, cb) => {
     const header = { requestHeaders: details.requestHeaders }
     for (const key in details.requestHeaders) {
@@ -78,16 +63,14 @@ const createWindow = () => {
   })
 
   if (process.env.DEV) {
-    mainWindow.loadURL(process.env.APP_URL)
+    void mainWindow.loadURL(process.env.APP_URL)
   } else {
-    mainWindow.loadFile('index.html')
+    void mainWindow.loadFile('index.html')
   }
 
   if (process.env.DEBUGGING) {
-    // if on DEV or Production with debug enabled
     mainWindow.webContents.openDevTools()
   } else {
-    // we're on production; no access to devtools pls
     mainWindow.webContents.on('devtools-opened', () => {
       mainWindow?.webContents.closeDevTools()
     })
@@ -96,6 +79,7 @@ const createWindow = () => {
   mainWindow.on('closed', () => {
     mainWindow = undefined
   })
+  setWindow(mainWindow)
 }
 
 ipcMain.handle('KernelApi:start', async () => {
@@ -103,21 +87,29 @@ ipcMain.handle('KernelApi:start', async () => {
 })
 
 ipcMain.handle('FileApi:selectFiles', async (_, multiSelections: boolean = true) => {
-  const properties: Array<'openFile' | 'openDirectory' | 'multiSelections' | 'showHiddenFiles' | 'createDirectory' | 'promptToCreate' | 'noResolveAliases' | 'treatPackageAsDirectory' | 'dontAddToRecent'> = ['openFile']
+  const properties: Array<'openFile' | 'openDirectory' | 'multiSelections' | 'showHiddenFiles' | 'createDirectory' | 'promptToCreate' |
+    'noResolveAliases' | 'treatPackageAsDirectory' | 'dontAddToRecent'> = ['openFile']
   if (multiSelections) {
     properties.push('multiSelections')
   }
   return dialog.showOpenDialogSync({
     properties,
-    filters: [
-      { name: 'CSV', extensions: ['csv'] }
-    ]
+    filters: [{
+      name: 'CSV',
+      extensions: ['csv']
+    }]
   })
 })
 
-app.whenReady().then(createWindow)
+ipcMain.handle('ApplicationApi:checkUpdate', () => checkUpdate(mainWindow))
+ipcMain.handle('ApplicationApi:downloadUpdate', () => downloadUpdate(mainWindow))
+ipcMain.handle('ApplicationApi:installUpdateApp', () => installUpdateApp())
+
+app.whenReady()
+  .then(createWindow)
 
 app.on('window-all-closed', async () => {
+  cancelDownload()
   // see  https://github.com/nodejs/help/issues/4050
   if (kernelProcess && kernelProcess.pid) {
     treeKill(kernelProcess.pid)

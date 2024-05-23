@@ -1,3 +1,5 @@
+import { ProgressInfo, UpdateCheckResult } from 'electron-updater'
+
 export interface WindowsApi {
   minimize: () => void
   toggleMaximize: () => void
@@ -14,6 +16,13 @@ export interface FileApi {
   openExternalLink: (url: string) => void
 }
 
+export interface ApplicationApi {
+  checkUpdate: () => Promise<UpdateCheckResult | null>
+  downloadUpdate: () => void
+  installUpdateApp: () => void
+  onUpdateProgress: (func: (info: ProgressInfo) => void) => void
+}
+
 export interface KernelApi {
   start: () => Promise<boolean | string>
 }
@@ -22,6 +31,7 @@ declare global {
   interface Window {
     WindowsApi: WindowsApi
     FileApi: FileApi,
-    KernelApi: KernelApi
+    KernelApi: KernelApi,
+    ApplicationApi: ApplicationApi
   }
 }

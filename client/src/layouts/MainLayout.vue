@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import createClient from 'openapi-fetch'
-import { date, useInterval, useTimeout } from 'quasar'
+import { date, useInterval, useQuasar, useTimeout } from 'quasar'
 import Logo from 'src/assets/logo.png'
 import { paths } from 'src/types/api'
 import { onMounted, ref } from 'vue'
 import SettingDialog from './components/SettingDialog.vue'
 import { isElectron } from 'src/utils/action'
+import { useUpdateStore } from 'stores/update-store'
 
 const { registerInterval } = useInterval()
 const { registerTimeout } = useTimeout()
+const $q = useQuasar()
 const status = ref('yellow')
-const settingDialogRef = ref<null | InstanceType<typeof SettingDialog>>(null)
 const time = ref<number>(0)
 const showTime = ref<boolean>(true)
 const client = ref(
@@ -21,6 +22,7 @@ const client = ref(
 defineOptions({
   name: 'MainLayout'
 })
+const updateStore = useUpdateStore()
 
 const handleMinimize = () => {
   if (isElectron()) {
@@ -64,10 +66,11 @@ const checkHealth = async () => {
 onMounted(() => {
   checkHealth()
   registerInterval(checkHealth, 10000)
+  updateStore.handleCheckUpdate()
 })
 
 const handleOpenSetting = () => {
-  settingDialogRef.value?.openDialog()
+  $q.dialog({ component: SettingDialog })
 }
 </script>
 
@@ -82,7 +85,9 @@ const handleOpenSetting = () => {
         <q-badge rounded :color="status" style="transition: all 1s;" />
         <q-space />
 
-        <q-btn dense flat icon="settings" @click="handleOpenSetting" />
+        <q-btn dense flat icon="settings" @click="handleOpenSetting">
+          <q-badge v-show="updateStore.data.hasNewVersion" floating color="red" rounded></q-badge>
+        </q-btn>
         <q-btn dense flat icon="minimize" @click="handleMinimize" />
         <q-btn dense flat icon="crop_square" @click="handleToggleMaximize" />
         <q-btn dense flat icon="close" @click="handleCloseApp" />
@@ -100,7 +105,6 @@ const handleOpenSetting = () => {
     <q-page-container>
       <q-page padding>
         <router-view />
-        <SettingDialog ref="settingDialogRef" />
         <div v-if="time > 0" class="text-caption fixed bg-grey-7 text-white q-px-sm"
           :style="{ bottom: 0, left: 0, opacity: showTime ? 0.5 : 0, transition: 'all 1s' }">
           {{ time }}ms
