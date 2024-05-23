@@ -48,7 +48,7 @@ export const useUpdateStore = defineStore('update', () => {
     })
   })
 
-  const handleCheckUpdate = async () => {
+  const handleCheckUpdate = async (noNewNotify: boolean = false) => {
     if (downloadProgress.value !== null) {
       return
     }
@@ -76,10 +76,12 @@ export const useUpdateStore = defineStore('update', () => {
     const hasNewVersion = updateInfo.version !== data.version
     data.hasNewVersion = hasNewVersion
     if (!hasNewVersion) {
-      $q.notify({
-        type: 'info',
-        message: '当前已经是最新版本了'
-      })
+      if (noNewNotify) {
+        $q.notify({
+          type: 'info',
+          message: '当前已经是最新版本了'
+        })
+      }
       return
     }
     data.newVersion = updateInfo.version

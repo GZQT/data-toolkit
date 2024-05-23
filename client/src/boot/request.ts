@@ -44,7 +44,11 @@ const middleware: Middleware = {
     return req
   },
   onResponse: async (res: Response) => {
-    const { body, status, ...resOptions } = res
+    const {
+      body,
+      status,
+      ...resOptions
+    } = res
     LoadingBar.stop()
     if (status >= 400 && status < 500) {
       const newBody = await res.clone().json()
@@ -53,10 +57,10 @@ const middleware: Middleware = {
       throw new Error(`获取数据失败：${status}`)
     }
     if (status >= 500) {
+      let newBody: { detail: string } | undefined
       try {
-        const newBody = await res.clone().json()
+        newBody = await res.clone().json()
         console.error(status, newBody)
-        throw new Error(`服务器错误：${newBody.detail}`)
       } catch (e) {
         console.error(status, e)
       } finally {
@@ -65,6 +69,7 @@ const middleware: Middleware = {
           message: '获取数据失败：服务器内部错误'
         })
       }
+      throw new Error(`服务器错误：${newBody?.detail}`)
     }
     if (status === 201) {
       Notify.create({
@@ -81,18 +86,27 @@ const middleware: Middleware = {
       return undefined
     }
     // change status of response
-    return new Response(body, { ...resOptions, status: 200 })
+    return new Response(body, {
+      ...resOptions,
+      status: 200
+    })
   }
 }
 
+const port = await window.KernelApi.getKernelAvailablePort()
 const client = createClient<paths>({
-  baseUrl: 'http://localhost:18764'
+  baseUrl: `http://localhost:${port}`
 })
+
+const simpleClient = createClient<paths>({
+  baseUrl: `http://localhost:${port}`
+})
+
 client.use(middleware)
+
 // "async" is optional;
 // more info on params: https://v2.quasar.dev/quasar-cli/boot-files
 export default boot(async (/* { app, router, ... } */) => {
-  // something to do
 })
 
-export { client }
+export { client, simpleClient, port }

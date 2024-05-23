@@ -2,6 +2,8 @@
 import { useDialogPluginComponent, useQuasar } from 'quasar'
 import { handleBrowser, isElectron } from 'src/utils/action'
 import { useUpdateStore } from 'stores/update-store'
+import { port } from '../../boot/request'
+import { useApplicationStore } from 'stores/application-store'
 
 const $q = useQuasar()
 const {
@@ -14,6 +16,7 @@ defineEmits([
   ...useDialogPluginComponent.emits
 ])
 
+const applicationStore = useApplicationStore()
 const updateStore = useUpdateStore()
 const handleUpdateTheme = (item: boolean | 'auto') => {
   $q.dark.set(item)
@@ -22,6 +25,11 @@ const handleUpdateTheme = (item: boolean | 'auto') => {
 const handleOpenHome = () => {
   if (isElectron()) {
     window.FileApi.openApplicationDirectory('')
+  }
+}
+const handleOpenExe = () => {
+  if (isElectron()) {
+    window.FileApi.openExeDirectory()
   }
 }
 
@@ -50,11 +58,16 @@ const handleOpenHome = () => {
           <div class="row items-center justify-between">
             <div>版本：{{ updateStore.data.version }}</div>
             <q-btn :disable="updateStore.newVersionIsDownloading" flat color="primary" size="md" dense
-                   :loading="updateStore.data.loading" @click="updateStore.handleCheckUpdate"
+                   :loading="updateStore.data.loading" @click="() => updateStore.handleCheckUpdate(true)"
                    :label="updateStore.data.hasNewVersion ? `更新到 ${updateStore.data.newVersion} 版本`  : (updateStore.newVersionIsDownloading ? '正在下载更新' :`检查更新`)"
             >
               <q-badge style="margin-top: 2px" floating v-show="updateStore.data.hasNewVersion" color="red" rounded></q-badge>
             </q-btn>
+          </div>
+          <div class="row items-center justify-between">
+            内核端口：{{ port }} <q-badge class="q-ml-xs cursor-pointer" @click="applicationStore.checkHealth" rounded :color="applicationStore.status">
+            <q-tooltip>{{applicationStore.response}}</q-tooltip>
+          </q-badge>
           </div>
           <div class="q-mt-lg row text-primary items-center cursor-pointer "
                @click="handleBrowser('http://36.134.229.254:1230/data/data-toolkit')">
@@ -69,8 +82,13 @@ const handleOpenHome = () => {
             <q-icon name="north_east" class="q-ml-xs" size="15px"/>
           </div>
           <div class="row text-primary items-center cursor-pointer " @click="handleOpenHome">
-            <q-icon name="home" class="q-mr-xs" size="15px"/>
+            <q-icon name="control_camera" class="q-mr-xs" size="15px"/>
             <div class="link text-caption">打开应用文件路径</div>
+            <q-icon name="north_east" class="q-ml-xs" size="15px"/>
+          </div>
+          <div class="row text-primary items-center cursor-pointer " @click="handleOpenExe">
+            <q-icon name="home" class="q-mr-xs" size="15px"/>
+            <div class="link text-caption">打开安装路径</div>
             <q-icon name="north_east" class="q-ml-xs" size="15px"/>
           </div>
         </q-card-section>

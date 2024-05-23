@@ -1,41 +1,22 @@
 <script setup lang="ts">
-import { useInterval, useQuasar } from 'quasar'
 import Logo from 'src/assets/logo.png'
-import { client } from 'src/boot/request'
 import { isElectron } from 'src/utils/action'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-const $q = useQuasar()
 const tip = ref('内核加载中...')
 const router = useRouter()
-const {
-  registerInterval,
-  removeInterval
-} = useInterval()
 
 onMounted(async () => {
   if (isElectron()) {
     const result = await window.KernelApi.start()
     if (result === true) {
       tip.value = '内核加载完成！'
+      void router.push('/task')
     } else {
       tip.value = result as string
     }
   }
-
-  registerInterval(async () => {
-    try {
-      const { data } = await client.GET('/health')
-      if (data?.status === 'ok') {
-        removeInterval()
-        router.push('/task')
-      }
-    } catch (error) {
-      tip.value = `内核检测中... Error ${error}`
-      $q.loadingBar.stop()
-    }
-  }, 2000)
 })
 
 </script>

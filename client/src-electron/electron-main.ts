@@ -5,7 +5,7 @@ import os from 'os'
 import path from 'path'
 import treeKill from 'tree-kill'
 import { fileURLToPath } from 'url'
-import { initKernel, kernelProcess } from './start-kernel'
+import { getKernelAvailablePort, getKernelPort, initKernel, kernelProcess } from './start-kernel'
 import { cancelDownload, checkUpdate, downloadUpdate, installUpdateApp, setWindow } from './auto-update'
 
 // https://quasar.dev/quasar-cli-vite/developing-electron-apps/frameless-electron-window#setting-frameless-window
@@ -82,9 +82,10 @@ const createWindow = () => {
   setWindow(mainWindow)
 }
 
-ipcMain.handle('KernelApi:start', async () => {
-  return initKernel()
-})
+ipcMain.handle('KernelApi:start', initKernel)
+ipcMain.handle('KernelApi:getKernelPort', () => getKernelAvailablePort())
+ipcMain.handle('KernelApi:getKernelAvailablePort', () => getKernelPort())
+ipcMain.handle('FileApi:getExeDirectory', () => app.getPath('exe'))
 
 ipcMain.handle('FileApi:selectFiles', async (_, multiSelections: boolean = true) => {
   const properties: Array<'openFile' | 'openDirectory' | 'multiSelections' | 'showHiddenFiles' | 'createDirectory' | 'promptToCreate' |

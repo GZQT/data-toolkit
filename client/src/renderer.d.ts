@@ -11,6 +11,7 @@ export interface FileApi {
   selectFiles: (multiSelections: boolean) => Promise<string[] | undefined>
   openFileDirectory: (file: string) => void
   openApplicationDirectory: (dirname: string) => void
+  openExeDirectory: () => void
   getApplicationDirectoryFiles: (dirname: string) => string[]
   getCsvHeader: (file: string) => Promise<string[]>
   openExternalLink: (url: string) => void
@@ -25,6 +26,7 @@ export interface ApplicationApi {
 
 export interface KernelApi {
   start: () => Promise<boolean | string>
+  getKernelAvailablePort: () => Promise<number>
 }
 
 declare global {

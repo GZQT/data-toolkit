@@ -1,29 +1,19 @@
 <script setup lang="ts">
-import createClient from 'openapi-fetch'
-import { date, useInterval, useQuasar, useTimeout } from 'quasar'
+import { useInterval, useQuasar } from 'quasar'
 import Logo from 'src/assets/logo.png'
-import { paths } from 'src/types/api'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import SettingDialog from './components/SettingDialog.vue'
 import { isElectron } from 'src/utils/action'
 import { useUpdateStore } from 'stores/update-store'
+import { useApplicationStore } from 'stores/application-store'
 
 const { registerInterval } = useInterval()
-const { registerTimeout } = useTimeout()
 const $q = useQuasar()
-const status = ref('yellow')
-const time = ref<number>(0)
-const showTime = ref<boolean>(true)
-const client = ref(
-  createClient<paths>({
-    baseUrl: 'http://localhost:18764'
-  }))
-
 defineOptions({
   name: 'MainLayout'
 })
 const updateStore = useUpdateStore()
-
+const applicationStore = useApplicationStore()
 const handleMinimize = () => {
   if (isElectron()) {
     window.WindowsApi.minimize()
@@ -40,32 +30,9 @@ const handleCloseApp = () => {
   }
 }
 
-const checkHealth = async () => {
-  const start = parseInt(date.formatDate(Date.now(), 'x'))
-  try {
-    const { data } = await client.value.GET('/health')
-    if (data?.status === 'ok') {
-      status.value = 'green'
-    } else {
-      status.value = 'red'
-      console.error(data)
-    }
-  } catch (error) {
-    console.error(error)
-    status.value = 'red'
-  } finally {
-    showTime.value = true
-    const end = parseInt(date.formatDate(Date.now(), 'x'))
-    time.value = end - start
-    registerTimeout(() => {
-      showTime.value = false
-    }, 3000)
-  }
-}
-
 onMounted(() => {
-  checkHealth()
-  registerInterval(checkHealth, 10000)
+  applicationStore.checkHealth()
+  registerInterval(applicationStore.checkHealth, 10000)
   updateStore.handleCheckUpdate()
 })
 
@@ -82,7 +49,7 @@ const handleOpenSetting = () => {
         <img style="width:18px; height: 18px;" alt="logo" :src="Logo" />
 
         <div class="q-ml-md">Data Toolkit</div>
-        <q-badge rounded :color="status" style="transition: all 1s;" />
+        <q-badge rounded :color="applicationStore.status" style="transition: all 1s;" />
         <q-space />
 
         <q-btn dense flat icon="settings" @click="handleOpenSetting">
@@ -105,9 +72,9 @@ const handleOpenSetting = () => {
     <q-page-container>
       <q-page padding>
         <router-view />
-        <div v-if="time > 0" class="text-caption fixed bg-grey-7 text-white q-px-sm"
-          :style="{ bottom: 0, left: 0, opacity: showTime ? 0.5 : 0, transition: 'all 1s' }">
-          {{ time }}ms
+        <div v-if="applicationStore.time > 0" class="text-caption fixed bg-grey-7 text-white q-px-sm"
+          :style="{ bottom: 0, left: 0, opacity: applicationStore.showTime ? 0.5 : 0, transition: 'all 1s' }">
+          {{ applicationStore.time }}ms
         </div>
       </q-page>
     </q-page-container>

@@ -70,7 +70,8 @@ contextBridge.exposeInMainWorld('WindowsApi', {
 })
 
 contextBridge.exposeInMainWorld('KernelApi', {
-  start: () => ipcRenderer.invoke('KernelApi:start')
+  start: () => ipcRenderer.invoke('KernelApi:start'),
+  getKernelAvailablePort: () => ipcRenderer.invoke('KernelApi:getKernelAvailablePort')
 })
 
 contextBridge.exposeInMainWorld('ApplicationApi', {
@@ -118,6 +119,10 @@ contextBridge.exposeInMainWorld('FileApi', {
     if (fs.existsSync(file)) {
       shell.showItemInFolder(file)
     }
+  },
+  openExeDirectory: async () => {
+    const appPath = await ipcRenderer.invoke('FileApi:getExeDirectory')
+    shell.showItemInFolder(appPath)
   },
   openApplicationDirectory: async (dirname: string) => {
     const homeDirectory = os.homedir()
