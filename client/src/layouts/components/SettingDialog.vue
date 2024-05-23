@@ -2,7 +2,7 @@
 import { useDialogPluginComponent, useQuasar } from 'quasar'
 import { handleBrowser, isElectron } from 'src/utils/action'
 import { useUpdateStore } from 'stores/update-store'
-import { port } from '../../boot/request'
+import { port } from 'boot/request'
 import { useApplicationStore } from 'stores/application-store'
 
 const $q = useQuasar()

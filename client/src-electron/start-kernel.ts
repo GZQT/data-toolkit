@@ -32,23 +32,23 @@ export const getKernelAvailablePort = async () => {
     logger.info(`Default port ${kernelPort} already in use, get new port to ${portNumber}`)
     kernelPort = portNumber
   }
-  return Promise.resolve(kernelPort)
+  return kernelPort
 }
 
 export const getKernelPort = () => kernelPort
 
 export const initKernel = async (): Promise<string | boolean> => {
-  if (process.env.RUN_SERVER !== 'true') {
+  if (process.env.RUN_SERVER !== 'true' && process.env.DEV) {
     logger.info('Init kernel skip.')
     return Promise.resolve(true)
   }
-  logger.info('Init kernel...')
+  logger.info(`Init kernel on port ${kernelPort}...`)
   const kernelPath = getResources('application.exe')
   if (!fs.existsSync(kernelPath)) {
     logger.error(`⚠️ Kernel program is missing. ${kernelPath}`)
     return Promise.resolve(`⚠️ Kernel program is missing. ${kernelPath}`)
   }
-  kernelProcess = cp.spawn(kernelPath, [], {
+  kernelProcess = cp.spawn(kernelPath, ['-P', `${kernelPort}`], {
     stdio: 'ignore',
     detached: false
   })

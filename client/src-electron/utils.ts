@@ -5,13 +5,15 @@ import path from 'path'
 import { app } from 'electron'
 import gNet from 'net'
 
-export const confDir = path.join(app.getPath('home'), '.config', 'data-toolkit')
+export const confDir = path.join(app.getPath('home'), 'data-toolkit')
 
 log.initialize()
-log.transports.file.resolvePathFn = () => path.join(confDir, 'main.log')
-console.log = log.log
 
-export const logger = log.create({ logId: 'default' })
+const logger = log.create({ logId: 'default' })
+console.log = log.log
+logger.transports.file.resolvePathFn = () => path.join(confDir, 'main.log')
+export { logger }
+
 const schema = {
   theme: {
     anyOf: [
@@ -62,7 +64,6 @@ export const checkPortInUse = (port: number): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const server = gNet.createServer()
     server.once('error', (err: Error) => {
-      console.log('err!!!!', err)
       if (err.name.includes('EADDRINUSE')) {
         resolve(true)
       } else {

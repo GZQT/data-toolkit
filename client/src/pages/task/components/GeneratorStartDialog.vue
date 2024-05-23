@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import _ from 'lodash'
 import { useQuasar } from 'quasar'
-import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
 import { GeneratorStartLineDialogForm } from 'src/types/generator'
 import { reactive, ref } from 'vue'
 import GeneratorStartConfigDialog from './GeneratorStartConfigDialog.vue'
 import GeneratorStartLineDialog from './GeneratorStartLineDialog.vue'
 import { isElectron } from 'src/utils/action'
+import { client } from 'boot/request'
 
 interface SelectOption {
   label: string

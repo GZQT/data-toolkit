@@ -63,6 +63,11 @@ export default configure((/* ctx */) => {
       // distDir
 
       // extendViteConf (viteConf) {},
+
+      extendViteConf (viteConf) {
+        viteConf.build = viteConf.build || {}
+        viteConf.build.target = 'esnext'
+      },
       // viteVuePluginOptions: {},
 
       vitePlugins: [

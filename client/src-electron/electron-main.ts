@@ -72,7 +72,7 @@ const createWindow = () => {
     mainWindow.webContents.openDevTools()
   } else {
     mainWindow.webContents.on('devtools-opened', () => {
-      mainWindow?.webContents.closeDevTools()
+      // mainWindow?.webContents.closeDevTools()
     })
   }
 

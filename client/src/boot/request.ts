@@ -1,6 +1,5 @@
 import createClient, { type Middleware } from 'openapi-fetch'
 import { LoadingBar, Notify } from 'quasar'
-import { boot } from 'quasar/wrappers'
 import { paths } from 'src/types/api'
 
 interface ErrorDetail {
@@ -103,10 +102,4 @@ const simpleClient = createClient<paths>({
 })
 
 client.use(middleware)
-
-// "async" is optional;
-// more info on params: https://v2.quasar.dev/quasar-cli/boot-files
-export default boot(async (/* { app, router, ... } */) => {
-})
-
 export { client, simpleClient, port }
