@@ -125,7 +125,7 @@ const handleSubmit = () => {
         <q-card-section class="row items-center q-pb-none">
           <div class="text-tip text-caption">请在下方选择需要对比的数据列并进行添加</div>
           <q-space />
-          <q-btn outline :disable="selectionCount < 2" color="secondary" size="sm" label="添加" @click="handleAdd">
+          <q-btn outline :disable="selectionCount < 1" color="secondary" size="sm" label="添加" @click="handleAdd">
             <q-tooltip v-if="selectionCount < 2">至少选择两列才可以进行此操作</q-tooltip>
           </q-btn>
           <q-btn outline :disable="compareGroup.length === 0" class="q-ml-md" color="primary" size="sm" label="完成"
