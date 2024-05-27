@@ -103,7 +103,10 @@ ipcMain.handle('FileApi:selectFiles', async (_, multiSelections: boolean = true)
 
 ipcMain.handle('ApplicationApi:checkUpdate', () => checkUpdate(mainWindow))
 ipcMain.handle('ApplicationApi:downloadUpdate', () => downloadUpdate(mainWindow))
-ipcMain.handle('ApplicationApi:installUpdateApp', () => installUpdateApp())
+ipcMain.handle('ApplicationApi:installUpdateApp', async () => {
+  await killKernel()
+  installUpdateApp()
+})
 
 app.whenReady()
   .then(createWindow)
