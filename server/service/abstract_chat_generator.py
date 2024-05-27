@@ -76,9 +76,9 @@ class AbstractChatGenerator:
                 "编号": table_key,
                 "最大值数值": table_value.loc[max_time],
                 "最大值时间": max_time,
-                "最小值数值": table_value.loc[max_time],
+                "最小值数值": table_value.loc[min_time],
                 "最小值时间": min_time,
-                "变化量": table_value.loc[max_time] - table_value.loc[max_time]
+                "变化量": table_value.loc[max_time] - table_value.loc[min_time]
             })
         return table_result
 
