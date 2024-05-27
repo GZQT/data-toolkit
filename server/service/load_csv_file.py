@@ -28,7 +28,7 @@ class LoadCsvFile:
         data_frames_list = [pd.read_csv(file) for file in self.files]
         combined_df = pd.concat(data_frames_list, ignore_index=True)
         # 忽略 'id' 列和任何以 'Unnamed' 开头的列
-        combined_df = combined_df.loc[:, ~combined_df.columns.str.contains('^Unnamed|^id')]
+        # combined_df = combined_df.loc[:, ~combined_df.columns.str.contains('^Unnamed|^id')]
         # 确定时间列，优先考虑 'time'，如果不存在则使用 'col0'
         time_column = 'time' if 'time' in combined_df.columns else 'col0'
         # 确保时间列存在
@@ -52,9 +52,10 @@ class LoadCsvFile:
         key_converters = {converter.column_key: converter.expression for converter in generator_config.converters}
 
         # 生成安全列名映射
-        safe_columns = {col: f'c{i}' for i, col in enumerate(combined_df.columns)}
+        filtered_columns = [col for col in combined_df.columns if col != 'id']
+        safe_columns = {col: f'c{i}' for i, col in enumerate(filtered_columns)}
         reverse_safe_columns = {v: k for k, v in safe_columns.items()}
-        local_dict = {safe_columns[col]: combined_df[col] for col in combined_df.columns}
+        local_dict = {safe_columns[col]: combined_df[col] for col in filtered_columns}
         temp_df = combined_df.copy()
         # 使用安全列名进行表达式替换
         temp_df.rename(columns=safe_columns, inplace=True)
