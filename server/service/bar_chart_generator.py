@@ -108,7 +108,7 @@ def draw_compare_bar_chart(data, request: BarChartGeneratorStartRequest, index: 
         plt.xticks(rotation=request.x_rotation, ha='left')
     elif request.x_rotation > 0:
         plt.xticks(rotation=request.x_rotation, ha='right')
-    ax.set_xticks([p + width / len(request.compare_group) for p in x])
+    ax.set_xticks([p + width / 2 for p in x])
     ax.set_xticklabels(labels)
     ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
     plt.subplots_adjust(bottom=0.4)
