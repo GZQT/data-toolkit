@@ -26,6 +26,8 @@ export interface ApplicationApi {
 
 export interface KernelApi {
   start: () => Promise<boolean | string>
+  restartKernel: () => Promise<boolean | string>
+  getKernelPort: () => Promise<number>
   getKernelAvailablePort: () => Promise<number>
 }
 

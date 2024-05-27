@@ -4,6 +4,8 @@ import fs from 'fs'
 import path from 'path'
 import { checkPortInUse, confDir, getAvailablePort, logger, sleep } from './utils'
 import { components } from 'src/types/api'
+import treeKill from 'tree-kill'
+import find from 'find-process'
 
 const appDir = path.dirname(app.getAppPath())
 if (!fs.existsSync(confDir)) {
@@ -79,4 +81,19 @@ export const initKernel = async (): Promise<string | boolean> => {
   }
   return Promise.reject(`Get kernel health failed! Retry more than ${count} times.`)
 }
-export { kernelProcess }
+
+export const killKernel = async (): Promise<void> => {
+  // see  https://github.com/nodejs/help/issues/4050
+  if (kernelProcess && kernelProcess.pid) {
+    treeKill(kernelProcess.pid)
+  }
+  const list = await find('name', 'application.exe')
+  for (const process of list) {
+    treeKill(process.pid)
+  }
+}
+
+export const restartKernel = async () => {
+  await killKernel()
+  await initKernel()
+}

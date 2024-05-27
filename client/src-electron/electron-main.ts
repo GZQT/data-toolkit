@@ -1,11 +1,9 @@
 import { enable, initialize } from '@electron/remote/main/index.js'
 import { BrowserWindow, app, dialog, ipcMain } from 'electron'
-import find from 'find-process'
 import os from 'os'
 import path from 'path'
-import treeKill from 'tree-kill'
 import { fileURLToPath } from 'url'
-import { getKernelAvailablePort, getKernelPort, initKernel, kernelProcess } from './start-kernel'
+import { getKernelAvailablePort, getKernelPort, initKernel, killKernel, restartKernel } from './start-kernel'
 import { cancelDownload, checkUpdate, downloadUpdate, installUpdateApp, setWindow } from './auto-update'
 
 // https://quasar.dev/quasar-cli-vite/developing-electron-apps/frameless-electron-window#setting-frameless-window
@@ -83,8 +81,9 @@ const createWindow = () => {
 }
 
 ipcMain.handle('KernelApi:start', initKernel)
-ipcMain.handle('KernelApi:getKernelPort', () => getKernelAvailablePort())
-ipcMain.handle('KernelApi:getKernelAvailablePort', () => getKernelPort())
+ipcMain.handle('KernelApi:restartKernel', restartKernel)
+ipcMain.handle('KernelApi:getKernelPort', () => getKernelPort())
+ipcMain.handle('KernelApi:getKernelAvailablePort', () => getKernelAvailablePort())
 ipcMain.handle('FileApi:getExeDirectory', () => app.getPath('exe'))
 
 ipcMain.handle('FileApi:selectFiles', async (_, multiSelections: boolean = true) => {
@@ -111,14 +110,7 @@ app.whenReady()
 
 app.on('window-all-closed', async () => {
   cancelDownload()
-  // see  https://github.com/nodejs/help/issues/4050
-  if (kernelProcess && kernelProcess.pid) {
-    treeKill(kernelProcess.pid)
-  }
-  const list = await find('name', 'application.exe')
-  for (const process of list) {
-    treeKill(process.pid)
-  }
+  await killKernel()
   if (platform !== 'darwin') {
     app.quit()
   }
@@ -129,3 +121,15 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+const gotTheLock = app.requestSingleInstanceLock()
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+  })
+}

@@ -4,6 +4,7 @@ import { handleBrowser, isElectron } from 'src/utils/action'
 import { useUpdateStore } from 'stores/update-store'
 import { port } from 'boot/request'
 import { useApplicationStore } from 'stores/application-store'
+import { ref } from 'vue'
 
 const $q = useQuasar()
 const {
@@ -16,6 +17,7 @@ defineEmits([
   ...useDialogPluginComponent.emits
 ])
 
+const restartLoading = ref(false)
 const applicationStore = useApplicationStore()
 const updateStore = useUpdateStore()
 const handleUpdateTheme = (item: boolean | 'auto') => {
@@ -31,6 +33,27 @@ const handleOpenExe = () => {
   if (isElectron()) {
     window.FileApi.openExeDirectory()
   }
+}
+
+const handleRestartKernel = async () => {
+  if (restartLoading.value) {
+    return
+  }
+  $q.dialog({
+    title: '确认进行重启内核吗？',
+    cancel: { color: 'negative' },
+    ok: { color: 'primary' }
+  }).onOk(async () => {
+    restartLoading.value = true
+    try {
+      await window.KernelApi.restartKernel()
+      $q.notify({ message: '启动完成' })
+    } catch (e) {
+      $q.notify({ message: '启动失败 ' + e })
+    } finally {
+      restartLoading.value = false
+    }
+  })
 }
 
 </script>
@@ -61,13 +84,23 @@ const handleOpenExe = () => {
                    :loading="updateStore.data.loading" @click="() => updateStore.handleCheckUpdate(true)"
                    :label="updateStore.data.hasNewVersion ? `更新到 ${updateStore.data.newVersion} 版本`  : (updateStore.newVersionIsDownloading ? '正在下载更新' :`检查更新`)"
             >
-              <q-badge style="margin-top: 2px" floating v-show="updateStore.data.hasNewVersion" color="red" rounded></q-badge>
+              <q-badge style="margin-top: 2px" floating v-show="updateStore.data.hasNewVersion" color="red"
+                       rounded></q-badge>
             </q-btn>
           </div>
           <div class="row items-center justify-between">
-            内核端口：{{ port }} <q-badge class="q-ml-xs cursor-pointer" @click="applicationStore.checkHealth" rounded :color="applicationStore.status">
-            <q-tooltip>{{applicationStore.response}}</q-tooltip>
-          </q-badge>
+            内核端口：{{ port }}
+            <div class="row items-center q-gutter-sm">
+              <q-badge class="q-ml-xs cursor-pointer" @click="applicationStore.checkHealth" rounded
+                       :color="applicationStore.status">
+                <q-tooltip>{{ applicationStore.response }}</q-tooltip>
+              </q-badge>
+              <q-icon name="refresh"
+                      :class="`q-ml-xs ${restartLoading?'cursor-not-allowed  animation-rotate':'cursor-pointer'}`"
+                      @click="handleRestartKernel">
+                <q-tooltip>重启内核</q-tooltip>
+              </q-icon>
+            </div>
           </div>
           <div class="q-mt-lg row text-primary items-center cursor-pointer "
                @click="handleBrowser('http://36.134.229.254:1230/data/data-toolkit')">

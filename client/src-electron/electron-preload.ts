@@ -71,7 +71,9 @@ contextBridge.exposeInMainWorld('WindowsApi', {
 
 contextBridge.exposeInMainWorld('KernelApi', {
   start: () => ipcRenderer.invoke('KernelApi:start'),
-  getKernelAvailablePort: () => ipcRenderer.invoke('KernelApi:getKernelAvailablePort')
+  getKernelPort: () => ipcRenderer.invoke('KernelApi:getKernelPort'),
+  getKernelAvailablePort: () => ipcRenderer.invoke('KernelApi:getKernelAvailablePort'),
+  restartKernel: () => ipcRenderer.invoke('KernelApi:restartKernel')
 })
 
 contextBridge.exposeInMainWorld('ApplicationApi', {
