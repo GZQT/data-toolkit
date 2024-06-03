@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { onMounted, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { QNotifyUpdateOptions } from 'quasar/dist/types/api'
 import { ProgressInfo, UpdateCheckResult, UpdateInfo } from 'electron-updater'
 import { useQuasar } from 'quasar'
@@ -19,8 +19,9 @@ export const useUpdateStore = defineStore('update', () => {
     newVersionIsDownloading.value = status
   }
 
-  onMounted(() => {
+  const handleDownloadEvent = () => {
     window.ApplicationApi.onUpdateProgress((info: ProgressInfo) => {
+      console.log(info)
       if (downloadProgress.value === null) {
         return
       }
@@ -46,7 +47,7 @@ export const useUpdateStore = defineStore('update', () => {
         })
       }
     })
-  })
+  }
 
   const handleCheckUpdate = async (noNewNotify: boolean = false) => {
     if (downloadProgress.value !== null) {
@@ -118,6 +119,7 @@ export const useUpdateStore = defineStore('update', () => {
   return {
     newVersionIsDownloading,
     data,
+    handleDownloadEvent,
     updateDownloading,
     handleCheckUpdate
   }

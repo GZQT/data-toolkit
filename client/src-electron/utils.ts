@@ -12,6 +12,8 @@ log.initialize()
 const logger = log.create({ logId: 'default' })
 console.log = log.log
 logger.transports.file.resolvePathFn = () => path.join(confDir, 'main.log')
+logger.transports.file.level = 'info'
+
 export { logger }
 
 const schema = {

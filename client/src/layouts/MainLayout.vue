@@ -31,6 +31,7 @@ const handleCloseApp = () => {
 }
 
 onMounted(() => {
+  updateStore.handleDownloadEvent()
   applicationStore.checkHealth()
   registerInterval(applicationStore.checkHealth, 10000)
   updateStore.handleCheckUpdate()

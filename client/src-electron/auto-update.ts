@@ -1,36 +1,39 @@
 import electronUpdater, { UpdateCheckResult } from 'electron-updater'
-import log from 'electron-log'
 import { BrowserWindow } from 'electron'
 import { logger } from 'app/src-electron/utils'
 
 const updateUrl = 'https://36.134.229.254:5244/d/dist/data-toolkit'
-const { autoUpdater, CancellationToken } = electronUpdater
-autoUpdater.logger = log
+const {
+  autoUpdater,
+  CancellationToken
+} = electronUpdater
+
+const cancelToken = new CancellationToken()
+
+let mainWindow: BrowserWindow | undefined
+autoUpdater.logger = logger
 autoUpdater.forceDevUpdateConfig = true
 autoUpdater.autoDownload = false
 autoUpdater.setFeedURL(updateUrl)
 
-const cancelToken = new CancellationToken()
-let mainWindow: BrowserWindow | undefined
-
-export const setWindow = (win: BrowserWindow | undefined) => {
-  mainWindow = win
-}
-
-// 注册更新过程中的各种事件
 autoUpdater.on('error', (error: Error) => {
   logger.error('Auto updater error:', error)
 })
 
 autoUpdater.on('download-progress', (info) => {
-  log.info(`download-progress ${info.percent}%`)
+  logger.info(`download-progress ${info.percent}%`)
+  console.log('download-progress ')
   mainWindow?.webContents.send('updateProgress', info)
 })
 
 autoUpdater.on('update-downloaded', (info) => {
-  log.info('update-downloaded')
-  log.info(info)
+  logger.info('update-downloaded')
+  logger.info(info)
 })
+
+export const setWindow = (win: BrowserWindow | undefined) => {
+  mainWindow = win
+}
 
 export const checkUpdate = async (win: BrowserWindow | undefined): Promise<UpdateCheckResult | null> => {
   mainWindow = win
@@ -47,7 +50,12 @@ export const downloadUpdate = async (win: BrowserWindow | undefined) => {
     // eslint-disable-next-line n/no-callback-literal
     callback(0)
   })
-  void autoUpdater.downloadUpdate(cancelToken)
+  logger.info('Start update...')
+  try {
+    void autoUpdater.downloadUpdate(cancelToken)
+  } catch (e) {
+    logger.error('update Error...', e)
+  }
 }
 
 export const installUpdateApp = () => {
