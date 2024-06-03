@@ -150,8 +150,8 @@ class MaxMinLineChartGenerator(AbstractLineChatGenerator, ABC):
                  linewidth=self.line_chart.line_width)
 
     def _table_data_resampled(self, df):
-        resampled = df.resample(self.line_chart.time_range).agg(['min', 'max'])
-        return fill_data(self.line_chart.fill, resampled)
+        # resampled = df.resample(self.line_chart.time_range).agg(['min', 'max'])
+        return fill_data(self.line_chart.fill, df)
 
 
 class RootMeanSquareLineChartGenerator(AbstractLineChatGenerator, ABC):

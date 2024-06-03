@@ -67,7 +67,7 @@ class AbstractChatGenerator:
         table_result = []
         # 获取到数据
         for table_key in self.data.keys():
-            if table_key == "time" or table_key == 'col0':
+            if table_key == "time" or table_key == 'col0' or table_key == 'id':
                 continue
             table_value = self._table_data_resampled(self.data[table_key])
             max_time = table_value.idxmax()
