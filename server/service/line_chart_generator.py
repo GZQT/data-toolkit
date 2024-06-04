@@ -143,14 +143,13 @@ class MaxMinLineChartGenerator(AbstractLineChatGenerator, ABC):
         return self
 
     def _resampled_plot(self, df):
-        resampled = self._table_data_resampled(df)
+        resampled = df.resample(self.line_chart.time_range).agg(['min', 'max'])
         plt.plot(resampled.index, resampled['min'], label='最小值', marker='',
                  linewidth=self.line_chart.line_width)
         plt.plot(resampled.index, resampled['max'], label='最大值', marker='',
                  linewidth=self.line_chart.line_width)
 
     def _table_data_resampled(self, df):
-        # resampled = df.resample(self.line_chart.time_range).agg(['min', 'max'])
         return fill_data(self.line_chart.fill, df)
 
 

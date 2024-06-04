@@ -41,13 +41,16 @@ const form = reactive<{
 
 onMounted(() => {
   form.config = props.data
-  const rows = props.columns.filter(col => col.includes('col'))
+  const rows = props.columns
     .map((column, index) => ({
       id: index,
       name: `c${index}`,
       column,
       expression: ''
     }))
+    .filter(item => {
+      return !item.column.includes('time') && !item.column.includes('id') && !item.column.includes('times')
+    })
   form.config.converters.forEach(item => {
     const existColumn = rows.find(row => row.column === item.columnKey)
     if (existColumn) {
