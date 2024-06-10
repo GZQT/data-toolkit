@@ -2,6 +2,8 @@ import argparse
 import os
 
 import uvicorn
+from alembic import command
+from alembic.config import Config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -32,6 +34,10 @@ if __name__ == "__main__":
     if not os.path.exists(ROOT_DIRECTORY):
         os.makedirs(ROOT_DIRECTORY)
     database.Base.metadata.create_all(bind=database.engine)
+
+    alembic_cfg = Config("alembic.ini")
+    alembic_cfg.set_main_option("sqlalchemy.url", database.SQLALCHEMY_DATABASE_URL)
+    command.upgrade(alembic_cfg, "head")
 
     parser = argparse.ArgumentParser(description='启动 web 后端服务', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--host', '-H', help='监听的主机地址', default="127.0.0.1", type=str)

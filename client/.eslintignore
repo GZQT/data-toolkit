@@ -5,5 +5,5 @@
 /node_modules
 .eslintrc.cjs
 /quasar.config.*.temporary.compiled*
-**/api.d.ts
+**/*api.d.ts
 src/types/api.d.ts

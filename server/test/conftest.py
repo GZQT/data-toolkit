@@ -9,6 +9,7 @@ from conf_test_db import app
 def create_test_db():
     from conf_test_db import override_get_db
     database = next(override_get_db())
+
     task = Task(name="test_task")
     database.add(task)
     database.commit()

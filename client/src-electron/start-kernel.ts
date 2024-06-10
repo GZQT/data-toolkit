@@ -2,10 +2,10 @@ import cp, { ChildProcess } from 'child_process'
 import { app, net } from 'electron'
 import fs from 'fs'
 import path from 'path'
-import { checkPortInUse, confDir, getAvailablePort, logger, sleep } from './utils'
-import { components } from 'src/types/api'
 import treeKill from 'tree-kill'
 import find from 'find-process'
+import { checkPortInUse, confDir, getAvailablePort, logger, sleep } from 'app/src-electron/utils.js'
+import { components } from 'src/types/api.js'
 
 const appDir = path.dirname(app.getAppPath())
 if (!fs.existsSync(confDir)) {

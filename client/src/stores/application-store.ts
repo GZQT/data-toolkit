@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { date } from 'quasar'
-import { simpleClient } from 'boot/request'
+import { healthClient } from 'boot/request'
 import { ref } from 'vue'
 
 export const useApplicationStore = defineStore('application', () => {
@@ -11,7 +11,7 @@ export const useApplicationStore = defineStore('application', () => {
   const checkHealth = async () => {
     const start = parseInt(date.formatDate(Date.now(), 'x'))
     try {
-      const { data } = await simpleClient.GET('/health')
+      const { data } = await healthClient.GET('/health')
       response.value = JSON.stringify(data)
       if (data?.status === 'ok') {
         status.value = 'green'

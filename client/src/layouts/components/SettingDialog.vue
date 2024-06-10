@@ -5,6 +5,7 @@ import { useUpdateStore } from 'stores/update-store'
 import { port } from 'boot/request'
 import { useApplicationStore } from 'stores/application-store'
 import { ref } from 'vue'
+import { useRemoteServerStore } from 'stores/remote-server-store'
 
 const $q = useQuasar()
 const {
@@ -20,6 +21,8 @@ defineEmits([
 const restartLoading = ref(false)
 const applicationStore = useApplicationStore()
 const updateStore = useUpdateStore()
+const remoteServerStore = useRemoteServerStore()
+
 const handleUpdateTheme = (item: boolean | 'auto') => {
   $q.dark.set(item)
 }
@@ -29,6 +32,7 @@ const handleOpenHome = () => {
     window.FileApi.openApplicationDirectory('')
   }
 }
+
 const handleOpenExe = () => {
   if (isElectron()) {
     window.FileApi.openExeDirectory()
@@ -91,16 +95,32 @@ const handleRestartKernel = async () => {
           <div class="row items-center justify-between">
             内核端口：{{ port }}
             <div class="row items-center q-gutter-sm">
-              <q-badge class="q-ml-xs cursor-pointer" @click="applicationStore.checkHealth" rounded
-                       :color="applicationStore.status">
-                <q-tooltip>{{ applicationStore.response }}</q-tooltip>
-              </q-badge>
               <q-icon name="refresh"
                       :class="`q-ml-xs ${restartLoading?'cursor-not-allowed  animation-rotate':'cursor-pointer'}`"
                       @click="handleRestartKernel">
                 <q-tooltip>重启内核</q-tooltip>
               </q-icon>
+              <q-badge class="q-ml-xs cursor-pointer" @click="applicationStore.checkHealth" rounded
+                       :color="applicationStore.status">
+                <q-tooltip>{{ applicationStore.response }}</q-tooltip>
+              </q-badge>
             </div>
+          </div>
+          <div class="row items-center justify-between">
+            <div>
+              远程地址：
+              <span class="cursor-pointer">
+                {{ remoteServerStore.remoteServer }}
+                <q-popup-edit :model-value="remoteServerStore.remoteServer"
+                              @update:model-value="remoteServerStore.handleUpdateRemoteServer" auto-save v-slot="scope">
+                  <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set"/>
+                </q-popup-edit>
+              </span>
+            </div>
+            <q-badge class="q-ml-xs cursor-pointer" @click="remoteServerStore.checkHealth" rounded
+                     :color="remoteServerStore.status">
+              <q-tooltip>{{ remoteServerStore.response }}</q-tooltip>
+            </q-badge>
           </div>
           <div class="q-mt-lg row text-primary items-center cursor-pointer "
                @click="handleBrowser('http://36.134.229.254:1230/data/data-toolkit')">

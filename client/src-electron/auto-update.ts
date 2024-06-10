@@ -1,6 +1,6 @@
 import electronUpdater, { UpdateCheckResult } from 'electron-updater'
 import { BrowserWindow } from 'electron'
-import { logger } from 'app/src-electron/utils'
+import { logger } from 'app/src-electron/utils.js'
 
 const updateUrl = 'https://36.134.229.254:5244/d/dist/data-toolkit'
 const {

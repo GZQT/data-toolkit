@@ -3,8 +3,21 @@ import { BrowserWindow, app, dialog, ipcMain } from 'electron'
 import os from 'os'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { getKernelAvailablePort, getKernelPort, initKernel, killKernel, restartKernel } from './start-kernel'
-import { cancelDownload, checkUpdate, downloadUpdate, installUpdateApp, setWindow } from './auto-update'
+import {
+  getKernelAvailablePort,
+  getKernelPort,
+  initKernel,
+  killKernel,
+  restartKernel
+} from 'app/src-electron/start-kernel.js'
+import {
+  cancelDownload,
+  checkUpdate,
+  downloadUpdate,
+  installUpdateApp,
+  setWindow
+} from 'app/src-electron/auto-update.js'
+import { store, STORE_KEYS } from 'app/src-electron/store'
 
 // https://quasar.dev/quasar-cli-vite/developing-electron-apps/frameless-electron-window#setting-frameless-window
 initialize()
@@ -103,6 +116,10 @@ ipcMain.handle('FileApi:selectFiles', async (_, multiSelections: boolean = true)
 
 ipcMain.handle('ApplicationApi:checkUpdate', () => checkUpdate(mainWindow))
 ipcMain.handle('ApplicationApi:downloadUpdate', () => downloadUpdate(mainWindow))
+ipcMain.handle('ApplicationApi:getRemoteServer', () => store.get(STORE_KEYS.REMOTE_SERVER))
+ipcMain.handle('ApplicationApi:setRemoteServer', (_, address: string) => {
+  store.set(STORE_KEYS.REMOTE_SERVER, address)
+})
 ipcMain.handle('ApplicationApi:installUpdateApp', async () => {
   await killKernel()
   installUpdateApp()

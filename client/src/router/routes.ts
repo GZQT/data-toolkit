@@ -49,6 +49,10 @@ const routes: RouteRecordRaw[] = [
             ]
           }
         ]
+      },
+      {
+        path: 'dau',
+        component: () => import('pages/dau/DauPage.vue')
       }
     ]
   },

@@ -10,7 +10,6 @@ const router = useRouter()
 onMounted(async () => {
   if (isElectron()) {
     const result = await window.KernelApi.start()
-    console.log(result)
     if (result === true) {
       tip.value = '内核加载完成！'
       void router.push('/task')

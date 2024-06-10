@@ -1,6 +1,7 @@
 import createClient, { type Middleware } from 'openapi-fetch'
 import { LoadingBar, Notify } from 'quasar'
 import { paths } from 'src/types/api'
+import { paths as remotePaths } from 'src/types/remote-api'
 
 interface ErrorDetail {
   type: string
@@ -93,13 +94,29 @@ const middleware: Middleware = {
 }
 
 const port = await window.KernelApi.getKernelAvailablePort()
+const remoteServer = await window.ApplicationApi.getRemoteServer()
+
 const client = createClient<paths>({
   baseUrl: `http://localhost:${port}`
 })
 
-const simpleClient = createClient<paths>({
+const healthClient = createClient<paths>({
   baseUrl: `http://localhost:${port}`
 })
 
+let remoteClient = createClient<remotePaths>({
+  baseUrl: remoteServer
+})
+
+let healthRemoteClient = createClient<remotePaths>({
+  baseUrl: remoteServer
+})
+
+const updateRemoteClient = (address: string) => {
+  remoteClient = createClient<remotePaths>({ baseUrl: address })
+  healthRemoteClient = createClient<remotePaths>({ baseUrl: remoteServer })
+}
+
 client.use(middleware)
-export { client, simpleClient, port }
+remoteClient.use(middleware)
+export { client, healthClient, port, remoteClient, healthRemoteClient, updateRemoteClient }

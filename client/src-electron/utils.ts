@@ -1,5 +1,4 @@
 import log from 'electron-log'
-import Store from 'electron-store'
 
 import path from 'path'
 import { app } from 'electron'
@@ -15,24 +14,6 @@ logger.transports.file.resolvePathFn = () => path.join(confDir, 'main.log')
 logger.transports.file.level = 'info'
 
 export { logger }
-
-const schema = {
-  theme: {
-    anyOf: [
-      { type: 'boolean' },
-      {
-        type: 'string',
-        enum: ['auto']
-      }
-    ],
-    default: true
-  }
-}
-
-export const store = new Store({
-  schema,
-  cwd: confDir
-})
 
 export const sleep = (ms: number) => {
   return new Promise(resolve => setTimeout(resolve, ms))

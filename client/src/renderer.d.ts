@@ -22,6 +22,8 @@ export interface ApplicationApi {
   downloadUpdate: () => void
   installUpdateApp: () => void
   onUpdateProgress: (func: (info: ProgressInfo) => void) => void
+  getRemoteServer: () => Promise<string>
+  setRemoteServer: (address: string) => void
 }
 
 export interface KernelApi {

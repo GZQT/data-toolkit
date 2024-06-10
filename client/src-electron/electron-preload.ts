@@ -82,7 +82,9 @@ contextBridge.exposeInMainWorld('ApplicationApi', {
   },
   checkUpdate: () => ipcRenderer.invoke('ApplicationApi:checkUpdate'),
   downloadUpdate: () => ipcRenderer.invoke('ApplicationApi:downloadUpdate'),
-  installUpdateApp: () => ipcRenderer.invoke('ApplicationApi:installUpdateApp')
+  installUpdateApp: () => ipcRenderer.invoke('ApplicationApi:installUpdateApp'),
+  getRemoteServer: () => ipcRenderer.invoke('ApplicationApi:getRemoteServer'),
+  setRemoteServer: (address: string) => ipcRenderer.invoke('ApplicationApi:setRemoteServer', address)
 })
 
 contextBridge.exposeInMainWorld('FileApi', {

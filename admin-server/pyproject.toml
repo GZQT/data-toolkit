@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "admin-server"
+version = "0.1.0"
+description = ""
+authors = ["李中月 <lizhongyue248@163.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.0"
+sqlalchemy = "^2.0.30"
+httpx = "^0.27.0"
+fastapi-camelcase = "^2.0.0"
+pytest = "^8.2.2"
+fastapi-pagination = "^0.12.24"
+psycopg2 = "^2.9.9"
+alembic = "^1.13.1"
+pandas = "^2.2.2"
+openpyxl = "^3.1.3"
+xlrd = "^2.0.1"
+testcontainers = {extras = ["postgres"], version = "^4.5.1"}
+coverage = "^7.5.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

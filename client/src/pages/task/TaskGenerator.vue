@@ -255,7 +255,6 @@ const handleAutoRefresh = (time: number) => {
     <q-table class="container-table container-table-sticky-head" v-model:selected="selected" flat bordered
       :rows="taskGeneratorData" selection="multiple" :columns="columns" row-key="id" :pagination="{ rowsPerPage: 10 }"
       :filter="filter" :loading="loading.table" table-header-class="sticky-head">
-
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td>
@@ -372,6 +371,5 @@ const handleAutoRefresh = (time: number) => {
 <style scoped lang="scss">
 .container-table {
   height: calc(100vh - 140px);
-
 }
 </style>
