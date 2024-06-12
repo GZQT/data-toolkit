@@ -120,3 +120,40 @@ class TestDau:
         assert response.status_code == 204
         content = self.database.query(DauConfig).filter_by(name="need_det_dau").all()
         assert len(content) == 0
+
+    def test_dau_bridge_name(self):
+        response = self.client.post('/dau', json={
+            "name": "bridge_name",
+            "bridge": "bridge_name"
+        })
+        assert response.status_code == 201
+        response = self.client.get(f"/dau/bridge/")
+        assert response.status_code == 200
+        body = response.json()
+        assert 'bridge_name' in body
+
+    def test_dau_get_by_bridge(self):
+        response = self.client.post('/dau', json={
+            "name": "bridge_name_1",
+            "bridge": "bridge_name_1"
+        })
+        assert response.status_code == 201
+        response = self.client.get(f"/dau/bridge/bridge_name_1")
+        assert response.status_code == 200
+        body = response.json()
+        assert len(body) == 1
+
+    def test_get_ids(self):
+        response = self.client.post('/dau', json={
+            "name": "test_get_ids",
+            "bridge": "test_get_ids"
+        })
+        assert response.status_code == 201
+        content = self.database.query(DauConfig).filter_by(name="test_get_ids").one()
+        response = self.client.get(f"/dau/ids", params={
+            "ids": [content.id]
+        })
+        assert response.status_code == 200
+        body = response.json()
+        assert len(body) == 1
+

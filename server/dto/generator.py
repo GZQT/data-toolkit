@@ -34,6 +34,21 @@ class GeneratorBase(CamelModel):
     name: str
 
 
+class DauConfig(CamelModel):
+    column: str
+    mapping: int
+
+
+class GeneratorDataConverterRequest(CamelModel):
+    column_key: str
+    expression: str
+
+
+class GeneratorConfigRequest(CamelModel):
+    converters: List[GeneratorDataConverterRequest]
+    dau_config: List[DauConfig] | None
+
+
 class GeneratorResponse(GeneratorBase):
     id: int
     created_date: datetime.datetime
@@ -41,6 +56,7 @@ class GeneratorResponse(GeneratorBase):
     files: str | None
     status: GeneratorResultEnum = GeneratorResultEnum.PROCESSING
     result: str | None
+    config_obj: GeneratorConfigRequest | None
 
 
 class GeneratorAllResponse(GeneratorResponse):
@@ -62,15 +78,6 @@ class LineChartRequest(CamelModel):
     fill: ChartFillEnum | None = None
     line_width: float = 1
     show_grid: bool = True
-
-
-class GeneratorDataConverterRequest(CamelModel):
-    column_key: str
-    expression: str
-
-
-class GeneratorConfigRequest(CamelModel):
-    converters: List[GeneratorDataConverterRequest]
 
 
 class TaskGeneratorStartRequest(CamelModel):

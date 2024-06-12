@@ -21,6 +21,18 @@ export type paths = {
     /** Delete Dau */
     delete: operations["delete_dau_dau__id__delete"];
   };
+  "/dau/bridge": {
+    /** Get Bridge */
+    get: operations["get_bridge_dau_bridge_get"];
+  };
+  "/dau/bridge/{bridge_name}": {
+    /** Get Bridge */
+    get: operations["get_bridge_dau_bridge__bridge_name__get"];
+  };
+  "/dau/ids": {
+    /** Get Ids */
+    get: operations["get_ids_dau_ids_get"];
+  };
   "/health": {
     /** Health */
     get: operations["health_health_get"];
@@ -284,6 +296,61 @@ export type operations = {
       /** @description Successful Response */
       204: {
         content: never;
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get Bridge */
+  get_bridge_dau_bridge_get: {
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": string[];
+        };
+      };
+    };
+  };
+  /** Get Bridge */
+  get_bridge_dau_bridge__bridge_name__get: {
+    parameters: {
+      path: {
+        bridge_name: string;
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["DauSearchResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  /** Get Ids */
+  get_ids_dau_ids_get: {
+    parameters: {
+      query?: {
+        ids?: number[];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["DauSearchResponse"][];
+        };
       };
       /** @description Validation Error */
       422: {

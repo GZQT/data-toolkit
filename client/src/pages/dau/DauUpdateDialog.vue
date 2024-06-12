@@ -59,6 +59,7 @@ const handleSubmit = () => {
     })
     return
   }
+  form.value.bridge = form.value.name
   if (form.value.id === null) {
     remoteClient.POST('/dau', {
       body: form.value
@@ -82,6 +83,8 @@ const handleSubmit = () => {
     <q-card class="q-dialog-plugin column full-height" style="max-height: 100%">
       <q-card-section class="q-pb-none flex row justify-between">
         <div class="text-h6">{{dau ? '编辑' : '添加'}}</div>
+        <q-space/>
+        <q-btn flat round size="sm" icon="close" @click="onDialogCancel"/>
       </q-card-section>
       <q-card-section class="flex column justify-between" style="flex: 1;">
         <q-scroll-area style="flex: 1;">

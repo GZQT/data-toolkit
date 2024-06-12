@@ -22,8 +22,8 @@ export type paths = {
     delete: operations["update_generator_task__task_id__generator__generator_id__delete"];
   };
   "/task/{task_id}/generator/{generator_id}/clearOutput": {
-    /** Update Generator */
-    put: operations["update_generator_task__task_id__generator__generator_id__clearOutput_put"];
+    /** Clear Output */
+    put: operations["clear_output_task__task_id__generator__generator_id__clearOutput_put"];
   };
   "/task/{task_id}/generate/barChart": {
     /** Start Bar Chart */
@@ -101,6 +101,13 @@ export type components = {
      * @enum {string}
      */
     ChartFillEnum: "FORWARD_FILL" | "BACKWARD_FILL" | "NONE" | "LINE" | "TIME";
+    /** DauConfig */
+    DauConfig: {
+      /** Column */
+      column: string;
+      /** Mapping */
+      mapping: number;
+    };
     /** GeneratorAllResponse */
     GeneratorAllResponse: {
       /** Name */
@@ -123,6 +130,7 @@ export type components = {
       status?: components["schemas"]["GeneratorResultEnum"];
       /** Result */
       result: string | null;
+      configObj: components["schemas"]["GeneratorConfigRequest"] | null;
       /** Output */
       output: string | null;
     };
@@ -130,6 +138,8 @@ export type components = {
     GeneratorConfigRequest: {
       /** Converters */
       converters: components["schemas"]["GeneratorDataConverterRequest"][];
+      /** Dauconfig */
+      dauConfig: components["schemas"]["DauConfig"][] | null;
     };
     /** GeneratorCreateRequest */
     GeneratorCreateRequest: {
@@ -167,6 +177,7 @@ export type components = {
       status?: components["schemas"]["GeneratorResultEnum"];
       /** Result */
       result: string | null;
+      configObj: components["schemas"]["GeneratorConfigRequest"] | null;
     };
     /**
      * GeneratorResultEnum
@@ -503,8 +514,8 @@ export type operations = {
       };
     };
   };
-  /** Update Generator */
-  update_generator_task__task_id__generator__generator_id__clearOutput_put: {
+  /** Clear Output */
+  clear_output_task__task_id__generator__generator_id__clearOutput_put: {
     parameters: {
       path: {
         task_id: number;

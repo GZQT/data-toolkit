@@ -5,6 +5,7 @@ from typing import Any
 GENERATOR_FILE_SEPARATOR = "_:_"
 HOME_DIRECTORY = os.path.expanduser('~')
 ROOT_DIRECTORY = os.path.join(HOME_DIRECTORY, 'data-toolkit')
+CONFIG_FILE = os.path.join(ROOT_DIRECTORY, 'config.json')
 CSV_SUFFIX = '.csv'
 logger = logging.getLogger('uvicorn')
 

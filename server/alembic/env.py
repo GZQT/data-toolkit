@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from schema.task import Task, TaskGenerator, TaskFile, DauConfig
+from schema.task import Task, TaskGenerator, TaskFile
 
 from database import Base, SQLALCHEMY_DATABASE_URL
 

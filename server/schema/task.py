@@ -1,3 +1,4 @@
+import json
 import string
 from typing import List
 
@@ -31,11 +32,10 @@ class TaskGenerator(CommonSchema):
         Enum(GeneratorResultEnum, name='GeneratorResult'), default="WAITING")
     output: Mapped[str] = mapped_column(Text, nullable=True)
     result: Mapped[string] = mapped_column(String(2048), nullable=True)
+    config: Mapped[str] = mapped_column(String(2048), nullable=True)
 
     task_id: Mapped[int] = mapped_column(ForeignKey("task.id"))
     task: Mapped["Task"] = relationship(back_populates="generators")
-    dau_config_id: Mapped[int] = mapped_column(ForeignKey("dau_config.id", name="generator_dau_config"), nullable=True)
-    dau_config: Mapped["DauConfig"] = relationship(back_populates="generators")
 
     @property
     def file_list(self):
@@ -43,25 +43,8 @@ class TaskGenerator(CommonSchema):
             return []
         return self.files.split("_:_")
 
-
-class DauConfig(CommonSchema):
-    __tablename__ = "dau_config"
-
-    bridge: Mapped[string] = mapped_column(String(128), nullable=False)
-    collection_station_no: Mapped[string] = mapped_column(String(128), nullable=True)
-    collection_device_no: Mapped[string] = mapped_column(String(128), nullable=True)
-    ip_address: Mapped[string] = mapped_column(String(128), nullable=True)
-    sample_rate: Mapped[string] = mapped_column(String(128), nullable=True)
-    physics_channel: Mapped[string] = mapped_column(String(128), nullable=True)
-    install_no: Mapped[string] = mapped_column(String(128), nullable=True)
-    transfer_no: Mapped[string] = mapped_column(String(128), nullable=True)
-    monitor_project: Mapped[string] = mapped_column(String(128), nullable=True)
-    device_type: Mapped[string] = mapped_column(String(128), nullable=True)
-    manufacturer: Mapped[string] = mapped_column(String(128), nullable=True)
-    specification: Mapped[string] = mapped_column(String(128), nullable=True)
-    device_no: Mapped[string] = mapped_column(String(128), nullable=True)
-    install_location: Mapped[string] = mapped_column(String(128), nullable=True)
-    direction: Mapped[string] = mapped_column(String(128), nullable=True)
-
-    generators: Mapped[List["TaskGenerator"]] = \
-        relationship(back_populates="dau_config", cascade="all, delete")
+    @property
+    def config_obj(self):
+        if self.config is None:
+            return None
+        return json.loads(self.config)

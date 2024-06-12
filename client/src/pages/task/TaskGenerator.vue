@@ -39,7 +39,6 @@ const $q = useQuasar()
 const route = useRoute()
 const taskId = ref<number>(0)
 const fileSelectDialog = ref<null | InstanceType<typeof FileSelectDialog>>(null)
-const generatorStartDialog = ref<null | InstanceType<typeof GeneratorStartDialog>>(null)
 const generatorOutputDialog = ref<null | InstanceType<typeof GeneratorOutputDialog>>(null)
 const showChartDialog = ref<null | InstanceType<typeof ShowChartDialog>>(null)
 const generatorStartBarDialog = ref<null | InstanceType<typeof GeneratorStartBarDialog>>(null)
@@ -194,7 +193,17 @@ const handleRun = (item: GeneratorType) => {
     $q.notify({ type: 'warning', message: '没有可以处理的文件' })
     return
   }
-  generatorStartDialog.value?.openDialog(item.id, fileList, item.status!)
+  console.log(item.configObj)
+  $q.dialog({
+    component: GeneratorStartDialog,
+    componentProps: {
+      taskId: taskId.value,
+      files: fileList,
+      id: item.id,
+      currentStatus: item.status,
+      config: item.configObj
+    }
+  }).onOk(handleData)
 }
 
 const handleEdit = (row: GeneratorType) => {
@@ -248,7 +257,6 @@ const handleAutoRefresh = (time: number) => {
     <FileSelectDialog ref="fileSelectDialog" @save="handleFileSelect">
       <q-input class="q-mb-md" v-model="name" dense outlined placeholder="请输入生成名称" label="名称" />
     </FileSelectDialog>
-    <GeneratorStartDialog ref="generatorStartDialog" :task-id="taskId" />
     <GeneratorOutputDialog ref="generatorOutputDialog" />
     <GeneratorStartBarDialog ref="generatorStartBarDialog" :task-id="taskId" />
     <ShowChartDialog ref="showChartDialog" />

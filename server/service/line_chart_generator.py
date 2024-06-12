@@ -73,6 +73,8 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         else:
             chart_name = self.line_chart.name[index]
         file_path = f'{os.path.join(path, line_key + chart_name).replace("/", "-")}.png'
+        if os.path.exists(file_path):
+            file_path = f'{os.path.join(path, get_now_date() + "_" + line_key + chart_name).replace("/", "-")}.png'
         # np_datum = np.array(self.data[line_key])
         # df = pd.DataFrame({'time': self.times, 'data': np_datum})
         df = self.data[line_key]

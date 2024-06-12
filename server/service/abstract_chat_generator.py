@@ -46,7 +46,10 @@ class AbstractChatGenerator:
         table_result = self.get_table_data()
         df = pd.DataFrame(table_result)
         # 存入到 excel
-        with pd.ExcelWriter(os.path.join(path, self.excel_name), engine='openpyxl') as writer:
+        filename = os.path.join(path, self.excel_name)
+        if os.path.exists(filename):
+            filename = os.path.join(path, get_now_date() + self.excel_name)
+        with pd.ExcelWriter(filename, engine='openpyxl') as writer:
             df.to_excel(writer, sheet_name='Sheet1', index=False)
 
             # 表格宽度自适应

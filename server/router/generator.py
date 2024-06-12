@@ -45,7 +45,7 @@ def update_generator(task_id: int, generator_id: int, generator: GeneratorCreate
 
 
 @router.put("/{task_id}/generator/{generator_id}/clearOutput", status_code=204)
-def update_generator(task_id: int, generator_id: int, db: Session = Depends(get_db)):
+def clear_output(task_id: int, generator_id: int, db: Session = Depends(get_db)):
     (db.query(TaskGenerator).filter_by(id=generator_id).
      update({TaskGenerator.output: '', TaskGenerator.updated_date: datetime.datetime.now()}))
     db.commit()

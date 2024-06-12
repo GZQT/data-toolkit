@@ -6,7 +6,7 @@ import pandas as pd
 from fastapi import APIRouter, Depends, Query, UploadFile, HTTPException
 from fastapi_pagination import Page, add_pagination
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy import select
+from sqlalchemy import select, distinct
 from sqlalchemy.orm import Session
 
 from dependency import get_db
@@ -106,6 +106,26 @@ def update_dau(id: int, request: DauSearchRequest, db: Session = Depends(get_db)
 def delete_dau(id: int, db: Session = Depends(get_db)):
     db.query(DauConfig).filter_by(id=id).delete()
     db.commit()
+
+
+@router.get("/bridge", response_model=list[str])
+def get_bridge(db: Session = Depends(get_db)):
+    result = db.query(distinct(DauConfig.bridge)).all()
+    return [bridge[0] for bridge in result]
+
+
+@router.get("/bridge/{bridge_name}", response_model=list[DauSearchResponse])
+def get_bridge(bridge_name: str, db: Session = Depends(get_db)):
+    if bridge_name == "":
+        return []
+    return db.query(DauConfig).filter_by(bridge=bridge_name).all()
+
+
+@router.get("/ids", response_model=list[DauSearchResponse])
+def get_ids(ids: List[int] = Query(None), db: Session = Depends(get_db)):
+    if len(ids) == 0:
+        return []
+    return db.query(DauConfig).filter(DauConfig.id.in_(ids)).all()
 
 
 add_pagination(router)
