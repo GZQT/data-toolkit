@@ -7,23 +7,24 @@ import pandas as pd
 from openpyxl.utils import get_column_letter
 from sqlalchemy.orm import Session
 
-from constant import GENERATOR_FILE_SEPARATOR, ROOT_DIRECTORY, CSV_SUFFIX
+import constant
+import utils
 from schema.task import TaskGenerator
 from service.load_csv_file import LoadCsvFile
-from utils import get_csv_data_file, get_now_date
+from utils import get_now_date
 
 
 class AbstractChatGenerator:
 
     def __init__(self, data: LoadCsvFile, generator: TaskGenerator, db: Session, excel_name: str):
-        self.files = generator.files.split(GENERATOR_FILE_SEPARATOR)
+        self.files = generator.files.split(constant.GENERATOR_FILE_SEPARATOR)
         self.db = db
         self.generator = generator
         self.output = '' if generator.output is None else generator.output
         self.keys = data.data.keys()
         self.data = data.data
         self.times = data.times
-        self.dir = os.path.join(ROOT_DIRECTORY, generator.name)
+        self.dir = os.path.join(constant.ROOT_DIRECTORY, generator.name)
         self.excel_name = excel_name
 
     def write_log(self):
@@ -48,7 +49,7 @@ class AbstractChatGenerator:
         # 存入到 excel
         filename = os.path.join(path, self.excel_name)
         if os.path.exists(filename):
-            filename = os.path.join(path, get_now_date() + self.excel_name)
+            filename = os.path.join(path, utils.get_file_now_date() + self.excel_name)
         with pd.ExcelWriter(filename, engine='openpyxl') as writer:
             df.to_excel(writer, sheet_name='Sheet1', index=False)
 

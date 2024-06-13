@@ -3,6 +3,9 @@
 *.rar
 *.csv
 *.xlsx
+!server/test/service/test.csv
+/server/test/service/**/**/*.png
+
 ### sqllite
 *.db
 

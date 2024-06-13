@@ -2,11 +2,11 @@ import os.path
 from abc import ABC, abstractmethod
 
 import numpy as np
-import pandas as pd
 from matplotlib import dates as mdates
 from matplotlib import pyplot as plt
 from sqlalchemy.orm import Session
 
+import utils
 from constant import logger
 from dto.generator import TaskGeneratorStartRequest, ChartFillEnum
 from schema.task import TaskGenerator
@@ -74,7 +74,7 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
             chart_name = self.line_chart.name[index]
         file_path = f'{os.path.join(path, line_key + chart_name).replace("/", "-")}.png'
         if os.path.exists(file_path):
-            file_path = f'{os.path.join(path, get_now_date() + "_" + line_key + chart_name).replace("/", "-")}.png'
+            file_path = f'{os.path.join(path, utils.get_file_now_date() + "_" + line_key + chart_name).replace("/", "-")}.png'
         # np_datum = np.array(self.data[line_key])
         # df = pd.DataFrame({'time': self.times, 'data': np_datum})
         df = self.data[line_key]

@@ -27,6 +27,9 @@ class LoadCsvFile:
 
     def load_data(self, generator_config: GeneratorConfigRequest = None):
         data_frames_list = [pd.read_csv(file) for file in self.files]
+        if len(data_frames_list) == 0:
+            self.output += "未读取到任何行的数据"
+            return self
         combined_df = pd.concat(data_frames_list, ignore_index=True)
         # 忽略 'id' 列和任何以 'Unnamed' 开头的列
         # combined_df = combined_df.loc[:, ~combined_df.columns.str.contains('^Unnamed|^id')]

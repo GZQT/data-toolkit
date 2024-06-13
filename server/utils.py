@@ -22,6 +22,10 @@ def get_now_date():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 
+def get_file_now_date():
+    return datetime.now().strftime('%Y%m%d%H%M%S')
+
+
 def detect_encoding(file_path):
     encodings = ['utf-8', 'utf-8-sig', 'ansi']
     for encoding in encodings:

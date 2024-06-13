@@ -9,7 +9,7 @@ class TestTask:
         response = client.post("/task", json={
             "name": name
         })
-        assert response.status_code == 200
+        assert response.status_code == 201
         body = response.json()
         assert body['name'] == name
         assert body['id'] > 0

@@ -17,7 +17,7 @@ from service.load_csv_file import LoadCsvFile
 from utils import get_now_date
 
 
-def _generate_chart(db, data, generator, request):
+def _generate_chart(db: Session, data, generator: TaskGenerator, request: TaskGeneratorStartRequest):
     generator.output += data.output
     average_generator: AbstractChatGenerator | None = None
     max_min_generator: AbstractChatGenerator | None = None
