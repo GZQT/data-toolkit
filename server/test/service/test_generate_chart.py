@@ -9,7 +9,7 @@ from service.chart_generator import generate_chart
 chart_param = {
     "generate": True,
     "column_index": [],
-    "time_range": '1S',
+    "time_range": '1s',
     "x_label": "test_x",
     "y_label": "test_y",
     "x_rotation": 45,
@@ -21,7 +21,7 @@ chart_param = {
 no_chart_param = {
     "generate": False,
     "column_index": [],
-    "time_range": '1S',
+    "time_range": '1s',
     "x_label": "test_x",
     "y_label": "test_y",
     "x_rotation": 45,

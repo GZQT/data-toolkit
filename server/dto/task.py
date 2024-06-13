@@ -1,6 +1,7 @@
 import datetime
 
 from fastapi_camelcase import CamelModel
+from pydantic import ConfigDict
 
 
 class TaskBase(CamelModel):
@@ -12,8 +13,7 @@ class TaskResponse(TaskBase):
     created_date: datetime.datetime
     updated_date: datetime.datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskCreateRequest(TaskBase):
@@ -34,5 +34,4 @@ class TaskFileResponse(TaskBase):
     created_date: datetime.datetime
     updated_date: datetime.datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

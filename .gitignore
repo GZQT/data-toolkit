@@ -5,6 +5,7 @@
 *.xlsx
 !server/test/service/test.csv
 /server/test/service/**/**/*.png
+**/test-results.xml
 
 ### Database
 client/src-electron/alembic.ini

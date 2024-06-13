@@ -37,15 +37,15 @@ class TestLoadCsv:
         assert "col0" in loader.data.columns
         assert "col16" in loader.data.columns
         for i in range(50):
-            assert loader.data['col1'][i] == i + 1
+            assert loader.data['col1'].iloc[i] == i + 1
         for i in range(50):
-            assert loader.data['col2'][i] == 1
+            assert loader.data['col2'].iloc[i] == 1
         for i in range(50):
             s = (i + 1) % 5
             if s == 0:
-                assert loader.data['col3'][i] == 5
+                assert loader.data['col3'].iloc[i] == 5
             else:
-                assert loader.data['col3'][i] == s
+                assert loader.data['col3'].iloc[i] == s
         assert loader.times.apply(lambda x: _check_format(x)).all(), \
             f"'time' column contains values not in the format '{expected_format}'."
 
@@ -65,13 +65,13 @@ class TestLoadCsv:
         }
         loader = LoadCsvFile(test_file).load_data(GeneratorConfigRequest(**param))
         for i in range(50):
-            assert loader.data['col1'][i] == i + 1 + 100
-            assert loader.data['col2'][i] == 1 - 100
-            assert loader.data['col4'][i] == 4
-            assert loader.data['col5'][i] == 0
-            assert loader.data['col6'][i] == 50 - i
-            assert loader.data['col7'][i] == 6
-            assert loader.data['col8'][i] == 1
+            assert loader.data['col1'].iloc[i] == i + 1 + 100
+            assert loader.data['col2'].iloc[i] == 1 - 100
+            assert loader.data['col4'].iloc[i] == 4
+            assert loader.data['col5'].iloc[i] == 0
+            assert loader.data['col6'].iloc[i] == 50 - i
+            assert loader.data['col7'].iloc[i] == 6
+            assert loader.data['col8'].iloc[i] == 1
 
     def mock_open(*args, **kwargs):
         config_content = {

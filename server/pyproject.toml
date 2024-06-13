@@ -25,6 +25,8 @@ alembic = "^1.13.1"
 requests = "^2.32.3"
 pytest-mock = "^3.14.0"
 responses = "^0.25.2"
+coverage = "^7.5.3"
+pytest-cov = "^5.0.0"
 
 
 [[tool.poetry.source]]
