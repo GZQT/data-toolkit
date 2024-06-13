@@ -6,6 +6,10 @@
 !server/test/service/test.csv
 /server/test/service/**/**/*.png
 
+### Database
+client/src-electron/alembic.ini
+client/src-electron/alembic
+
 ### sqllite
 *.db
 

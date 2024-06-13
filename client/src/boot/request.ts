@@ -93,7 +93,7 @@ const middleware: Middleware = {
   }
 }
 
-const port = await window.KernelApi.getKernelAvailablePort()
+const port = 18764
 const remoteServer = await window.ApplicationApi.getRemoteServer()
 
 const client = createClient<paths>({

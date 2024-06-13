@@ -10,8 +10,7 @@ import _ from 'lodash'
 const {
   dialogRef,
   onDialogHide,
-  onDialogOK,
-  onDialogCancel
+  onDialogOK
 } = useDialogPluginComponent()
 
 defineEmits({

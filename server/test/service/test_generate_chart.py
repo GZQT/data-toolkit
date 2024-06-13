@@ -1,11 +1,6 @@
 import os.path
 import shutil
 from unittest import mock
-from unittest.mock import patch
-
-import pytest
-
-import constant
 from conf_test_db import override_get_db
 from dto.generator import TaskGeneratorStartRequest
 from schema.task import TaskGenerator, Task
@@ -69,7 +64,8 @@ class TestGenerateChart:
         self.database.commit()
         self.database.add(
             TaskGenerator(name="test_generate",
-                          files=f"{os.path.abspath(os.path.join(os.path.dirname(current_file_path), 'test.csv'))}", task_id=1))
+                          files=f"{os.path.abspath(os.path.join(os.path.dirname(current_file_path), 'test.csv'))}",
+                          task_id=1))
         self.database.commit()
 
     def _test_generate_chart(self, param, chart_type):
@@ -116,5 +112,3 @@ class TestGenerateChart:
     def test_generate_average_data_table(self):
         request_dict = request_template
         request_dict["average_data_table"] = True
-
-

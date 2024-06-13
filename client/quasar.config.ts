@@ -225,6 +225,16 @@ export default configure((/* ctx */) => {
             from: 'src-electron/application.exe',
             to: 'appearance/application.exe',
             filter: '!**/{.DS_Store}'
+          },
+          {
+            from: 'src-electron/alembic.ini',
+            to: 'appearance/alembic.ini',
+            filter: '!**/{.DS_Store}'
+          },
+          {
+            from: 'src-electron/alembic',
+            to: 'appearance/alembic',
+            filter: ['!**/{.DS_Store}', '!**/__pycache__']
           }
         ],
         publish: {

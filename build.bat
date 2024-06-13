@@ -11,6 +11,8 @@ cd ..
 
 REM 复制 application.exe 到 client/src-electron 目录
 copy server\dist\application.exe client\src-electron
+copy server\alembic.ini client\src-electron\alembic.ini
+xcopy "server\alembic" "client\src-electron\alembic" /E /I /Y
 
 REM 切换到 client 目录
 cd client

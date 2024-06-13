@@ -19,6 +19,7 @@ const getResources = (file: string) => {
     const projectDir = path.dirname(appDir)
     targetPath = path.join(projectDir, 'src-electron', file)
   }
+  logger.info(targetPath)
   return targetPath
 }
 
@@ -50,7 +51,7 @@ export const initKernel = async (): Promise<string | boolean> => {
     logger.error(`⚠️ Kernel program is missing. ${kernelPath}`)
     return Promise.resolve(`⚠️ Kernel program is missing. ${kernelPath}`)
   }
-  kernelProcess = cp.spawn(kernelPath, ['-P', `${kernelPort}`], {
+  kernelProcess = cp.spawn(kernelPath, ['-P', `${kernelPort}`, '-p', path.dirname(path.resolve(kernelPath))], {
     stdio: 'ignore',
     detached: false
   })
