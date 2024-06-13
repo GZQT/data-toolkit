@@ -14,7 +14,7 @@
     "javascript", "javascriptreact", "typescript", "vue"],
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": [
-    "pinia"
+    "pinia", "GZQT", "gzqt"
   ],
   "eslint.format.enable": true,
   "typescript.format.enable": false,

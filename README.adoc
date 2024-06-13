@@ -1,0 +1,7 @@
+= Data Toolkit
+
+The project has three module:
+
+* `server`: Client local server.
+* `client`: User client for web and desktop.
+* `admin-server`: Web server.
