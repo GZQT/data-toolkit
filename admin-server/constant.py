@@ -8,6 +8,8 @@ ROOT_DIRECTORY = os.path.join(HOME_DIRECTORY, 'data-toolkit')
 CSV_SUFFIX = '.csv'
 logger = logging.getLogger('uvicorn')
 
+server_log = os.path.join(ROOT_DIRECTORY, "server.log")
+server_access_log = os.path.join(ROOT_DIRECTORY, "server-access.log")
 CUSTOM_LOGGING_CONFIG: dict[str, Any] = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -33,7 +35,7 @@ CUSTOM_LOGGING_CONFIG: dict[str, Any] = {
         "application_file_handler": {
             "formatter": "default",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(ROOT_DIRECTORY, "application.log"),
+            "filename": server_log,
             "mode": "a+",
             "maxBytes": 10 * 1024 * 1024,
             "backupCount": 0,
@@ -41,7 +43,7 @@ CUSTOM_LOGGING_CONFIG: dict[str, Any] = {
         "access_file_handler": {
             "formatter": "access_file",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(ROOT_DIRECTORY, "application-access.log"),
+            "filename": server_access_log,
             "mode": "a+",
             "maxBytes": 10 * 1024 * 1024,
             "backupCount": 0,

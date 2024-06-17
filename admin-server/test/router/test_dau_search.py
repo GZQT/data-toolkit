@@ -1,4 +1,5 @@
 import math
+import os
 
 import pytest
 
@@ -17,6 +18,9 @@ def _assert_page(response, items, total, page, size):
     return body
 
 
+current_file_path = os.path.dirname(os.path.abspath(__file__))
+
+
 class TestDauSearch:
 
     @pytest.fixture(autouse=True)
@@ -24,7 +28,8 @@ class TestDauSearch:
         self.client = request.getfixturevalue('create_test_db')
         self.database = next(override_get_db())
         self.client.post("/dau/import/test_dau_search", files={
-            "files": ('test_import_dau_file.xls', open('test_import_dau_file.xls', 'rb'),
+            "files": ('test_import_dau_file.xls',
+                      open(os.path.join(current_file_path, 'test_import_dau_file.xls'), 'rb'),
                       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         })
         data = self.database.query(DauConfig).all()

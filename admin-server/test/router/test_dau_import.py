@@ -1,7 +1,11 @@
+import os
+
 import pytest
 
 from conf_test_db import override_get_db
 from schema.dau import DauConfig
+
+current_file_path = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestDauImport:
@@ -10,7 +14,8 @@ class TestDauImport:
     def setup_class(self, request):
         self.client = request.getfixturevalue('create_test_db')
         self.database = next(override_get_db())
-        self.file = ('test_import_dau_file.xls', open('test_import_dau_file.xls', 'rb'),
+        self.file = ('test_import_dau_file.xls',
+                     open(os.path.join(current_file_path, 'test_import_dau_file.xls'), 'rb'),
                      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
     def test_import_dau(self):
