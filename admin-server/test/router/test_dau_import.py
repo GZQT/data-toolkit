@@ -14,40 +14,41 @@ class TestDauImport:
     def setup_class(self, request):
         self.client = request.getfixturevalue('create_test_db')
         self.database = next(override_get_db())
-        self.file = ('test_import_dau_file.xls',
-                     open(os.path.join(current_file_path, 'test_import_dau_file.xls'), 'rb'),
+        self.file = ('test_import_DAU配置表.xls',
+                     open(os.path.join(current_file_path, 'test_import_DAU配置表.xls'), 'rb'),
                      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
     def test_import_dau(self):
-        response = self.client.post("/dau/import/test_bridge_import", files={
+        response = self.client.post("/dau/import", files={
             "files": self.file
         })
         assert response.status_code == 201
-        data = self.database.query(DauConfig).filter_by(name='test_bridge_import').all()
-        assert len(data) == 52
+        data = self.database.query(DauConfig).filter_by(name='test_import_').all()
+        assert len(data) == 104
 
     def test_import_exist_bridge(self):
-        response = self.client.post("/dau/import/test_bridge_exist", files={
+        self.file = ('1——test_import_DAU配置表.xls',
+                     open(os.path.join(current_file_path, 'test_import_DAU配置表.xls'), 'rb'),
+                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response = self.client.post("/dau/import", files={
             "files": self.file
         })
         assert response.status_code == 201
-        response = self.client.post("/dau/import/test_bridge_exist", files={
+        response = self.client.post("/dau/import", files={
             "files": self.file
         })
-        assert response.status_code == 400
-        body = response.json()
-        assert body['detail'] == '已经存在当前桥梁的数据了，无需再进行添加'
+        assert response.status_code == 201
+        data = self.database.query(DauConfig).filter_by(name='1——test_import_').all()
+        assert len(data) == 104
 
     def test_import_no_excel(self):
-        response = self.client.post("/dau/import/test_bridge_no_excel", files={
+        response = self.client.post("/dau/import", files={
             "files": ('__init__.py', open('__init__.py', 'rb'))
         })
-        assert response.status_code == 400
-        body = response.json()
-        assert body['detail'] == '文件 __init__.py 并不是一个 Excel 文件'
+        assert response.status_code == 201
 
     def test_import_no_files(self):
-        response = self.client.post("/dau/import/test_bridge_exist", files={
+        response = self.client.post("/dau/import", files={
             "files": {}
         })
         assert response.status_code == 400

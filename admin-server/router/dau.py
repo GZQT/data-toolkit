@@ -9,10 +9,12 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy import select, distinct
 from sqlalchemy.orm import Session
 
+from constant import logger
 from dependency import get_db
 from dto.dau import DauSearchResponse, DauSearchRequest
 from schema.dau import DauConfig
 from service.dau import import_dau_config
+from utils import get_substring_before_keyword
 
 router = APIRouter(
     prefix="/dau",
@@ -60,30 +62,35 @@ def search(param: DauSearchRequest = Depends(), db: Session = Depends(get_db)) -
     return paginate(db, s.order_by(DauConfig.id.desc()))
 
 
-@router.post("/import/{bridge}", status_code=201)
-async def import_dau(bridge: str, files: List[UploadFile], db: Session = Depends(get_db)):
-    count = db.query(DauConfig).where(DauConfig.name.ilike(bridge)).count()
-    if count > 0:
-        raise HTTPException(status_code=400, detail=f"已经存在当前桥梁的数据了，无需再进行添加")
-    dataframes = []
+@router.post("/import", status_code=201)
+async def import_dau(files: List[UploadFile], sheet_names=None, db: Session = Depends(get_db)):
+    if sheet_names is None:
+        sheet_names = ["DAU", "左幅", "右幅"]
     for file in files:
+        bridge = get_substring_before_keyword(file.filename, "DAU配置表")
+        count = db.query(DauConfig).where(DauConfig.name.ilike(bridge)).count()
+        if count > 0:
+            logger.warning("已经存在当前桥梁的数据了，无需再进行添加")
+            continue
         # 检查文件扩展名是否为 Excel 文件
         if not file.filename.endswith(('.xlsx', '.xls')):
-            raise HTTPException(status_code=400, detail=f"文件 {file.filename} 并不是一个 Excel 文件")
+            logger.warning(f"文件 {file.filename} 并不是一个 Excel 文件")
+            continue
         # 读取上传的文件内容
-        contents = await file.read()
         try:
+            contents = await file.read()
             # 使用 Pandas 读取 Excel 文件
-            df = pd.read_excel(io.BytesIO(contents))
-            dataframes.append(df)
+            excel_data = pd.read_excel(io.BytesIO(contents), sheet_name=None)
+            combined_df = []
+            for key in excel_data.keys():
+                for sheet_name in sheet_names:
+                    if sheet_name in key:
+                        combined_df.append(excel_data[key])
+                        break
+            combined_df = pd.concat(combined_df, ignore_index=True).ffill()
+            import_dau_config(bridge, bridge, combined_df, db)
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"读取 excel 文件失败 {file.filename} {e}")
-    # 合并所有 DataFrame
-    if dataframes:
-        combined_df = pd.concat(dataframes, ignore_index=True).ffill()
-    else:
-        raise HTTPException(status_code=400, detail="文件合并失败，请重新尝试或者单个文件进行导入")
-    import_dau_config(bridge, bridge, combined_df, db)
+            logger.warning(f"读取 excel 文件失败 {file.filename} {e}")
 
 
 @router.post("", status_code=201)

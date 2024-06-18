@@ -1,5 +1,7 @@
 import datetime
+from typing import List
 
+from fastapi import UploadFile
 from fastapi_camelcase import CamelModel
 from schema.dau import DauConfig
 
@@ -48,3 +50,10 @@ class DauSearchResponse(DauSearchRequest):
     id: int | None
     created_date: datetime.datetime | None
     updated_date: datetime.datetime | None
+
+
+class DauImportRequest(CamelModel):
+    file: UploadFile
+    header_row_index: int = 0
+    sheet_name_list: List[str] = ['DAU', '左幅', '右幅']
+
