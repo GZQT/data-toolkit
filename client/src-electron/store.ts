@@ -17,7 +17,7 @@ const schema: Schema<ConfigSchemaType> = {
     ],
     default: true
   },
-  remoteServer: { type: 'string', default: 'http://localhost:8880' }
+  remoteServer: { type: 'string', default: 'http://192.168.68.225:8881' }
 }
 
 export const STORE_KEYS: { [key: string]: keyof ConfigSchemaType } = {

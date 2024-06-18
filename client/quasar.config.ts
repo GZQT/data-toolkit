@@ -239,7 +239,7 @@ export default configure((/* ctx */) => {
         ],
         publish: {
           provider: 'generic',
-          url: 'https://36.134.229.254:5244/d/dist/data-toolkit'
+          url: 'http://192.168.68.225:15244/files/%E8%BD%AF%E4%BB%B6%E5%8C%85/data-toolkit'
         },
         win: {
           artifactName: `$\{productName} Setup ${version}.$\{ext}`,
