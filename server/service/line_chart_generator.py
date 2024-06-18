@@ -66,7 +66,7 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         return self
 
     def _draw_line_chart(self, path, line_key, index):
-        if line_key == 'time' or line_key == 'col0':
+        if line_key == 'time' or line_key == 'col0' or line_key == 'id':
             return
         if index >= len(self.line_chart.name):
             chart_name = f"{self.type}时程曲线图"
