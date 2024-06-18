@@ -123,13 +123,13 @@ const handleRestartKernel = async () => {
             </q-badge>
           </div>
           <div class="q-mt-lg row text-primary items-center cursor-pointer "
-               @click="handleBrowser('http://36.134.229.254:1230/data/data-toolkit')">
+               @click="handleBrowser('http://git-link.gzgswork.com:13000/gzgs-qtgc/data-toolkit')">
             <q-icon name="mdi-gitlab" class="q-mr-xs"/>
             <div class="link text-caption">查看源代码</div>
             <q-icon name="north_east" class="q-ml-xs" size="15px"/>
           </div>
           <div class="row text-primary items-center cursor-pointer "
-               @click="handleBrowser('http://36.134.229.254:1230/data/data-toolkit/-/issues')">
+               @click="handleBrowser('http://git-link.gzgswork.com:13000/gzgs-qtgc/data-toolkit/issues')">
             <q-icon name="mdi-bug" class="q-mr-xs"/>
             <div class="link text-caption">问题反馈</div>
             <q-icon name="north_east" class="q-ml-xs" size="15px"/>

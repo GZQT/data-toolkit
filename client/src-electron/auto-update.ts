@@ -2,7 +2,7 @@ import electronUpdater, { UpdateCheckResult } from 'electron-updater'
 import { BrowserWindow } from 'electron'
 import { logger } from 'app/src-electron/utils.js'
 
-const updateUrl = 'https://36.134.229.254:5244/d/dist/data-toolkit'
+const updateUrl = 'http://192.168.68.225:15244/d/files/%E8%BD%AF%E4%BB%B6%E5%8C%85/data-toolkit'
 const {
   autoUpdater,
   CancellationToken

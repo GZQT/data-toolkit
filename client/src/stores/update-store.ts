@@ -91,6 +91,11 @@ export const useUpdateStore = defineStore('update', () => {
       message: `存在新版本 ${data.newVersion}, 当前版本 ${data.version}。`,
       actions: [
         {
+          label: '忽略',
+          color: 'primary',
+          size: 'md'
+        },
+        {
           label: '现在更新',
           color: 'primary',
           size: 'md',
@@ -106,11 +111,6 @@ export const useUpdateStore = defineStore('update', () => {
               caption: '0%'
             })
           }
-        },
-        {
-          label: '忽略',
-          color: 'primary',
-          size: 'md'
         }
       ]
     })
