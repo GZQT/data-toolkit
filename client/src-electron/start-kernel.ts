@@ -65,7 +65,6 @@ export const initKernel = async (): Promise<string | boolean> => {
   let count = 0
   while (count <= 20) {
     try {
-      net.fetch(`http://localhost:${kernelPort}/health`).then()
       const apiResult = await net.fetch(`http://localhost:${kernelPort}/health`)
       const apiData: components['schemas']['HealthResponse'] = await apiResult.json()
       if (apiData.status === 'ok') {

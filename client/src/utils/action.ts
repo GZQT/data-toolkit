@@ -10,4 +10,8 @@ export const handleBrowser = (url: string) => {
   window.FileApi.openExternalLink(url)
 }
 
+export const handleExitApp = () => {
+  window.WindowsApi.close()
+}
+
 export const isElectron = (): boolean => process.env.MODE === 'electron'
