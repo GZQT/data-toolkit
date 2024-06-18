@@ -76,8 +76,8 @@ def _generate_chart(db: Session, data, generator: TaskGenerator, request: TaskGe
 
 def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest, db: Session):
     if generator.output is None:
-        generator.output = \
-            f"[{get_now_date()}] 任务开始，接收到的参数为 \n{request.__dict__}\n"
+        generator.output += \
+            f"\n[{get_now_date()}] 任务开始，接收到的参数为 \n{request.__dict__}\n"
     else:
         generator.output += \
             f"\n[{get_now_date()}] 任务开始，接收到的参数为 \n{request.__dict__}\n"
@@ -92,8 +92,8 @@ def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest,
     try:
         config: GeneratorConfigRequest | None = None
         if request.config is not None:
-            generator.output = \
-                f"[{get_now_date()}] 检测到有新的配置信息，更新数据库数据"
+            generator.output += \
+                f"\n[{get_now_date()}] 检测到有新的配置信息，更新数据库数据\n"
             config = request.config
             db.query(TaskGenerator).filter_by(id=generator.id).update({
                 TaskGenerator.config: json.dumps(config.dict()),
@@ -102,12 +102,14 @@ def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest,
             })
             db.commit()
         elif generator.config_obj is not None:
-            generator.output = \
-                f"[{get_now_date()}] 检测到存在配置信息，使用原始配置"
+            generator.output += \
+                f"\n[{get_now_date()}] 检测到存在配置信息，使用原始配置"
             config = generator.config_obj
         data = LoadCsvFile(generator.files).load_data(config)
         _generate_chart(db, data, generator, request)
     except Exception as e:
+        generator.output += \
+            f"\n[{get_now_date()}] 生成失败 \n{traceback.format_exc()}"
         traceback.print_exc()
         logger.warning(f"生成失败 {generator.name}")
         logger.exception(e)

@@ -103,15 +103,15 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         pass
 
     def _init(self, line_chart, name):
-        self.output += f"[{get_now_date()}] 开始生成{name}折线图"
+        self.output += f"\n[{get_now_date()}] 开始生成{name}折线图"
         self.line_chart = line_chart
         if self.line_chart.column_index is None:
             self.columns_index = []
-            self.output += f"[{get_now_date()}] {name}生成所有列"
+            self.output += f"\n[{get_now_date()}] {name}生成所有列"
             logger.info(f"{self.generator.name} {name}生成所有列")
         else:
             self.columns_index = self.line_chart.column_index
-            self.output += f"[{get_now_date()}] {name}生成列 {self.columns_index}"
+            self.output += f"\n[{get_now_date()}] {name}生成列 {self.columns_index}"
             logger.info(f"{self.generator.name} {name}生成列 {self.columns_index}")
         self.type = name
 

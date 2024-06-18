@@ -86,17 +86,17 @@ class LoadCsvFile:
         combined_df.update(temp_df)
 
     def apply_dau_config(self, combined_df, generator_config):
-        if generator_config is None or generator_config.dau_config is None:
+        if generator_config is None or generator_config.dau_config is None or len(generator_config.dau_config) == 0:
             return
         try:
             with open(CONFIG_FILE, 'r', encoding='utf-8') as file:
                 config = json.load(file)
         except FileNotFoundError:
-            self.output += f"未找到配置文件 {CONFIG_FILE}"
+            self.output += f"\n{get_now_date()} 未找到配置文件 {CONFIG_FILE}"
             logger.warning(f"File not found: {CONFIG_FILE}")
             return
         except json.JSONDecodeError:
-            self.output += f"错误的文件格式 {CONFIG_FILE}"
+            self.output += f"\n{get_now_date()} 错误的文件格式 {CONFIG_FILE}"
             logger.warning(f"Error decoding JSON in file: {CONFIG_FILE}")
             return
 
@@ -107,11 +107,11 @@ class LoadCsvFile:
             "ids": id_list
         })
         if response.status_code != 200:
-            self.output += f"远程服务请求错误 {remote_server} {response.status_code}"
+            self.output += f"\n{get_now_date()} 远程服务请求错误 {remote_server} {response.status_code}"
             logger.warning(f"Remote server error {remote_server} {response.status_code} {response.text}")
             return
         body = response.json()
-        self.output += f"获取远程服务 DAU 配置结果 \n {body}"
+        self.output += f"\n{get_now_date()} 获取远程服务 DAU 配置结果 \n {body}"
         mapping = {}
         for item in body:
             mapping[item["id"]] = item["installNo"]
@@ -119,11 +119,11 @@ class LoadCsvFile:
         new_columns = {}
         for config in generator_config.dau_config:
             if config.mapping not in all_keys:
-                self.output += f"列映射 {config.column} {config.mapping} 数据不存在"
+                self.output += f"\n{get_now_date()} 列映射 {config.column} {config.mapping} 数据不存在"
                 continue
             mapping_column = mapping[config.mapping]
-            self.output += f"更改列名称 {config.column} 为 {mapping_column}"
+            self.output += f"\n{get_now_date()} 更改列名称 {config.column} 为 {mapping_column}"
             new_columns[config.column] = mapping_column
         combined_df.rename(columns=new_columns, inplace=True)
         self.data = combined_df
-        self.output += f"列名称更改完成"
+        self.output += f"\n{get_now_date()} 列名称更改完成"

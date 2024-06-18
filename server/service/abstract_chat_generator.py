@@ -73,7 +73,13 @@ class AbstractChatGenerator:
         for table_key in self.data.keys():
             if table_key == "time" or table_key == 'col0' or table_key == 'id':
                 continue
-            table_value = self._table_data_resampled(self.data[table_key])
+
+            numeric = pd.to_numeric(self.data[table_key], errors='coerce')
+            column_data = numeric.dropna()
+            nan_values = numeric[numeric.isna()]
+            if nan_values is not None and len(nan_values) > 0:
+                self.output += f"\n[{get_now_date()}] 存在不合法的数据 \n {nan_values} \n"
+            table_value = self._table_data_resampled(column_data)
             max_time = table_value.idxmax()
             min_time = table_value.idxmin()
             table_result.append({
