@@ -9,20 +9,6 @@ from database import CommonSchema
 from dto.generator import GeneratorResultEnum
 
 
-class Task(CommonSchema):
-    __tablename__ = "task"
-
-    files: Mapped[List["TaskFile"]] = relationship(back_populates="task", cascade="all, delete")
-    generators: Mapped[List["TaskGenerator"]] = relationship(back_populates="task", cascade="all, delete")
-
-
-class TaskFile(CommonSchema):
-    __tablename__ = "task_file"
-
-    task_id: Mapped[int] = mapped_column(ForeignKey("task.id"))
-    task: Mapped["Task"] = relationship(back_populates="files")
-
-
 class TaskGenerator(CommonSchema):
     __tablename__ = "generator"
 
@@ -48,3 +34,17 @@ class TaskGenerator(CommonSchema):
         if self.config is None:
             return None
         return json.loads(self.config)
+
+
+class Task(CommonSchema):
+    __tablename__ = "task"
+
+    files: Mapped[List["TaskFile"]] = relationship(back_populates="task", cascade="all, delete")
+    generators: Mapped[List["TaskGenerator"]] = relationship(back_populates="task", cascade="all, delete")
+
+
+class TaskFile(CommonSchema):
+    __tablename__ = "task_file"
+
+    task_id: Mapped[int] = mapped_column(ForeignKey("task.id"))
+    task: Mapped["Task"] = relationship(back_populates="files")

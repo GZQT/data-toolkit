@@ -40,11 +40,13 @@ if __name__ == "__main__":
 
     if not os.path.exists(ROOT_DIRECTORY):
         os.makedirs(ROOT_DIRECTORY)
-    database.Base.metadata.create_all(bind=database.engine)
-
     alembic_cfg = Config(os.path.abspath(os.path.join(args.path, "alembic.ini")))
     alembic_cfg.set_main_option("sqlalchemy.url", database.SQLALCHEMY_DATABASE_URL)
     alembic_cfg.set_main_option("script_location",
                                 os.path.abspath(os.path.join(args.path, "alembic")))
-    command.upgrade(alembic_cfg, "15b5635b3f66")
+    if os.path.exists(os.path.join(ROOT_DIRECTORY, 'sql_app.db')):
+        command.upgrade(alembic_cfg, "15b5635b3f66")
+    else:
+        database.Base.metadata.create_all(bind=database.engine)
+        command.stamp(alembic_cfg, "15b5635b3f66")
     uvicorn.run(app, host=args.host, port=args.port, log_config=CUSTOM_LOGGING_CONFIG)
