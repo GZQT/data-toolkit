@@ -55,7 +55,7 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
             positions = np.where(self.keys == line_key)
             position = positions[0][0] if positions[0].size > 0 else -1
             if len(self.columns_index) > 0 and position not in self.columns_index:
-                self.output += f"[{get_now_date()}] {line_key} 需要跳过"
+                self.output += f"[{get_now_date()}] {line_key} 需要跳过\n"
                 logger.info(f"{line_key} 折线图需要跳过")
             elif len(self.data[line_key]) != len(self.times):
                 self.output += \
@@ -67,7 +67,8 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         return self
 
     def _draw_line_chart(self, path, line_key, index):
-        if line_key == 'time' or line_key == 'col0' or line_key == 'id':
+        if utils.check_invalid_column(line_key):
+            self.output += f"[{get_now_date()}] {line_key} 需要跳过\n"
             return
         if index >= len(self.line_chart.name):
             chart_name = f"{self.type}时程曲线图"
@@ -79,18 +80,24 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         # np_datum = np.array(self.data[line_key])
         # df = pd.DataFrame({'time': self.times, 'data': np_datum})
         df = self.data[line_key]
-        plt.figure(figsize=(10, 5))
+        if len(df) == 0:
+            self.output += f"[{get_now_date()}] 列 {line_key} 没有数据，需要跳过\n"
+            return
 
         numeric = pd.to_numeric(df, errors='coerce')
         column_data = numeric.dropna()
         nan_values = numeric[numeric.isna()]
         if nan_values is not None and len(nan_values) > 0:
             self.output += f"\n[{get_now_date()}] 存在不合法的数据 \n {nan_values} \n"
-        self._resampled_plot(column_data)
+        if len(column_data) == 0:
+            self.output += f"[{get_now_date()}] 列转化为数字后 {line_key} 没有数据，需要跳过\n"
+            return
 
+        self._resampled_plot(column_data)
         date_format = mdates.DateFormatter('%Y%m%d')
         plt.gca().xaxis.set_major_formatter(date_format)
         plt.title(chart_name)
+        plt.figure(figsize=(10, 5))
         plt.xlabel(self.line_chart.x_label)
         plt.ylabel(self.line_chart.y_label)
         plt.legend()

@@ -49,3 +49,9 @@ def get_csv_data_file(file):
 
 def is_number(variable):
     return isinstance(variable, (int, float))
+
+
+def check_invalid_column(line_key):
+    if line_key == 'time' or line_key == 'col0' or line_key == 'id' or 'Unnamed' in line_key:
+        return True
+    return False
