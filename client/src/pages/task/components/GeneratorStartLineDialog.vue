@@ -117,7 +117,7 @@ const handleCopy = async (content: string) => {
                   <q-item-section>
                     <q-checkbox v-model="form.columnIndex" dense
                       :disable="column === 'time' || column === 'col0' || column === 'id'" :val="index"
-                      :label="`(${index}) ${column}`" @update:model-value="handleSelect" />
+                      :label="`${column}`" @update:model-value="handleSelect" />
                   </q-item-section>
                 </q-item>
               </q-list>

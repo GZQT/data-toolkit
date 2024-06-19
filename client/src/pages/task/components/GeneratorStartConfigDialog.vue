@@ -17,7 +17,6 @@ const props = defineProps<{
 }>()
 
 const tableColumns: QTableProps['columns'] = [
-  { name: 'id', label: '列数', field: 'id', align: 'left', style: 'width: 1rem' },
   { name: 'name', label: '变量名', field: 'name', align: 'left', style: 'width: 1rem' },
   { name: 'column', label: '列名', field: 'column', align: 'left', style: 'width: 1rem' },
   { name: 'expression', label: '计算(不写则使用原始值)', field: 'expression', align: 'left' }

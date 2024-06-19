@@ -3,12 +3,13 @@ import _ from 'lodash'
 import { useDialogPluginComponent, useQuasar } from 'quasar'
 import { components } from 'src/types/api'
 import { GeneratorStartLineDialogForm } from 'src/types/generator'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import GeneratorStartConfigDialog from './GeneratorStartConfigDialog.vue'
 import GeneratorStartLineDialog from './GeneratorStartLineDialog.vue'
 import { isElectron } from 'src/utils/action'
 import { client } from 'boot/request'
 import GeneratorStartDauConfigDialog from 'pages/task/components/GeneratorStartDauConfigDialog.vue'
+
 const $q = useQuasar()
 const defaultLineChartParam: components['schemas']['LineChartRequest'] = {
   generate: false,
@@ -42,7 +43,8 @@ const form = reactive<components['schemas']['TaskGeneratorStartRequest']>({
 })
 export type ConfigChartType = 'average' | 'maxMin' | 'rootMeanSquare' | 'raw'
 const loading = ref(false)
-const columns = ref<string[]>([])
+const allColumns = ref<string[]>([])
+const invalidColumnCount = ref(0)
 const currentConfig = ref<ConfigChartType>('average')
 const props = defineProps<{
   taskId: number,
@@ -86,14 +88,17 @@ onMounted(async () => {
   if (!isElectron()) {
     return
   }
-  columns.value = await window.FileApi.getCsvHeader(file)
-  columns.value = columns.value.filter(item => {
-    return !item.includes('time') && !item.includes('id') && !item.includes('times') && !item.includes('col0')
-  })
+  allColumns.value = await window.FileApi.getCsvHeader(file)
   if (props.config) {
     form.config = props.config
     console.log(form.config)
   }
+})
+
+const columns = computed(() => {
+  return allColumns.value.filter(item => {
+    return !item.includes('time') && !item.includes('id') && !item.includes('times') && !item.includes('col0')
+  })
 })
 
 const handleConfig = (config: ConfigChartType) => {
@@ -101,8 +106,9 @@ const handleConfig = (config: ConfigChartType) => {
   $q.dialog({
     component: GeneratorStartLineDialog,
     componentProps: {
-      columns: columns.value,
-      data: form[`${config}LineChart`]
+      columns: allColumns.value,
+      data: form[`${config}LineChart`],
+      invalidColumnCount: invalidColumnCount.value
     }
   }).onOk((data: GeneratorStartLineDialogForm & { unit: string }) => {
     form[`${config}LineChart`].columnIndex = data.columnIndex
@@ -171,9 +177,10 @@ const chartList: { name: ConfigChartType, label: string }[] =
 
 <template>
   <div class="container">
-    <q-dialog ref="dialogRef" @hide="onDialogHide" >
+    <q-dialog ref="dialogRef" @hide="onDialogHide">
       <q-card style="min-width: 350px">
-        <q-banner v-if="currentStatus === 'SUCCESS' || currentStatus !== 'PROCESSING'" inline-actions class="text-white bg-primary">
+        <q-banner v-if="currentStatus === 'SUCCESS' || currentStatus !== 'PROCESSING'" inline-actions
+                  class="text-white bg-primary">
           TIP：当前任务已经{{ currentStatus === 'SUCCESS' ? '执行过了' : '提交过了' }}，再次提交会覆盖掉上次内容
         </q-banner>
         <q-banner v-else-if="currentStatus === 'PROCESSING'" inline-actions class="text-white bg-primary">
@@ -206,11 +213,13 @@ const chartList: { name: ConfigChartType, label: string }[] =
         <q-card-actions class="flex text-primary">
           <q-btn outline color="secondary" @click="handleConfigDialog">
             数据预处理
-            <q-icon v-if="form.config && form.config.converters && form.config.converters.length > 0" class="q-pl-xs" size="16px" name="check_circle" />
+            <q-icon v-if="form.config && form.config.converters && form.config.converters.length > 0" class="q-pl-xs"
+                    size="16px" name="check_circle"/>
           </q-btn>
           <q-btn outline color="secondary" @click="handleDauConfigDialog">
             DAU 配置
-            <q-icon v-if="form.config && form.config.dauConfig && form.config.dauConfig.length > 0" class="q-pl-xs" size="16px" name="check_circle" />
+            <q-icon v-if="form.config && form.config.dauConfig && form.config.dauConfig.length > 0" class="q-pl-xs"
+                    size="16px" name="check_circle"/>
           </q-btn>
           <q-space/>
           <q-btn outline label="取消" v-close-popup/>
