@@ -93,11 +93,11 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
             self.output += f"[{get_now_date()}] 列转化为数字后 {line_key} 没有数据，需要跳过\n"
             return
 
+        plt.figure(figsize=(10, 5))
         self._resampled_plot(column_data)
         date_format = mdates.DateFormatter('%Y%m%d')
         plt.gca().xaxis.set_major_formatter(date_format)
         plt.title(chart_name)
-        plt.figure(figsize=(10, 5))
         plt.xlabel(self.line_chart.x_label)
         plt.ylabel(self.line_chart.y_label)
         plt.legend()
