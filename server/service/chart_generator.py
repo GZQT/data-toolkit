@@ -76,7 +76,7 @@ def _generate_chart(db: Session, data, generator: TaskGenerator, request: TaskGe
 
 def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest, db: Session):
     if generator.output is None:
-        generator.output += \
+        generator.output = \
             f"\n[{get_now_date()}] 任务开始，接收到的参数为 \n{request.__dict__}\n"
     else:
         generator.output += \
