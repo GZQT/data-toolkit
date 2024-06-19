@@ -2,6 +2,7 @@ import os.path
 from abc import ABC, abstractmethod
 
 import numpy as np
+import pandas as pd
 from matplotlib import dates as mdates
 from matplotlib import pyplot as plt
 from sqlalchemy.orm import Session
@@ -79,7 +80,14 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         # df = pd.DataFrame({'time': self.times, 'data': np_datum})
         df = self.data[line_key]
         plt.figure(figsize=(10, 5))
-        self._resampled_plot(df)
+
+        numeric = pd.to_numeric(df, errors='coerce')
+        column_data = numeric.dropna()
+        nan_values = numeric[numeric.isna()]
+        if nan_values is not None and len(nan_values) > 0:
+            self.output += f"\n[{get_now_date()}] 存在不合法的数据 \n {nan_values} \n"
+        self._resampled_plot(column_data)
+
         date_format = mdates.DateFormatter('%Y%m%d')
         plt.gca().xaxis.set_major_formatter(date_format)
         plt.title(chart_name)
