@@ -8,6 +8,7 @@ export const useApplicationStore = defineStore('application', () => {
   const status = ref('yellow')
   const time = ref<number>(0)
   const response = ref<string>('')
+  const errorCount = ref(0)
   const checkHealth = async () => {
     const start = parseInt(date.formatDate(Date.now(), 'x'))
     try {
@@ -22,6 +23,7 @@ export const useApplicationStore = defineStore('application', () => {
     } catch (error) {
       console.error(error)
       status.value = 'red'
+      errorCount.value += 1
     } finally {
       showTime.value = true
       const end = parseInt(date.formatDate(Date.now(), 'x'))
@@ -29,6 +31,16 @@ export const useApplicationStore = defineStore('application', () => {
       setTimeout(() => {
         showTime.value = false
       }, 3000)
+      if (errorCount.value > 100) {
+        errorCount.value = 0
+        console.log('内核健康检测失败超过 100 次，尝试重启内核')
+        const result = await window.KernelApi.start()
+        if (result === true) {
+          console.log('内核重启成功')
+        } else {
+          console.log('内核重启失败')
+        }
+      }
     }
   }
   return {
