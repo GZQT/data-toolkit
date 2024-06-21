@@ -65,6 +65,7 @@ class GeneratorAllResponse(GeneratorResponse):
 
 class GeneratorCreateRequest(GeneratorBase):
     files: str
+    config_obj: GeneratorConfigRequest | None
 
 
 class LineChartRequest(CamelModel):

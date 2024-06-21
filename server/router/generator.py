@@ -1,4 +1,6 @@
 import datetime
+import json
+
 from fastapi import APIRouter, Depends, BackgroundTasks, HTTPException
 from sqlalchemy.orm import Session
 from starlette.responses import StreamingResponse
@@ -25,7 +27,13 @@ def get_generator(task_id: int, db: Session = Depends(get_db)):
 
 @router.post("/{task_id}/generator", response_model=GeneratorResponse)
 def add_generator(task_id: int, generator: GeneratorCreateRequest, db: Session = Depends(get_db)):
+    if generator.config_obj is None:
+        generator.config_obj = {
+            "converters": [],
+            "dau_config": []
+        }
     entity = TaskGenerator(**generator.dict(),
+                           config=json.dumps(generator.config_obj.dict()),
                            created_date=datetime.datetime.now(),
                            updated_date=datetime.datetime.now(),
                            task_id=task_id)
@@ -37,8 +45,14 @@ def add_generator(task_id: int, generator: GeneratorCreateRequest, db: Session =
 
 @router.put("/{task_id}/generator/{generator_id}", status_code=204)
 def update_generator(task_id: int, generator_id: int, generator: GeneratorCreateRequest, db: Session = Depends(get_db)):
+    if generator.config_obj is None:
+        generator.config_obj = {
+            "converters": [],
+            "dau_config": []
+        }
     (db.query(TaskGenerator).filter_by(id=generator_id).
      update({TaskGenerator.name: generator.name,
+             TaskGenerator.config: json.dumps(generator.config_obj.dict()),
              TaskGenerator.files: generator.files,
              TaskGenerator.updated_date: datetime.datetime.now()}))
     db.commit()
