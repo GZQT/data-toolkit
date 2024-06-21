@@ -53,7 +53,7 @@ const routes = ref([
   {
     name: '图表生成',
     icon: 'analytics',
-    path: '/task'
+    path: '/generator'
   },
   {
     name: 'DAU配置',

@@ -12,7 +12,7 @@ onMounted(async () => {
     const result = await window.KernelApi.start()
     if (result === true) {
       tip.value = '内核加载完成！'
-      void router.push('/task')
+      void router.push('/generator')
     } else {
       tip.value = result as string
     }

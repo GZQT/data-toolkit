@@ -265,18 +265,18 @@ const handleAutoRefresh = (time: number) => {
       :filter="filter" :loading="loading.table" table-header-class="sticky-head">
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td>
+          <q-td auto-width>
             <q-checkbox v-model="props.selected" color="primary" />
           </q-td>
-          <q-td key="id" class="cursor-pointer" :props="props" @click="props.expand = !props.expand">
+          <q-td key="id" class="cursor-pointer" auto-width :props="props" @click="props.expand = !props.expand">
             {{ props.row.id }}
           </q-td>
-          <q-td key="name" class="cursor-pointer ellipsis" style="max-width: 240px;" :props="props"
+          <q-td key="name" auto-width class="cursor-pointer ellipsis" style="max-width: 240px;" :props="props"
             @click="props.expand = !props.expand">
             {{ props.row.name }}
             <q-tooltip anchor="top middle" self="center middle">{{ props.row.name }}</q-tooltip>
           </q-td>
-          <q-td key="status" :props="props">
+          <q-td key="status" auto-width :props="props">
             <q-chip v-if="props.row.status === 'WAITING'" color="ongoing" class="text-white" size="10px">等待开始</q-chip>
             <q-chip v-else-if="props.row.status === 'SUCCESS'" color="positive" class="text-white"
               size="10px">成功</q-chip>
@@ -285,22 +285,22 @@ const handleAutoRefresh = (time: number) => {
             <q-chip v-else-if="props.row.status === 'PROCESSING'" color="warning" class="text-white"
               size="10px">进行中</q-chip>
           </q-td>
-          <q-td key="total" class="cursor-pointer" :props="props" @click="props.expand = !props.expand">
+          <q-td key="total" auto-width class="cursor-pointer" :props="props" @click="props.expand = !props.expand">
             {{ props.row.files && (props.row.files.split(GENERATOR_FILE_SPLIT).length ?? 0) }}
           </q-td>
-          <q-td key="chartTotal" :props="props">
+          <q-td key="chartTotal" auto-width :props="props">
             <div class="cursor-pointer" @click="handleShowChart(props.row)">
               {{ props.row.chartTotal ?? '未加载' }}
             </div>
           </q-td>
-          <q-td key="dataTotal" :props="props">
+          <q-td key="dataTotal" auto-width :props="props">
             {{ props.row.dataTotal ?? '未加载' }}
           </q-td>
-          <q-td key="result" class="ellipsis" :props="props" style="max-width: 140px;">
+          <q-td key="result" auto-width class="ellipsis" :props="props" style="max-width: 140px;">
             {{ props.row.result }}
             <q-tooltip anchor="top middle" self="center middle" max-width="400px">{{ props.row.result }}</q-tooltip>
           </q-td>
-          <q-td key="action" :props="props">
+          <q-td key="action" auto-width :props="props">
             <q-btn flat round color="secondary" icon="play_circle" size="sm" dense @click="() => handleRun(props.row)">
               <q-tooltip anchor="top middle" self="center middle">开始生成</q-tooltip>
             </q-btn>

@@ -139,7 +139,7 @@ const handleSubmit = () => {
             :dense="true" @remove="handleRemoveResult(item)">
             <template v-for="(dataItem, dataIndex) in item" :key="`dataItem-${dataIndex}`">
               <div v-if="dataItem.length > 0">
-                第{{ dataIndex }}表{{ dataItem.join() }}列
+                第{{ dataIndex + 1 }}表{{ dataItem.join() }}列
                 <span v-if="dataIndex !== item.length - 1">对比&nbsp;</span>
               </div>
             </template>
