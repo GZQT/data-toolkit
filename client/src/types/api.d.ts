@@ -147,6 +147,7 @@ export type components = {
       name: string;
       /** Files */
       files: string;
+      configObj: components["schemas"]["GeneratorConfigRequest"] | null;
     };
     /** GeneratorDataConverterRequest */
     GeneratorDataConverterRequest: {

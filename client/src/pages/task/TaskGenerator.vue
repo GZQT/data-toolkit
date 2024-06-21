@@ -1,17 +1,17 @@
 <script setup lang="tsx">
 import _ from 'lodash'
-import { QChip, QTableProps, date, useInterval, useQuasar } from 'quasar'
+import { QChip, QTableProps, useInterval, useQuasar } from 'quasar'
 import { client } from 'src/boot/request'
 import { components } from 'src/types/api'
 import { handleHomeDirectoryOpenFile, handleOpenFile, isElectron } from 'src/utils/action'
 import { GENERATOR_FILE_SPLIT } from 'src/utils/constant'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import FileSelectDialog from './components/FileSelectDialog.vue'
 import GeneratorOutputDialog from './components/GeneratorOutputDialog.vue'
 import GeneratorStartBarDialog from './components/GeneratorStartBarDialog.vue'
 import GeneratorStartDialog from './components/GeneratorStartDialog.vue'
 import ShowChartDialog from './components/ShowChartDialog.vue'
+import GeneratorEditDialog from 'pages/task/components/GeneratorEditDialog.vue'
 
 export interface TableExtend {
   total?: number
@@ -38,13 +38,11 @@ const columns: QTableProps['columns'] = [
 const $q = useQuasar()
 const route = useRoute()
 const taskId = ref<number>(0)
-const fileSelectDialog = ref<null | InstanceType<typeof FileSelectDialog>>(null)
 const generatorOutputDialog = ref<null | InstanceType<typeof GeneratorOutputDialog>>(null)
 const showChartDialog = ref<null | InstanceType<typeof ShowChartDialog>>(null)
 const generatorStartBarDialog = ref<null | InstanceType<typeof GeneratorStartBarDialog>>(null)
 const selected = ref<(GeneratorType)[]>([])
 const filter = ref('')
-const name = ref('')
 const generatorFile = ref<Record<number, TableExtend>>({})
 const loading = reactive({
   table: false,
@@ -103,41 +101,13 @@ onMounted(() => {
 watch(() => route.params.id, handleData)
 
 const handleAdd = () => {
-  fileSelectDialog.value?.openDialog(null, [])
-  name.value = date.formatDate(Date.now(), 'YYYY年MM月DD日HH点mm分ss秒生成')
-}
-
-const handleFileSelect = async (id: number | null, files: string[]) => {
-  if (name.value === '') {
-    $q.notify({ type: 'warning', message: '操作失败: 名称必须填写' })
-    return
-  }
-  if (files.length === 0) {
-    $q.notify({ type: 'warning', message: '操作失败：未选择任何文件' })
-    return
-  }
-  if (id === null) {
-    await client.POST('/task/{task_id}/generator', {
-      params: {
-        path: { task_id: taskId.value }
-      },
-      body: {
-        name: name.value,
-        files: files.join(GENERATOR_FILE_SPLIT)
-      }
-    })
-  } else {
-    await client.PUT('/task/{task_id}/generator/{generator_id}', {
-      params: {
-        path: { task_id: taskId.value, generator_id: id }
-      },
-      body: {
-        name: name.value,
-        files: files.join(GENERATOR_FILE_SPLIT)
-      }
-    })
-  }
-  await handleData()
+  $q.dialog({
+    component: GeneratorEditDialog,
+    componentProps: {
+      taskId: taskId.value,
+      item: null
+    }
+  })
 }
 
 const handleCount = async () => {
@@ -211,8 +181,15 @@ const handleEdit = (row: GeneratorType) => {
     $q.notify({ type: 'negative', message: '当前数据不存在任何文件，似乎是错误数据' })
     return
   }
-  fileSelectDialog.value?.openDialog(row.id, row.files.split(GENERATOR_FILE_SPLIT))
-  name.value = row.name
+  $q.dialog({
+    component: GeneratorEditDialog,
+    componentProps: {
+      item: row,
+      taskId: taskId.value
+    }
+  }).onOk(async () => {
+    await handleData()
+  })
 }
 
 const handleDelete = (row: GeneratorType) => {
@@ -254,9 +231,6 @@ const handleAutoRefresh = (time: number) => {
 
 <template>
   <div class="container">
-    <FileSelectDialog ref="fileSelectDialog" @save="handleFileSelect">
-      <q-input class="q-mb-md" v-model="name" dense outlined placeholder="请输入生成名称" label="名称" />
-    </FileSelectDialog>
     <GeneratorOutputDialog ref="generatorOutputDialog" />
     <GeneratorStartBarDialog ref="generatorStartBarDialog" :task-id="taskId" />
     <ShowChartDialog ref="showChartDialog" />

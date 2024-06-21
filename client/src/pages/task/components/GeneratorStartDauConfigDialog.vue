@@ -81,7 +81,7 @@ const handleDauConfig = () => {
 
 onMounted(() => {
   handleDauBridge()
-  if (props.dauConfig) {
+  if (props.dauConfig && props.dauConfig.length > 0) {
     form.dauConfig = props.dauConfig
     const ids = form.dauConfig.map(item => item.mapping)
     remoteClient.GET('/dau/ids', {
@@ -132,8 +132,9 @@ watch(filterData, (value) => {
         outline: true,
         handler: () => {
           const list = _.sortBy(filterData.value, 'physicsChannel')
+          console.log(list)
           form.dauConfig = props.columns.map((column, index) => ({
-            column, mapping: list[index].id!
+            column, mapping: filterData.value[index].id!
           }))
         }
       }
