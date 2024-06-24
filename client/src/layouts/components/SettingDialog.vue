@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDialogPluginComponent, useQuasar } from 'quasar'
-import { handleBrowser, handleOpenExe, handleOpenHome, isElectron } from 'src/utils/action'
+import { handleBrowser, handleOpenExe, handleOpenHome } from 'src/utils/action'
 import { useUpdateStore } from 'stores/update-store'
 import { port } from 'boot/request'
 import { useApplicationStore } from 'stores/application-store'
