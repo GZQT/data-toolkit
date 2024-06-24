@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDialogPluginComponent, useQuasar } from 'quasar'
-import { handleBrowser, isElectron } from 'src/utils/action'
+import { handleBrowser, handleOpenExe, handleOpenHome, isElectron } from 'src/utils/action'
 import { useUpdateStore } from 'stores/update-store'
 import { port } from 'boot/request'
 import { useApplicationStore } from 'stores/application-store'
@@ -25,18 +25,6 @@ const remoteServerStore = useRemoteServerStore()
 
 const handleUpdateTheme = (item: boolean | 'auto') => {
   $q.dark.set(item)
-}
-
-const handleOpenHome = () => {
-  if (isElectron()) {
-    window.FileApi.openApplicationDirectory('')
-  }
-}
-
-const handleOpenExe = () => {
-  if (isElectron()) {
-    window.FileApi.openExeDirectory()
-  }
 }
 
 const handleRestartKernel = async () => {

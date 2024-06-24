@@ -14,4 +14,16 @@ export const handleExitApp = () => {
   window.WindowsApi.close()
 }
 
+export const handleOpenHome = () => {
+  if (isElectron()) {
+    window.FileApi.openApplicationDirectory('')
+  }
+}
+
+export const handleOpenExe = () => {
+  if (isElectron()) {
+    window.FileApi.openExeDirectory()
+  }
+}
+
 export const isElectron = (): boolean => process.env.MODE === 'electron'

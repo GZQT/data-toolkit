@@ -42,7 +42,7 @@ onMounted(() => {
     applicationStore.checkHealth()
     remoteServerStore.checkHealth()
   }, 10000)
-  updateStore.handleCheckUpdate()
+  // updateStore.handleCheckUpdate()
 })
 
 const handleOpenSetting = () => {
