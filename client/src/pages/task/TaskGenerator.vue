@@ -107,7 +107,7 @@ const handleAdd = () => {
       taskId: taskId.value,
       item: null
     }
-  })
+  }).onOk(handleData)
 }
 
 const handleCount = async () => {

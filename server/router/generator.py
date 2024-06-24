@@ -32,11 +32,13 @@ def add_generator(task_id: int, generator: GeneratorCreateRequest, db: Session =
             "converters": [],
             "dau_config": []
         }
-    entity = TaskGenerator(**generator.dict(),
-                           config=json.dumps(generator.config_obj.dict()),
-                           created_date=datetime.datetime.now(),
-                           updated_date=datetime.datetime.now(),
-                           task_id=task_id)
+    entity = TaskGenerator(
+        name=generator.name,
+        files=generator.files,
+        config=json.dumps(generator.config_obj.dict()),
+        created_date=datetime.datetime.now(),
+        updated_date=datetime.datetime.now(),
+        task_id=task_id)
     db.add(entity)
     db.commit()
     db.refresh(entity)

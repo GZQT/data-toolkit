@@ -29,6 +29,10 @@ const handleAddTask = () => {
       body: { name: data }
     })
     await handleData()
+    if (taskData.value.length > 0) {
+      void router.push(`/generator/${taskData.value[0].id}`)
+      tab.value = `chart-${taskData.value[0].id}`
+    }
   })
 }
 
@@ -106,8 +110,16 @@ const handleDelete = async (item: components['schemas']['TaskResponse']) => {
       </q-route-tab>
     </q-tabs>
     <q-separator class="q-mb-md"/>
-    <div class="router">
+    <div v-if="taskData.length > 0" class="router">
       <router-view/>
+    </div>
+    <div v-else class="flex column flex-center" style="height: 400px">
+      <div class="text-h5">
+        目前还没有数据哦~😅
+      </div>
+      <div class="text-subtitle1 text-tip q-mt-sm">
+        快点击左上角 + 号进行添加吧!
+      </div>
     </div>
   </q-card>
   <!--    <q-card style="width: 10rem;min-width: 10rem; ">-->
