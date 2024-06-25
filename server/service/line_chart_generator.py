@@ -131,7 +131,10 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         self.type = name
         if self.request.save_data:
             filename = os.path.join(self.dir, f"{name}处理后数据.csv")
-            self._table_data_resampled(self.data).to_csv(filename, index=False)
+            csv_data = self._table_data_resampled(self.data)
+            time_column = 'time' if 'time' in csv_data.columns else 'col0'
+            csv_data[time_column] = csv_data[time_column].dt.strftime('%Y-%m-%d-%H-%M-%S.%f')
+            csv_data.to_csv(filename, index=False)
 
 
 class AverageLineChartGenerator(AbstractLineChatGenerator, ABC):
@@ -193,6 +196,10 @@ class RootMeanSquareLineChartGenerator(AbstractLineChatGenerator, ABC):
 
     @staticmethod
     def _rms(series):
+        if utils.check_invalid_column(series.name):
+            if series.empty:
+                return np.nan
+            return series.iloc[0]
         series = pd.to_numeric(series, errors='coerce')
         series = series.dropna()
         if len(series) == 0:

@@ -47,6 +47,7 @@ class GeneratorDataConverterRequest(CamelModel):
 class GeneratorConfigRequest(CamelModel):
     converters: List[GeneratorDataConverterRequest]
     dau_config: List[DauConfig] | None
+    date_format: str | None = '%Y-%m-%d-%H-%M-%S.%f'
 
 
 class GeneratorResponse(GeneratorBase):

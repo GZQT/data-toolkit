@@ -13,6 +13,7 @@ from utils import get_now_date
 class LoadCsvFile:
     def __init__(self, files):
         self.output = ""
+        self.time_column = ""
         self.files = []
         for file_path in files.split(GENERATOR_FILE_SEPARATOR):
             if not os.path.exists(file_path):
@@ -39,7 +40,12 @@ class LoadCsvFile:
         if time_column not in combined_df.columns:
             self.output += f"[{get_now_date()}] 读取数据中不存在 time 或者 col0 的时间列\n"
             return self
-        combined_df[time_column] = pd.to_datetime(combined_df[time_column], format='%Y-%m-%d-%H-%M-%S.%f')
+        self.time_column = time_column
+        if generator_config is None or generator_config.date_format is None:
+            date_format = '%Y-%m-%d-%H-%M-%S.%f'
+        else:
+            date_format = generator_config.date_format
+        combined_df[time_column] = pd.to_datetime(combined_df[time_column], format=date_format)
         combined_df.set_index(combined_df[time_column], inplace=True)
         # 使用 numexpr 库对每一列执行相应的表达式
         self.apply_expressions(combined_df, generator_config)

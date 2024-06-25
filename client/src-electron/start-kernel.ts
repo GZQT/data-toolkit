@@ -52,7 +52,6 @@ export const initKernel = async (): Promise<string | boolean> => {
     return Promise.resolve(`⚠️ Kernel program is missing. ${kernelPath}`)
   }
   kernelProcess = cp.spawn(kernelPath, ['-P', `${kernelPort}`, '-p', path.dirname(path.resolve(kernelPath))], {
-    stdio: 'ignore',
     detached: false
   })
   logger.info('Booted kernel process [pid=' + kernelProcess.pid + ', port=' + kernelPort + ']')
@@ -61,6 +60,15 @@ export const initKernel = async (): Promise<string | boolean> => {
     if (code !== 0) {
       logger.error(`Error: kernel exit code ${code}`)
     }
+  })
+  kernelProcess.on('error', (message) => {
+    logger.error(`kernel [pid=${kernelProcess?.pid}, port=${kernelPort}] error [${message}]`)
+  })
+  kernelProcess.stderr?.on('data', (data: string) => {
+    logger.info(`[Kernel process] ${data}]`)
+  })
+  kernelProcess.stderr?.on('error', (data: string) => {
+    logger.warn(`[Kernel process] ${data}]`)
   })
   let count = 0
   while (count <= 20) {

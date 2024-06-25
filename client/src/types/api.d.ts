@@ -140,6 +140,11 @@ export type components = {
       converters: components["schemas"]["GeneratorDataConverterRequest"][];
       /** Dauconfig */
       dauConfig: components["schemas"]["DauConfig"][] | null;
+      /**
+       * Dateformat
+       * @default %Y-%m-%d-%H-%M-%S.%f
+       */
+      dateFormat?: string | null;
     };
     /** GeneratorCreateRequest */
     GeneratorCreateRequest: {

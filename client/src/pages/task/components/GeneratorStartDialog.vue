@@ -39,7 +39,8 @@ const form = reactive<components['schemas']['TaskGeneratorStartRequest']>({
   maxMinBarGroup: [],
   config: {
     converters: [],
-    dauConfig: []
+    dauConfig: [],
+    dateFormat: '%Y-%m-%d-%H-%M-%S.%f'
   }
 })
 export type ConfigChartType = 'average' | 'maxMin' | 'rootMeanSquare' | 'raw'
@@ -133,6 +134,7 @@ const handleConfigDialog = () => {
     }
   }).onOk((config: components['schemas']['GeneratorConfigRequest']) => {
     form.config = {
+      ...form.config,
       converters: config.converters,
       dauConfig: form.config?.dauConfig ?? []
     }
@@ -148,6 +150,7 @@ const handleDauConfigDialog = () => {
     }
   }).onOk((config: components['schemas']['DauConfig'][]) => {
     form.config = {
+      ...form.config,
       converters: form.config?.converters ?? [],
       dauConfig: config
     }
@@ -212,6 +215,7 @@ const chartList: { name: ConfigChartType, label: string }[] =
           </div>
           <q-checkbox left-label v-model="form.saveData" label="另存为处理过的数据" />
           <span class="text-tip text-caption">（选择一个折线图后有效，最大最小值暂不支持此功能）</span>
+          <q-input v-model="form.config!.dateFormat" label="时间格式匹配" hint="%Y年 %m月 %d日 %H时 %M分 %S秒 %f毫秒" />
         </q-card-section>
         <q-card-actions class="flex text-primary">
           <q-btn outline color="secondary" @click="handleConfigDialog">
