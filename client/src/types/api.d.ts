@@ -314,6 +314,8 @@ export type components = {
       rootMeanSquareLineChart: components["schemas"]["LineChartRequest"];
       rawLineChart: components["schemas"]["LineChartRequest"];
       config?: components["schemas"]["GeneratorConfigRequest"] | null;
+      /** Savedata */
+      saveData: boolean;
       /** Averagebarchart */
       averageBarChart: boolean;
       /** Maxminbarchart */

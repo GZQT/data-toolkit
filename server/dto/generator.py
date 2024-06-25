@@ -87,6 +87,7 @@ class TaskGeneratorStartRequest(CamelModel):
     root_mean_square_line_chart: LineChartRequest
     raw_line_chart: LineChartRequest
     config: GeneratorConfigRequest | None = None
+    save_data: bool
 
     average_bar_chart: bool
     max_min_bar_chart: bool

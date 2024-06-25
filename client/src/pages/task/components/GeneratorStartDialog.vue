@@ -34,6 +34,7 @@ const form = reactive<components['schemas']['TaskGeneratorStartRequest']>({
   maxMinDataTable: false,
   rootMeanSquareDataTable: false,
   rawDataTable: false,
+  saveData: false,
   averageBarGroup: [],
   maxMinBarGroup: [],
   config: {
@@ -209,6 +210,8 @@ const chartList: { name: ConfigChartType, label: string }[] =
             <q-btn :disable="!form[`${chart.name}LineChart`].generate" color="secondary" flat round size="sm"
                    icon="settings" @click="handleConfig(chart.name)"/>
           </div>
+          <q-checkbox left-label v-model="form.saveData" label="另存为处理过的数据" />
+          <span class="text-tip text-caption">（选择一个折线图后有效，最大最小值暂不支持此功能）</span>
         </q-card-section>
         <q-card-actions class="flex text-primary">
           <q-btn outline color="secondary" @click="handleConfigDialog">
