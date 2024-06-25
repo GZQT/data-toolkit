@@ -26,6 +26,7 @@ class AbstractChatGenerator:
         self.times = data.times
         self.dir = os.path.join(constant.ROOT_DIRECTORY, generator.name)
         self.excel_name = excel_name
+        self.type = ''
 
     def write_log(self):
         self.db.query(TaskGenerator).filter_by(id=self.generator.id).update({
