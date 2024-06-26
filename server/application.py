@@ -1,5 +1,6 @@
 import argparse
 import os
+import matplotlib
 
 import uvicorn
 from alembic import command
@@ -29,6 +30,8 @@ home_dir = os.path.expanduser('~')
 app.include_router(generator.router)
 app.include_router(task.router)
 app.include_router(health.router)
+matplotlib.use('Agg')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='启动 web 后端服务', formatter_class=argparse.RawTextHelpFormatter)
