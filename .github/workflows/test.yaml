@@ -7,7 +7,7 @@ jobs:
       matrix:
         python-version: ["3.12"]
         poetry-version: ["1.8.2"]
-        os: [ubuntu-22.04, windows-latest]
+        os: [windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'poetry'
+          cache: "poetry"
       - name: Run poetry install
         run: poetry install
         working-directory: ./server
