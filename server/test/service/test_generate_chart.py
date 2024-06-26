@@ -16,7 +16,9 @@ chart_param = {
     "name": [],
     "fill": "LINE",
     "line_width": 0.65,
-    "show_grid": True
+    "show_grid": True,
+    "save_data": False,
+    "config": None
 }
 no_chart_param = {
     "generate": False,
@@ -28,7 +30,9 @@ no_chart_param = {
     "name": [],
     "fill": None,
     "line_width": 0.65,
-    "show_grid": True
+    "show_grid": True,
+    "save_data": False,
+    "config": None
 }
 request_template = {
     'average_line_chart': no_chart_param,
@@ -36,6 +40,7 @@ request_template = {
     'root_mean_square_line_chart': no_chart_param,
     'raw_line_chart': no_chart_param,
     'config': None,
+    "save_data": False,
     'average_bar_chart': False,
     'max_min_bar_chart': False,
     'average_data_table': False,
