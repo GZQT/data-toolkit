@@ -19,14 +19,17 @@ def _check_format(dt):
 
 current_file_path = os.path.abspath(__file__)
 test_file = os.path.abspath(os.path.join(os.path.dirname(current_file_path), "test.csv"))
+init_file = os.path.abspath(os.path.join(os.path.dirname(current_file_path), "__init__.py"))
+test_no_exist_file = os.path.abspath(os.path.join(os.path.dirname(current_file_path), "test_no_exist.csv"))
 
 
 class TestLoadCsv:
 
     def test_file_error(self):
-        load = LoadCsvFile("test_no_exist.csv")
+        load = LoadCsvFile(test_no_exist_file)
         assert '不存在' in load.output
-        load = LoadCsvFile("__init__.py")
+        load = LoadCsvFile(init_file)
+        print(load.output)
         assert '不是 csv 类型' in load.output
 
     def test_no_config(self):
