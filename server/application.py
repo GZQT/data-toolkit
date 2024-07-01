@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import database
 from constant import ROOT_DIRECTORY, CUSTOM_LOGGING_CONFIG
-from router import generator, task, health
+from router import generator, task, health, merge
 
 app = FastAPI(
     title="Data Toolkit",
@@ -30,6 +30,7 @@ home_dir = os.path.expanduser('~')
 app.include_router(generator.router)
 app.include_router(task.router)
 app.include_router(health.router)
+app.include_router(merge.router)
 matplotlib.use('Agg')
 
 

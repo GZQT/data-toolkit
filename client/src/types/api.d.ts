@@ -61,6 +61,10 @@ export type paths = {
     /** Health */
     get: operations["health_health_get"];
   };
+  "/merge": {
+    /** Merge */
+    post: operations["merge_merge_post"];
+  };
 };
 
 export type webhooks = Record<string, never>;
@@ -233,6 +237,26 @@ export type components = {
        * @default true
        */
       showGrid?: boolean;
+    };
+    /** MergeBase */
+    MergeBase: {
+      /** Filepath */
+      filePath: string;
+      /** Column */
+      column: string;
+    };
+    /** MergeFiles */
+    MergeFiles: {
+      /** Filepath */
+      filePath: string;
+      /** Selectcolumns */
+      selectColumns: string[];
+    };
+    /** MergeRequest */
+    MergeRequest: {
+      base: components["schemas"]["MergeBase"] | null;
+      /** Files */
+      files: components["schemas"]["MergeFiles"][];
     };
     /** PreviewImageRequest */
     PreviewImageRequest: {
@@ -771,6 +795,28 @@ export type operations = {
       200: {
         content: {
           "application/json": components["schemas"]["HealthResponse"];
+        };
+      };
+    };
+  };
+  /** Merge */
+  merge_merge_post: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MergeRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };

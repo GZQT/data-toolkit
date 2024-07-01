@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { useDialogPluginComponent } from 'quasar'
-import { useMergeStore } from 'stores/merge-store'
+import { useMergeStore } from 'pages/merge/merge-store'
 import { onMounted, reactive, watch } from 'vue'
 import { isDataColumn } from 'src/utils'
 

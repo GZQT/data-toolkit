@@ -55,3 +55,10 @@ def check_invalid_column(line_key):
     if line_key == 'time' or line_key == 'col0' or line_key == 'id' or 'Unnamed' in line_key:
         return True
     return False
+
+
+def get_time_column(df):
+    for col in df.columns:
+        if col in ['col0', 'time']:
+            return col
+    return None
