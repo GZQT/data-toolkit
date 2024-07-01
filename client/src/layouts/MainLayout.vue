@@ -56,6 +56,11 @@ const routes = ref([
     path: '/generator'
   },
   {
+    name: '数据合并',
+    icon: 'hive',
+    path: '/merge'
+  },
+  {
     name: 'DAU配置',
     icon: 'settings_input_component',
     path: '/dau'

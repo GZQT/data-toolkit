@@ -27,6 +27,10 @@ const routes: RouteRecordRaw[] = [
         ]
       },
       {
+        path: 'merge',
+        component: () => import('pages/merge/MergePage.vue')
+      },
+      {
         path: 'dau',
         component: () => import('pages/dau/DauPage.vue')
       }
