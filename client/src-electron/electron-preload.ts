@@ -28,12 +28,13 @@
  * }
  */
 import { BrowserWindow } from '@electron/remote'
-import { contextBridge, ipcRenderer, shell } from 'electron'
+import { contextBridge, FileFilter, ipcRenderer, shell } from 'electron'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
 import readline from 'readline'
 import { ProgressInfo } from 'electron-updater'
+import { Report } from 'pages/report/report-store'
 
 const getAllFiles = (dirPath: string, arrayOfFiles: string[] = []): string[] => {
   if (!fs.existsSync(dirPath)) {
@@ -76,6 +77,10 @@ contextBridge.exposeInMainWorld('KernelApi', {
   restartKernel: () => ipcRenderer.invoke('KernelApi:restartKernel')
 })
 
+contextBridge.exposeInMainWorld('ReportApi', {
+  generate: (report: Report): Promise<void> => ipcRenderer.invoke('ReportApi:generate', report)
+})
+
 contextBridge.exposeInMainWorld('ApplicationApi', {
   onUpdateProgress: (func: (info: ProgressInfo) => void) => {
     ipcRenderer.on('updateProgress', (_, info) => func(info))
@@ -116,12 +121,25 @@ contextBridge.exposeInMainWorld('FileApi', {
       })
     })
   },
-  selectFiles: (multiSelections: boolean = true): Promise<string[] | undefined> => {
-    return ipcRenderer.invoke('FileApi:selectFiles', multiSelections)
+  selectFiles: (multiSelections: boolean = true,
+    openDirectory: boolean = false,
+    filters: FileFilter[] = [{
+      name: 'CSV',
+      extensions: ['csv']
+    }]): Promise<string[] | undefined> => {
+    return ipcRenderer.invoke('FileApi:selectFiles', multiSelections, openDirectory, filters)
+  },
+  checkExistPath: (file: string): boolean => {
+    return fs.existsSync(file)
   },
   openFileDirectory: (file: string) => {
     if (fs.existsSync(file)) {
       shell.showItemInFolder(file)
+    }
+  },
+  openDirectory: (dirPath: string) => {
+    if (fs.existsSync(dirPath)) {
+      void shell.openPath(dirPath)
     }
   },
   openExeDirectory: async () => {

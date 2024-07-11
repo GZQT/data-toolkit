@@ -1,5 +1,5 @@
 import { enable, initialize } from '@electron/remote/main/index.js'
-import { BrowserWindow, app, dialog, ipcMain } from 'electron'
+import { FileFilter, BrowserWindow, app, dialog, ipcMain } from 'electron'
 import os from 'os'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -18,6 +18,8 @@ import {
   setWindow
 } from 'app/src-electron/auto-update.js'
 import { store, STORE_KEYS } from 'app/src-electron/store'
+import { Report } from 'pages/report/report-store'
+import { reportGenerate } from 'app/src-electron/api/Report'
 
 // https://quasar.dev/quasar-cli-vite/developing-electron-apps/frameless-electron-window#setting-frameless-window
 initialize()
@@ -99,18 +101,21 @@ ipcMain.handle('KernelApi:getKernelPort', () => getKernelPort())
 ipcMain.handle('KernelApi:getKernelAvailablePort', () => getKernelAvailablePort())
 ipcMain.handle('FileApi:getExeDirectory', () => app.getPath('exe'))
 
-ipcMain.handle('FileApi:selectFiles', async (_, multiSelections: boolean = true) => {
+ipcMain.handle('FileApi:selectFiles', async (_,
+  multiSelections, openDirectory, filters: FileFilter[]) => {
   const properties: Array<'openFile' | 'openDirectory' | 'multiSelections' | 'showHiddenFiles' | 'createDirectory' | 'promptToCreate' |
-    'noResolveAliases' | 'treatPackageAsDirectory' | 'dontAddToRecent'> = ['openFile']
+    'noResolveAliases' | 'treatPackageAsDirectory' | 'dontAddToRecent'> = ['showHiddenFiles', 'createDirectory']
   if (multiSelections) {
     properties.push('multiSelections')
   }
+  if (openDirectory) {
+    properties.push('openDirectory')
+  } else {
+    properties.push('openFile')
+  }
   return dialog.showOpenDialogSync({
     properties,
-    filters: [{
-      name: 'CSV',
-      extensions: ['csv']
-    }]
+    filters
   })
 })
 
@@ -124,6 +129,7 @@ ipcMain.handle('ApplicationApi:installUpdateApp', async () => {
   await killKernel()
   installUpdateApp()
 })
+ipcMain.handle('ReportApi:generate', (_, report: Report) => reportGenerate(report))
 
 app.whenReady()
   .then(createWindow)

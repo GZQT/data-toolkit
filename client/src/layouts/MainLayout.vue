@@ -64,6 +64,11 @@ const routes = ref([
     name: 'DAU配置',
     icon: 'settings_input_component',
     path: '/dau'
+  },
+  {
+    name: '报告生成',
+    icon: 'summarize',
+    path: '/report'
   }
 ])
 

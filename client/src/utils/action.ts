@@ -1,17 +1,31 @@
 export const handleOpenFile = (file: string) => {
-  window.FileApi.openFileDirectory(file)
+  if (isElectron()) {
+    window.FileApi.openFileDirectory(file)
+  }
+}
+
+export const handleOpenDir = (path: string) => {
+  if (isElectron()) {
+    window.FileApi.openDirectory(path)
+  }
 }
 
 export const handleHomeDirectoryOpenFile = (file: string) => {
-  window.FileApi.openApplicationDirectory(file)
+  if (isElectron()) {
+    window.FileApi.openApplicationDirectory(file)
+  }
 }
 
 export const handleBrowser = (url: string) => {
-  window.FileApi.openExternalLink(url)
+  if (isElectron()) {
+    window.FileApi.openExternalLink(url)
+  }
 }
 
 export const handleExitApp = () => {
-  window.WindowsApi.close()
+  if (isElectron()) {
+    window.WindowsApi.close()
+  }
 }
 
 export const handleOpenHome = () => {

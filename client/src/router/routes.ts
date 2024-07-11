@@ -1,10 +1,18 @@
 import { RouteRecordRaw } from 'vue-router'
+import { isElectron } from 'src/utils/action'
+import _ from 'lodash'
 
-const routes: RouteRecordRaw[] = [
+let routes: RouteRecordRaw[] = [
+  {
+    path: '/:catchAll(.*)*',
+    component: () => import('pages/ErrorNotFound.vue')
+  }
+]
+
+const electronRoutes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/BlankLayout.vue'),
-    // redirect: '/task'
     children: [
       {
         path: '',
@@ -33,15 +41,32 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'dau',
         component: () => import('pages/dau/DauPage.vue')
+      },
+      {
+        path: 'report',
+        component: () => import('pages/report/ReportPage.vue')
       }
     ]
-  },
-  // Always leave this as last one,
-  // but you can also remove it
-  {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue')
   }
 ]
+
+const webRoutes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    component: () => import('layouts/WebMainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/dashboard/DashboardPage.vue')
+      }
+    ]
+  }
+]
+
+if (isElectron()) {
+  routes = _.concat(electronRoutes, routes)
+} else {
+  routes = _.concat(webRoutes, routes)
+}
 
 export default routes
