@@ -96,13 +96,15 @@ export const reportGenerate = async (report: Report): Promise<void> => {
   const excelList = fileList.filter(item => item.endsWith('.xlsx'))
   const excelData = await parseExcelFile(excelList)
   const excelKeys = Object.keys(excelData)
+  const data = report.config?.reduce((acc: Record<string, string>, item) => {
+    acc[item.key] = item.value
+    return acc
+  }, {})
   try {
     const template = fs.readFileSync(report.templatePath)
     const buffer = await createReport({
       template,
-      data: {
-        month: '三'
-      },
+      data,
       additionalJsContext: {
         文件: (fileName: string, width: number = 6, height: number = 4) => {
           const chartPath = chartList.find(item => item.includes(fileName))

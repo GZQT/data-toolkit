@@ -10,6 +10,7 @@ export interface Report {
   existTemplatePath?: boolean
   existChartPath?: boolean
   existOutputPath?: boolean
+  config?: {key: string, value: string}[]
 }
 
 interface Data {

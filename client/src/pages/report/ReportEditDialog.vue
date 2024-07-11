@@ -2,6 +2,7 @@
 import { useDialogPluginComponent } from 'quasar'
 import { onMounted, reactive } from 'vue'
 import { Report, useReportStore } from 'pages/report/report-store'
+import _ from 'lodash'
 
 const reportStore = useReportStore()
 const props = defineProps<{
@@ -11,7 +12,8 @@ const data = reactive<Report>({
   name: '',
   templatePath: '',
   chartPath: '',
-  outputPath: ''
+  outputPath: '',
+  config: []
 })
 
 defineEmits([
@@ -31,9 +33,13 @@ onMounted(() => {
     data.templatePath = item!.templatePath
     data.chartPath = item!.chartPath
     data.outputPath = item!.outputPath
+    data.config = _.cloneDeep(item!.config ?? [
+      { key: '', value: '' }
+    ])
   }
 })
 const handleSave = () => {
+  data.config = data.config?.filter(item => item.key !== '')
   if (props.name) {
     reportStore.data.reportList = reportStore.data.reportList.map(item => item.name === props.name ? data : item)
   } else {
@@ -82,6 +88,12 @@ const validateFileExist = (val?: string) => {
   }
   return window.FileApi.checkExistPath(val) ? true : '路径不存在，请重新选择。'
 }
+const handleAddConfig = () => {
+  data.config?.push({ key: '', value: '' })
+}
+const handleRemoveConfig = (index: number) => {
+  data.config?.splice(index, 1)
+}
 </script>
 
 <template>
@@ -110,6 +122,12 @@ const validateFileExist = (val?: string) => {
                    lazy-rules
                    :rules="[ val => validateFileExist(val)]"
                    @click="handlePickOutputPath"/>
+          <div>模板变量<q-icon class="text-tip cursor-pointer q-ml-sm" size="xs" name="add_circle" @click="handleAddConfig"/></div>
+          <div v-for="(item, index) in data.config" :key="`${index}-${item.key}-config`" class="row q-mt-md q-gutter-x-md items-center">
+            <q-input :model-value="item.key" @change="(e: string) => {item.key = e}" label="键" outlined dense style="width: 40%"/>
+            <q-input :model-value="item.value" @change="(e: string) => {item.value = e}" label="值" outlined dense style="width: 40%"/>
+            <q-icon class="text-tip cursor-pointer" size="xs" name="do_not_disturb_on" @click="() => handleRemoveConfig(index)"/>
+          </div>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn color="primary" outline label="取消" @click="onDialogCancel"/>

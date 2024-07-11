@@ -34,6 +34,12 @@ const columns: QTableProps['columns'] = [
     align: 'left'
   },
   {
+    name: 'config',
+    label: '配置',
+    field: 'config',
+    align: 'left'
+  },
+  {
     name: 'action',
     label: '操作',
     field: 'name',
@@ -97,6 +103,7 @@ const handleRun = (row: Report) => {
       $q.loading.hide()
     })
 }
+
 </script>
 
 <template>
@@ -132,6 +139,11 @@ const handleRun = (row: Report) => {
           <q-td key="outputPath" :props="props" :class="props.row.existOutputPath ? 'cursor-pointer': 'text-red'" style="text-wrap: wrap"
                 @click="() => props.row.existOutputPath && handleOpenDir(props.row.outputPath)">
             {{ props.row.outputPath }}
+          </q-td>
+          <q-td key="config" :props="props" style="text-wrap: wrap">
+            <q-chip v-for="item in props.row.config" :key="item.key">
+              {{`${item.key}-${item.value}`}}
+            </q-chip>
           </q-td>
           <q-td key="action" :props="props" auto-width>
             <q-btn flat round color="primary" icon="play_circle" size="sm" dense @click="() => handleRun(props.row)">
