@@ -18,8 +18,8 @@ REM 切换到 client 目录
 cd client
 
 REM 运行 bun
-npm install
-npm run build:electron
+bun install
+bun run build:electron
 
 echo 脚本执行完毕
 pause

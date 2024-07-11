@@ -24,6 +24,7 @@ class AbstractChatGenerator:
         self.keys = data.data.keys()
         self.data = data.data
         self.times = data.times
+        self.dau_config = data.dau_config
         self.dir = os.path.join(constant.ROOT_DIRECTORY, generator.name)
         self.excel_name = excel_name
         self.type = ''
@@ -71,6 +72,7 @@ class AbstractChatGenerator:
     def get_table_data(self):
         table_result = []
         # 获取到数据
+        dau_install_no_list = self.dau_config.keys()
         for table_key in self.data.keys():
             if utils.check_invalid_column(table_key):
                 continue
@@ -83,13 +85,17 @@ class AbstractChatGenerator:
             table_value = self._table_data_resampled(column_data)
             max_time = table_value.idxmax()
             min_time = table_value.idxmin()
+            install_location = ''
+            if table_key in dau_install_no_list:
+                install_location = self.dau_config[table_key]['installLocation']
             table_result.append({
                 "编号": table_key,
                 "最大值数值": table_value.loc[max_time],
                 "最大值时间": max_time,
                 "最小值数值": table_value.loc[min_time],
                 "最小值时间": min_time,
-                "变化量": table_value.loc[max_time] - table_value.loc[min_time]
+                "变化量": table_value.loc[max_time] - table_value.loc[min_time],
+                '安装位置': install_location
             })
         return table_result
 

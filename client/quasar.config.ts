@@ -220,6 +220,9 @@ export default configure((/* ctx */) => {
         // https://www.electron.build/configuration/configuration
         appId: 'data-toolkit',
         productName: 'Data Toolkit',
+        releaseInfo: {
+          releaseNotesFile: 'changelog/CHANGELOG_0.0.21.md'
+        },
         extraResources: [
           {
             from: 'src-electron/application.exe',

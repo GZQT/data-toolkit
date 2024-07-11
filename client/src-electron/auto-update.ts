@@ -1,5 +1,5 @@
 import electronUpdater, { UpdateCheckResult } from 'electron-updater'
-import { BrowserWindow } from 'electron'
+import { BrowserWindow, dialog, MessageBoxOptions } from 'electron'
 import { logger } from 'app/src-electron/utils.js'
 
 const updateUrl = 'http://192.168.68.225:15244/d/files/%E8%BD%AF%E4%BB%B6%E5%8C%85/data-toolkit'
@@ -29,6 +29,24 @@ autoUpdater.on('download-progress', (info) => {
 autoUpdater.on('update-downloaded', (info) => {
   logger.info('update-downloaded')
   logger.info(info)
+})
+
+autoUpdater.on('update-available', (info) => {
+  const releaseNotes = info.releaseNotes
+  const dialogOpts: MessageBoxOptions = {
+    type: 'info',
+    buttons: ['立即下载', '稍后'],
+    title: '版本更新',
+    textWidth: 250,
+    message: '发现新版本' + info.version + '(' + ((info.files[0].size ?? 0) / 1024 / 1024).toFixed(2) + 'MB)' + '\r\n\r\n' + releaseNotes,
+    cancelId: 1
+  }
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) {
+      void autoUpdater.downloadUpdate()
+    }
+  })
 })
 
 export const setWindow = (win: BrowserWindow | undefined) => {

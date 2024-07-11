@@ -25,6 +25,7 @@ class LoadCsvFile:
         self.keys = []
         self.data = {}
         self.times = []
+        self.dau_config = {}
 
     def load_data(self, generator_config: GeneratorConfigRequest = None):
         data_frames_list = [pd.read_csv(file) for file in self.files]
@@ -121,6 +122,7 @@ class LoadCsvFile:
         mapping = {}
         for item in body:
             mapping[item["id"]] = item["installNo"]
+            self.dau_config[item["installNo"]] = item
         all_keys = mapping.keys()
         new_columns = {}
         for config in generator_config.dau_config:
