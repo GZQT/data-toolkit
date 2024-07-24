@@ -126,7 +126,7 @@ export const reportGenerate = async (report: Report): Promise<void> => {
           }
           return `${value}`
         },
-        取最大: (key: string) => {
+        取最大: (key: string, keep: number = 3) => {
           const compareData = excelKeys
             .filter(item => item.includes(key) && item.includes('最大值') && is.number(excelData[item]))
             .map((item: string) => ({
@@ -134,9 +134,13 @@ export const reportGenerate = async (report: Report): Promise<void> => {
               数值: excelData[item],
               位置: excelData[`${key.split('_最大值')[0]}_位置`]
             }))
-          return _.maxBy(compareData, '数值')
+          const maxValue = _.maxBy(compareData, '数值')
+          if (is.number(maxValue)) {
+            return maxValue.toFixed(keep)
+          }
+          return maxValue
         },
-        取最小: (key: string) => {
+        取最小: (key: string, keep: number = 3) => {
           const compareData = excelKeys
             .filter(item => item.includes(key) && item.includes('最小值') && is.number(excelData[key]))
             .map((item: string) => ({
@@ -144,7 +148,11 @@ export const reportGenerate = async (report: Report): Promise<void> => {
               数值: excelData[item],
               位置: excelData[`${key.split('_最小值')[0]}_位置`]
             }))
-          return _.maxBy(compareData, '数值')
+          const minValue = _.minBy(compareData, '数值')
+          if (is.number(minValue)) {
+            return minValue.toFixed(keep)
+          }
+          return minValue
         }
       },
       cmdDelimiter: ['{{', '}}']
