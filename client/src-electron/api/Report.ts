@@ -142,7 +142,7 @@ export const reportGenerate = async (report: Report): Promise<void> => {
         },
         取最小: (key: string, keep: number = 3) => {
           const compareData = excelKeys
-            .filter(item => item.includes(key) && item.includes('最小值') && is.number(excelData[key]))
+            .filter(item => item.includes(key) && item.includes('最小值') && is.number(excelData[item]))
             .map((item: string) => ({
               编号: item.split('_')[0],
               数值: excelData[item],
