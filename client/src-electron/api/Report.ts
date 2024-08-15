@@ -67,9 +67,15 @@ const parseExcelFile = async (excelList: string[]) => {
       type = '均方根'
     }
     const workSheet = workSheets[0]
+    if (!workSheet) {
+      continue
+    }
     const rowData = workSheet.data
     rowData.forEach(item => {
       let key = item[0]
+      if (!key) {
+        return
+      }
       if (key.includes(' ')) {
         key = key.split(' ')[0]
         data[`${key}_${type}_位置`] = key.split(' ')[1]
@@ -128,7 +134,7 @@ export const reportGenerate = async (report: Report): Promise<void> => {
         },
         取最大: (key: string, keep: number = 3) => {
           const compareData = excelKeys
-            .filter(item => item.includes(key) && item.includes('最大值') && is.number(excelData[item]))
+            .filter(item => item && item.includes(key) && item.includes('最大值') && is.number(excelData[item]))
             .map((item: string) => ({
               编号: item.split('_')[0],
               数值: excelData[item],
@@ -142,7 +148,7 @@ export const reportGenerate = async (report: Report): Promise<void> => {
         },
         取最小: (key: string, keep: number = 3) => {
           const compareData = excelKeys
-            .filter(item => item.includes(key) && item.includes('最小值') && is.number(excelData[item]))
+            .filter(item => item && item.includes(key) && item.includes('最小值') && is.number(excelData[item]))
             .map((item: string) => ({
               编号: item.split('_')[0],
               数值: excelData[item],
