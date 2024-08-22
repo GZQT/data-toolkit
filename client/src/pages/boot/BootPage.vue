@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Logo from 'src/assets/logo.png'
 import { handleExitApp, handleOpenExe, handleOpenHome, isElectron } from 'src/utils/action'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -35,7 +34,7 @@ onMounted(async () => {
       </q-btn>
     </div>
     <div id="bg" class="row no-wrap justify-center items-center" style="width: 100%;height: 100%;color: white;">
-      <img style="width:24vh;align-self: center;" alt="logo" :src="Logo" />
+<!--      <img style="width:24vh;align-self: center;" alt="logo" :src="Logo" />-->
       <div class="q-ml-lg text-h4 text-grey-6 text-italic">贵州黔通工程技术有限公司</div>
     </div>
     <div style="position: absolute;bottom: 0;width: 100%;">
