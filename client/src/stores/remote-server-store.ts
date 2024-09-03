@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import { healthRemoteClient, updateRemoteClient } from 'boot/request'
 
 export const useRemoteServerStore = defineStore('remote-server', () => {
-  const remoteServer = ref<string>()
+  const remoteServer = ref<string>('http://192.168.68.225:8881')
   const status = ref('yellow')
   const response = ref<string>('')
   const getRemoteServer = async () => {

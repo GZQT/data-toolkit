@@ -2,9 +2,11 @@
 import { handleExitApp, handleOpenExe, handleOpenHome, isElectron } from 'src/utils/action'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUpdateStore } from 'stores/update-store'
 
 const tip = ref('内核加载中...')
 const router = useRouter()
+const updateStore = useUpdateStore()
 
 onMounted(async () => {
   if (isElectron()) {
@@ -44,7 +46,7 @@ onMounted(async () => {
       </div>
       <div id="details"
         style="color: #9aa0a6;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;padding: 8px;">
-        {{ tip }}
+        (v{{updateStore.data.version}}) {{ tip }}
       </div>
     </div>
   </div>
