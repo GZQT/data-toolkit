@@ -35,6 +35,7 @@ export interface KernelApi {
   restartKernel: () => Promise<boolean | string>
   getKernelPort: () => Promise<number>
   getKernelAvailablePort: () => Promise<number>
+  registerLogsInformation: (func: (info: string) => void) => void
 }
 
 export interface ReportApi {

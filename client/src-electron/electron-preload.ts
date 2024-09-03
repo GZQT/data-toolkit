@@ -74,7 +74,10 @@ contextBridge.exposeInMainWorld('KernelApi', {
   start: () => ipcRenderer.invoke('KernelApi:start'),
   getKernelPort: () => ipcRenderer.invoke('KernelApi:getKernelPort'),
   getKernelAvailablePort: () => ipcRenderer.invoke('KernelApi:getKernelAvailablePort'),
-  restartKernel: () => ipcRenderer.invoke('KernelApi:restartKernel')
+  restartKernel: () => ipcRenderer.invoke('KernelApi:restartKernel'),
+  registerLogsInformation: (func: (info: string) => void) => {
+    ipcRenderer.on('Kernel:logs', (_, info) => func(info))
+  }
 })
 
 contextBridge.exposeInMainWorld('ReportApi', {

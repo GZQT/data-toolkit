@@ -7,6 +7,7 @@ import { isElectron } from 'src/utils/action'
 import { useUpdateStore } from 'stores/update-store'
 import { useApplicationStore } from 'stores/application-store'
 import { useRemoteServerStore } from 'stores/remote-server-store'
+import BackendInfo from 'layouts/components/BackendInfo.vue'
 
 const { registerInterval } = useInterval()
 const $q = useQuasar()
@@ -42,11 +43,13 @@ onMounted(() => {
     applicationStore.checkHealth()
     remoteServerStore.checkHealth()
   }, 10000)
-  // updateStore.handleCheckUpdate()
 })
 
 const handleOpenSetting = () => {
   $q.dialog({ component: SettingDialog })
+}
+const handleOpenConsole = () => {
+  $q.dialog({ component: BackendInfo })
 }
 
 const routes = ref([
@@ -84,7 +87,7 @@ const routes = ref([
         <div class="q-ml-md">Data Toolkit</div>
         <q-badge rounded :color="applicationStore.status" style="transition: all 1s;"/>
         <q-space/>
-
+        <q-btn dense flat icon="terminal" @click="handleOpenConsole"/>
         <q-btn dense flat icon="settings" @click="handleOpenSetting">
           <q-badge v-show="updateStore.data.hasNewVersion" floating color="red" rounded></q-badge>
         </q-btn>

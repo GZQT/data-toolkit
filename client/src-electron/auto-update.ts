@@ -1,5 +1,5 @@
 import electronUpdater, { UpdateCheckResult } from 'electron-updater'
-import { BrowserWindow, dialog, MessageBoxOptions } from 'electron'
+import { BrowserWindow } from 'electron'
 import { logger } from 'app/src-electron/utils.js'
 
 const updateUrl = 'http://192.168.68.225:15244/d/files/%E8%BD%AF%E4%BB%B6%E5%8C%85/data-toolkit'

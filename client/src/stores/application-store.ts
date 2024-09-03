@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { date } from 'quasar'
 import { healthClient } from 'boot/request'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 export const useApplicationStore = defineStore('application', () => {
   const showTime = ref<boolean>(true)
@@ -9,6 +9,10 @@ export const useApplicationStore = defineStore('application', () => {
   const time = ref<number>(0)
   const response = ref<string>('')
   const errorCount = ref(0)
+  const logs = ref<string[]>([])
+
+  const autoToBottom = ref(true)
+  const isRunning = ref(true)
   const checkHealth = async () => {
     const start = parseInt(date.formatDate(Date.now(), 'x'))
     try {
@@ -43,11 +47,21 @@ export const useApplicationStore = defineStore('application', () => {
       }
     }
   }
+
+  onMounted(() => {
+    window?.KernelApi.registerLogsInformation((info) => {
+      logs.value.push(info)
+      isRunning.value = !info.startsWith('[Kernel process] Exist')
+    })
+  })
   return {
     showTime,
     status,
     time,
     response,
+    logs,
+    autoToBottom,
+    isRunning,
     checkHealth
   }
 })

@@ -95,8 +95,8 @@ const createWindow = () => {
   setWindow(mainWindow)
 }
 
-ipcMain.handle('KernelApi:start', initKernel)
-ipcMain.handle('KernelApi:restartKernel', restartKernel)
+ipcMain.handle('KernelApi:start', () => initKernel(mainWindow))
+ipcMain.handle('KernelApi:restartKernel', () => restartKernel(mainWindow))
 ipcMain.handle('KernelApi:getKernelPort', () => getKernelPort())
 ipcMain.handle('KernelApi:getKernelAvailablePort', () => getKernelAvailablePort())
 ipcMain.handle('FileApi:getExeDirectory', () => app.getPath('exe'))

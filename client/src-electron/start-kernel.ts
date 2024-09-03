@@ -1,5 +1,5 @@
 import cp, { ChildProcess } from 'child_process'
-import { app, net } from 'electron'
+import { app, BrowserWindow, net } from 'electron'
 import fs from 'fs'
 import path from 'path'
 import treeKill from 'tree-kill'
@@ -40,7 +40,7 @@ export const getKernelAvailablePort = async () => {
 
 export const getKernelPort = () => kernelPort
 
-export const initKernel = async (): Promise<string | boolean> => {
+export const initKernel = async (win: BrowserWindow | undefined): Promise<string | boolean> => {
   if (process.env.RUN_SERVER !== 'true' && process.env.DEV) {
     logger.info('Init kernel skip.')
     return Promise.resolve(true)
@@ -55,20 +55,45 @@ export const initKernel = async (): Promise<string | boolean> => {
     detached: false
   })
   logger.info('Booted kernel process [pid=' + kernelProcess.pid + ', port=' + kernelPort + ']')
+  kernelProcess.on('spawn', () => {
+    const info = '[Kernel process] Process start'
+    logger.info(info)
+    win?.webContents?.send('Kernel:logs', info)
+  })
   kernelProcess.on('close', (code: number) => {
-    logger.info(`kernel [pid=${kernelProcess?.pid}, port=${kernelPort}] exited with code [${code}]`)
+    const info = `[Kernel process] Exist [pid=${kernelProcess?.pid}, port=${kernelPort}] exited with code [${code}]`
+    logger.info(info)
+    win?.webContents?.send('Kernel:logs', info)
     if (code !== 0) {
-      logger.error(`Error: kernel exit code ${code}`)
+      const warn = `[Kernel process error]: kernel exit code ${code}`
+      logger.error(warn)
+      win?.webContents?.send('Kernel:logs', warn)
     }
   })
   kernelProcess.on('error', (message) => {
-    logger.error(`kernel [pid=${kernelProcess?.pid}, port=${kernelPort}] error [${message}]`)
+    const info = `[pid=${kernelProcess?.pid}, port=${kernelPort}] error [${message}]`
+    logger.error(info)
+    win?.webContents?.send('Kernel:logs', info)
   })
-  kernelProcess.stderr?.on('data', (data: string) => {
-    logger.info(`[Kernel process] ${data}]`)
+  kernelProcess.stdout?.on('data', (data) => {
+    const info = `${data.toString('utf8')}]`
+    logger.info(info)
+    win?.webContents?.send('Kernel:logs', info)
+  })
+  kernelProcess.stdout?.on('error', (data: string) => {
+    const error = `${data}]`
+    logger.warn(error)
+    win?.webContents?.send('Kernel:logs', error)
+  })
+  kernelProcess.stderr?.on('data', (data) => {
+    const info = `${data.toString('utf8')}]`
+    logger.info(info)
+    win?.webContents?.send('Kernel:logs', info)
   })
   kernelProcess.stderr?.on('error', (data: string) => {
-    logger.warn(`[Kernel process] ${data}]`)
+    const error = `${data}]`
+    logger.warn(error)
+    win?.webContents?.send('Kernel:logs', error)
   })
   let count = 0
   while (count <= 20) {
@@ -101,7 +126,7 @@ export const killKernel = async (): Promise<void> => {
   }
 }
 
-export const restartKernel = async () => {
+export const restartKernel = async (win: BrowserWindow | undefined) => {
   await killKernel()
-  await initKernel()
+  await initKernel(win)
 }
