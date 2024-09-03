@@ -86,6 +86,7 @@ const handleData = async (page: number = 1, size: number = 10) => {
     })
     if (data) {
       dauData.value = data.items
+      console.log(dauData.value)
       form.page = data.page ?? 0
       form.rowsPerPage = data.size ?? 0
       form.rowsNumber = data.total ?? 0
@@ -134,10 +135,24 @@ const handleEdit = (row: components['schemas']['DauSearchResponse']) => {
   })
 }
 
+const handleCopy = (row: components['schemas']['DauSearchResponse']) => {
+  $q.dialog({
+    component: DauUpdateDialog,
+    componentProps: {
+      dau: {
+        ...row,
+        id: undefined
+      }
+    }
+  }).onOk(() => {
+    handleData(form.page, form.rowsPerPage)
+  })
+}
+
 const handleDelete = (row: components['schemas']['DauSearchResponse']) => {
   $q.dialog({
     title: '确认移除吗',
-    message: `此操作将会移除 ${row.name} 所有数据但不会移除已经生成的图表文件（如果已生成过）。`,
+    message: `此操作将会移除 ${row.bridge} 所有数据但不会移除已经生成的图表文件（如果已生成过）。`,
     cancel: {
       color: 'primary',
       outline: true
@@ -226,33 +241,41 @@ const conditionCount = computed(() => {
       @request="handleTableRequest">
       <template v-slot:top>
         <div class="flex row full-width">
-          <q-input class="col-4" dense outlined v-model="form.condition.name" label="桥梁名称" />
-          <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.collectionStationNo" label="采集仪编号" />
-          <q-input class="col-2 q-pl-md" dense outlined v-model="form.condition.collectionDeviceNo" label="采集设备编号" />
+          <q-input class="col-4" dense outlined v-model="form.condition.bridge"
+                   @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)"
+                   label="桥梁名称"/>
+          <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.collectionStationNo"
+                   @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)"
+                   label="采集仪编号"/>
+          <q-input class="col-2 q-pl-md" dense outlined v-model="form.condition.collectionDeviceNo"
+                   @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)"
+                   label="采集设备编号"/>
           <div class="flex row items-center justify-end" style="flex: 1">
-            <q-btn color="primary" :loading="form.loading" label="搜索" outline @click="() => handleData(1, form.rowsPerPage)"/>
+            <q-btn color="primary" :loading="form.loading" label="搜索" outline
+                   @click="() => handleData(1, form.rowsPerPage)"/>
             <q-btn color="primary q-ml-md" label="重置" outline @click="handleReset"/>
             <q-btn color="secondary q-ml-md" label="添加" outline @click="handleAdd"/>
           </div>
           <q-expansion-item class="col-12" dense v-model="form.showCondition">
             <template v-slot:header>
               <div class="full-width flex justify-center items-center text-tip text-caption">
-                <div>{{form.showCondition ? '隐藏' : '显示'}}其他过滤条件</div>
-                <q-badge v-if="conditionCount > 0" class="q-ml-sm" color="orange" text-color="white" :label="conditionCount" />
+                <div>{{ form.showCondition ? '隐藏' : '显示' }}其他过滤条件</div>
+                <q-badge v-if="conditionCount > 0" class="q-ml-sm" color="orange" text-color="white"
+                         :label="conditionCount"/>
               </div>
             </template>
             <div class="flex row q-gutter-y-md">
-              <q-input class="col-3" dense outlined v-model="form.condition.ipAddress" label="IP地址" />
-              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.physicsChannel" label="物理通道" />
-              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.installNo" label="安装点编号" />
-              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.transferNo" label="传输编号" />
-              <q-input class="col-3" dense outlined v-model="form.condition.monitorProject" label="监测项目" />
-              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.deviceType" label="设备类型" />
-              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.manufacturer" label="厂家名称" />
-              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.specification" label="规格型号" />
-              <q-input class="col-3" dense outlined v-model="form.condition.deviceNo" label="设备编号" />
-              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.installLocation" label="安装位置" />
-              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.direction" label="方向" />
+              <q-input class="col-3" dense outlined v-model="form.condition.ipAddress" @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)" label="IP地址"/>
+              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.physicsChannel" @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)" label="物理通道"/>
+              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.installNo" @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)" label="安装点编号"/>
+              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.transferNo" @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)" label="传输编号"/>
+              <q-input class="col-3" dense outlined v-model="form.condition.monitorProject" @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)" label="监测项目"/>
+              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.deviceType" @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)" label="设备类型"/>
+              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.manufacturer" @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)" label="厂家名称"/>
+              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.specification" @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)" label="规格型号"/>
+              <q-input class="col-3" dense outlined v-model="form.condition.deviceNo" @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)" label="设备编号"/>
+              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.installLocation" @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)" label="安装位置"/>
+              <q-input class="col-3 q-pl-md" dense outlined v-model="form.condition.direction" @keydown.enter.prevent="() => handleData(1, form.rowsPerPage)" label="方向"/>
             </div>
           </q-expansion-item>
         </div>
@@ -260,7 +283,7 @@ const conditionCount = computed(() => {
       <template v-slot:body="props">
         <q-tr :props="props" @click="props.expand = !props.expand" class="cursor-pointer">
           <q-td key="bridge" :props="props">
-            {{ props.row.name }}
+            {{ props.row.bridge }}
           </q-td>
           <q-td key="collectionStationNo" :props="props">
             {{ props.row.collectionStationNo }}
@@ -284,6 +307,9 @@ const conditionCount = computed(() => {
             <q-btn flat round color="secondary" icon="edit" size="sm" dense @click="() => handleEdit(props.row)">
               <q-tooltip anchor="top middle" self="center middle">编辑</q-tooltip>
             </q-btn>
+            <q-btn flat round color="primary" icon="content_copy" size="sm" dense @click="() => handleCopy(props.row)">
+              <q-tooltip anchor="top middle" self="center middle">复制</q-tooltip>
+            </q-btn>
             <q-btn flat round color="red" icon="delete" size="sm" dense @click="() => handleDelete(props.row)">
               <q-tooltip anchor="top middle" self="center middle">删除</q-tooltip>
             </q-btn>
@@ -294,7 +320,7 @@ const conditionCount = computed(() => {
             <div class="flex row q-col-gutter-xs">
               <div class="flex col-6 row">
                 <div class="text-bold" style="width: 10rem">桥梁名称:</div>
-                <div>{{ props.row.name ?? '-' }}</div>
+                <div>{{ props.row.bridge ?? '-' }}</div>
               </div>
               <div class="flex col-6 row">
                 <div class="text-bold" style="width: 10rem">采集仪编号:</div>
