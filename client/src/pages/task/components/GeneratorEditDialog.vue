@@ -15,7 +15,12 @@ interface EditItem {
 }
 
 const $q = useQuasar()
-const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+const {
+  dialogRef,
+  onDialogHide,
+  onDialogOK,
+  onDialogCancel
+} = useDialogPluginComponent()
 const editItem = reactive<components['schemas']['GeneratorCreateRequest'] & EditItem>({
   id: null,
   name: '',
@@ -67,18 +72,13 @@ const handleSelect = () => {
   if (!isElectron()) {
     return
   }
-  window.FileApi.selectFiles(isAdd.value)
+  window.FileApi.selectFiles(true)
     .then((pathList) => {
       if (!pathList) {
         return
       }
-      if (isAdd.value) {
-        const names = editItem.files
-        pathList.concat(names)
-        editItem.fileList = _.union(pathList)
-        return
-      }
-      editItem.fileList = pathList
+      const names = editItem.fileList
+      editItem.fileList = _.union(_.concat(names, pathList))
     })
 }
 
@@ -95,19 +95,24 @@ const handleDeleteFile = (item: string) => {
     message: `当前文件： ${item}`,
     cancel: true
   }).onOk(() => {
-    const names = _.cloneDeep(editItem.files)
-    _.pull(names, item)
-    editItem.fileList = _.union(names)
+    const names = _.cloneDeep(editItem.fileList)
+    editItem.fileList = _.without(names, item)
   })
 }
 
 const handleSaveData = async () => {
   if (editItem.name.trim() === '') {
-    $q.notify({ type: 'warning', message: '操作失败: 名称必须填写' })
+    $q.notify({
+      type: 'warning',
+      message: '操作失败: 名称必须填写'
+    })
     return
   }
   if (editItem.fileList.length === 0) {
-    $q.notify({ type: 'warning', message: '操作失败：未选择任何文件' })
+    $q.notify({
+      type: 'warning',
+      message: '操作失败：未选择任何文件'
+    })
     return
   }
   if (editItem.id === null) {
@@ -124,7 +129,10 @@ const handleSaveData = async () => {
   } else {
     await client.PUT('/task/{task_id}/generator/{generator_id}', {
       params: {
-        path: { task_id: props.taskId, generator_id: editItem.id }
+        path: {
+          task_id: props.taskId,
+          generator_id: editItem.id
+        }
       },
       body: {
         name: editItem.name,
@@ -187,7 +195,7 @@ const handleDauConfigDialog = async () => {
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-input class="q-mb-md" v-model="editItem.name" dense outlined placeholder="请输入生成名称" label="名称" />
+          <q-input class="q-mb-md" v-model="editItem.name" dense outlined placeholder="请输入生成名称" label="名称"/>
           <div v-if="editItem.fileList.length === 0" class="text-tip cursor-pointer" @click="handleSelect">
             请选择至少一个文件
           </div>
