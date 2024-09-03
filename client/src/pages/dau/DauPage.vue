@@ -141,7 +141,7 @@ const handleCopy = (row: components['schemas']['DauSearchResponse']) => {
     componentProps: {
       dau: {
         ...row,
-        id: undefined
+        id: null
       }
     }
   }).onOk(() => {

@@ -59,8 +59,8 @@ const handleSubmit = () => {
     })
     return
   }
-  form.value.bridge = form.value.name
   if (form.value.id === null) {
+    console.log('form.value', form.value)
     remoteClient.POST('/dau', {
       body: form.value
     }).then(() => {
@@ -88,7 +88,8 @@ const handleSubmit = () => {
       </q-card-section>
       <q-card-section class="flex column justify-between" style="flex: 1;">
         <q-scroll-area style="flex: 1;">
-          <q-input v-model="form.name" label="桥梁名称" />
+          <q-input v-model="form.name" label="中心名称" />
+          <q-input v-model="form.bridge" label="桥梁名称" />
           <q-input v-model="form.collectionStationNo" label="采集仪编号" />
           <q-input v-model="form.collectionDeviceNo" label="采集设备编号" />
           <q-input v-model="form.ipAddress" label="IP地址" />
