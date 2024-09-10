@@ -49,7 +49,10 @@ async def merge(request: MergeRequest):
         df[time_col] = df[time_col].dt.strftime('%Y-%m-%d-%H-%M-%S')
         df = df.set_index(time_col)
         # 处理列名重复问题
-        df.columns = [f"{os.path.basename(file_path).replace('.csv', '')}_{col}" for col in df.columns]
+        df.columns = [
+            f"{utils.remove_last_underscore(os.path.basename(file_path).replace('.csv', ''))}_{col}"
+            for col in df.columns
+        ]
         base_df = base_df.join(df, how='outer')
 
     # 导出合并后的数据到指定的 CSV 文件

@@ -62,3 +62,14 @@ def get_time_column(df):
         if col in ['col0', 'time']:
             return col
     return None
+
+
+def remove_last_underscore(text):
+    # 找到最后一个下划线的位置
+    last_underscore_index = text.rfind('_')
+    # 如果存在下划线，则移除下划线及其后的内容
+    if last_underscore_index != -1:
+        return text[:last_underscore_index]
+    else:
+        # 如果没有下划线，返回原始字符串
+        return text
