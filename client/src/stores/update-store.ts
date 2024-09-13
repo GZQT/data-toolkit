@@ -86,9 +86,16 @@ export const useUpdateStore = defineStore('update', () => {
       return
     }
     data.newVersion = updateInfo.version
+    const releaseNotes = updateInfo.releaseNotes
+    let releaseHtml = ''
+    if (releaseNotes && typeof releaseNotes === 'string') {
+      releaseHtml = releaseNotes.replaceAll('\n', '<br />').replaceAll('\r', '<br/>')
+    }
     $q.notify({
       icon: 'info',
-      message: `存在新版本 ${data.newVersion}, 当前版本 ${data.version}。`,
+      message: `存在新版本 ${data.newVersion}, 当前版本 ${data.version}。<br />${releaseHtml}`,
+      html: true,
+      timeout: 0,
       actions: [
         {
           label: '忽略',
@@ -107,7 +114,8 @@ export const useUpdateStore = defineStore('update', () => {
               group: false,
               timeout: 0,
               spinner: true,
-              message: '正在下载...',
+              message: `更新功能如下<br />${releaseHtml}当前正在下载最新版本...`,
+              html: true,
               caption: '0%'
             })
           }
