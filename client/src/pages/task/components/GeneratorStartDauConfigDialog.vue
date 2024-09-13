@@ -113,6 +113,18 @@ const filterData = computed(() => {
   })
 })
 
+const handleMatch = () => {
+  const list = _.sortBy(filterData.value, (item) => {
+    if (!item.physicsChannel) {
+      return Infinity
+    }
+    return parseInt(item.physicsChannel.replace('CH', ''), 10)
+  })
+  form.dauConfig = props.columns.map((column, index) => ({
+    column, mapping: list[index].id!
+  }))
+}
+
 watch(filterData, (value) => {
   if (value.length !== props.columns.length || !dauBridge.isSelected) {
     return
@@ -130,13 +142,7 @@ watch(filterData, (value) => {
       {
         label: '确认合并',
         outline: true,
-        handler: () => {
-          const list = _.sortBy(filterData.value, 'physicsChannel')
-          console.log(list)
-          form.dauConfig = props.columns.map((column, index) => ({
-            column, mapping: filterData.value[index].id!
-          }))
-        }
+        handler: handleMatch
       }
     ]
   })
@@ -183,6 +189,17 @@ const getItemMapping = (item: string) => {
   }
 }
 
+const handleRemove = (column: string) => {
+  const index = form.dauConfig.findIndex(item => item.column === column)
+  if (index >= 0) {
+    form.dauConfig.splice(index, 1)
+  }
+}
+
+const handleClear = () => {
+  form.dauConfig = []
+}
+
 </script>
 
 <template>
@@ -203,7 +220,7 @@ const getItemMapping = (item: string) => {
       >
         <template v-slot:before>
           <q-list style="min-width: 16rem">
-            <div class="text-caption text-tip q-pt-md">当前已读取到的列信息 {{ columns.length }}</div>
+            <div class="text-caption text-tip q-pt-md">当前已读取到的列信息 {{ columns.length }} <span style="cursor: pointer" @click="handleClear">点击清空</span></div>
             <q-item class="flex items-center" :active="form.currentItem === item" v-ripple clickable dense
                     v-for="item in columns" :key="item" @click="() => {
                 form.currentItem = item
@@ -211,6 +228,16 @@ const getItemMapping = (item: string) => {
               <q-badge class="q-mr-md" rounded
                        :color="form.dauConfig.find(config => config.column === item) !== undefined ? 'green' : 'yellow'"/>
               {{ item }} <q-badge class="q-ml-sm" v-if="form.dauConfig.find(config => config.column === item)" :label="`${getItemMapping(item)}`" />
+              <q-menu
+                touch-position
+                context-menu
+              >
+                <q-list dense style="min-width: 100px">
+                  <q-item clickable v-close-popup @click="() => handleRemove(item)">
+                    <q-item-section>清空</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
             </q-item>
           </q-list>
         </template>
@@ -228,6 +255,9 @@ const getItemMapping = (item: string) => {
               <div class="flex flex-row q-gutter-x-md">
                 <input v-model="form.condition" placeholder="输入需要搜索的关键字"/>
                 <q-btn class="q-px-md" outline color="primary" dense label="保存" @click="handleSave" />
+                <q-btn class="q-px-md" outline color="secondary" dense label="匹配" @click="handleMatch">
+                  <q-tooltip>从上到下重新匹配，会覆盖原来配置</q-tooltip>
+                </q-btn>
               </div>
             </div>
             <q-separator class="full-width q-mt-sm"/>
@@ -246,7 +276,7 @@ const getItemMapping = (item: string) => {
                       dense
                       :model-value="form.dauConfig.find(config => config.column === form.currentItem && item.id === config.mapping) !== undefined"
                       :val="true"
-                      @update:model-value="(value) => handleCheckItem(item, value)"
+                      @update:model-value="(value: boolean) => handleCheckItem(item, value)"
                     />
                   </q-item-section>
                   <q-item-section>
