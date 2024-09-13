@@ -138,7 +138,8 @@ export const reportGenerate = async (report: Report): Promise<void> => {
             .map((item: string) => ({
               编号: item.split('_')[0],
               数值: excelData[item],
-              位置: excelData[`${key.split('_最大值')[0]}_位置`]
+              位置: excelData[`${item.split('_最大值')[0]}_位置`],
+              时间: excelData[`${item.split('_最大值')[0]}_最大值时间`]
             }))
           const maxValue = _.maxBy(compareData, '数值')
           if (is.number(maxValue)) {
@@ -152,7 +153,8 @@ export const reportGenerate = async (report: Report): Promise<void> => {
             .map((item: string) => ({
               编号: item.split('_')[0],
               数值: excelData[item],
-              位置: excelData[`${key.split('_最小值')[0]}_位置`]
+              位置: excelData[`${item.split('_最小值')[0]}_位置`],
+              时间: excelData[`${item.split('_最小值')[0]}_最小值时间`]
             }))
           const minValue = _.minBy(compareData, '数值')
           if (is.number(minValue)) {
