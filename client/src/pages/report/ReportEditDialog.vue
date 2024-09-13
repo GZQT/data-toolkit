@@ -104,7 +104,7 @@ const handleRemoveConfig = (index: number) => {
         <q-card-section class="flex items-center">
           <div class="text-subtitle1">{{ name ? '编辑' : '添加' }}数据</div>
           <q-space/>
-          <q-btn flat size="xs" round icon="close"/>
+          <q-btn flat size="xs" v-close-popup round icon="close"/>
         </q-card-section>
         <q-card-section class="column q-gutter-y-xs">
           <q-input v-model="data.name" label="报告名称" outlined dense
