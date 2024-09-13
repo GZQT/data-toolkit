@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
 import { reactive, ref } from 'vue'
-import { QNotifyUpdateOptions } from 'quasar/dist/types/api'
 import { ProgressInfo, UpdateCheckResult, UpdateInfo } from 'electron-updater'
-import { useQuasar } from 'quasar'
+import { QNotifyUpdateOptions, useQuasar } from 'quasar'
 
 export const useUpdateStore = defineStore('update', () => {
   const $q = useQuasar()
