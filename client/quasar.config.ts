@@ -221,7 +221,7 @@ export default configure((/* ctx */) => {
         appId: 'data-toolkit',
         productName: 'Data Toolkit',
         releaseInfo: {
-          releaseNotesFile: 'changelog/CHANGELOG_1.0.1.md'
+          releaseNotesFile: 'changelog/CHANGELOG_1.0.4.md'
         },
         extraResources: [
           {
