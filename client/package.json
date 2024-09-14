@@ -1,7 +1,7 @@
 {
   "name": "data-toolkit",
-  "version": "1.0.5",
-  "description": "A Quasar Project",
+  "version": "1.0.6",
+  "description": "数据工具",
   "productName": "Data Toolkit",
   "author": "lizhongyue <lizhongyue248@163.com>",
   "type": "module",
