@@ -7,6 +7,7 @@ import path from 'path'
 import xlsx from 'node-xlsx'
 import { date, is } from 'quasar'
 import _ from 'lodash'
+import { logger } from 'app/src-electron/utils.ts'
 
 const imageToBase64 = (filePath: string): string => {
   const imageBuffer = fs.readFileSync(filePath)
@@ -92,6 +93,26 @@ const parseExcelFile = async (excelList: string[]) => {
   return data
 }
 
+const getMaxMinValue = (excelKeys: string[], key: string, excelData: Record<string, string>, keep: number, type: string) => {
+  const compareData = excelKeys
+    .filter(item => item && item.includes(key) && item.includes('平均值') && item.includes(type) && is.number(excelData[item]))
+    .map((item: string) => ({
+      编号: item.split('_')[0],
+      数值: excelData[item],
+      位置: excelData[`${item.split(`_${type}`)[0]}_位置`],
+      时间: excelData[`${item.split(`_${type}`)[0]}_${type}时间`]
+    }))
+  const value = _.maxBy(compareData, '数值')
+  if (value) {
+    try {
+      value.数值 = `${Number.parseFloat(value.数值).toFixed(keep)}`
+    } catch (error) {
+      logger.error(type, error)
+    }
+  }
+  return value
+}
+
 export const reportGenerate = async (report: Report): Promise<void> => {
   const check = checkReportPath(report)
   if (check !== null) {
@@ -133,34 +154,10 @@ export const reportGenerate = async (report: Report): Promise<void> => {
           return `${value}`
         },
         取最大: (key: string, keep: number = 3) => {
-          const compareData = excelKeys
-            .filter(item => item && item.includes(key) && item.includes('最大值') && is.number(excelData[item]))
-            .map((item: string) => ({
-              编号: item.split('_')[0],
-              数值: excelData[item],
-              位置: excelData[`${item.split('_最大值')[0]}_位置`],
-              时间: excelData[`${item.split('_最大值')[0]}_最大值时间`]
-            }))
-          const maxValue = _.maxBy(compareData, '数值')
-          if (is.number(maxValue)) {
-            return maxValue.toFixed(keep)
-          }
-          return maxValue
+          return getMaxMinValue(excelKeys, key, excelData, keep, '最大值')
         },
         取最小: (key: string, keep: number = 3) => {
-          const compareData = excelKeys
-            .filter(item => item && item.includes(key) && item.includes('最小值') && is.number(excelData[item]))
-            .map((item: string) => ({
-              编号: item.split('_')[0],
-              数值: excelData[item],
-              位置: excelData[`${item.split('_最小值')[0]}_位置`],
-              时间: excelData[`${item.split('_最小值')[0]}_最小值时间`]
-            }))
-          const minValue = _.minBy(compareData, '数值')
-          if (is.number(minValue)) {
-            return minValue.toFixed(keep)
-          }
-          return minValue
+          return getMaxMinValue(excelKeys, key, excelData, keep, '最小值')
         }
       },
       cmdDelimiter: ['{{', '}}']
