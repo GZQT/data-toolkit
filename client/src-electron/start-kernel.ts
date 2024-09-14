@@ -63,11 +63,9 @@ export const initKernel = async (win: BrowserWindow | undefined): Promise<string
   kernelProcess.on('close', (code: number) => {
     const info = `[Kernel process] Exist [pid=${kernelProcess?.pid}, port=${kernelPort}] exited with code [${code}]`
     logger.info(info)
-    win?.webContents?.send('Kernel:logs', info)
     if (code !== 0) {
       const warn = `[Kernel process error]: kernel exit code ${code}`
       logger.error(warn)
-      win?.webContents?.send('Kernel:logs', warn)
     }
   })
   kernelProcess.on('error', (message) => {
