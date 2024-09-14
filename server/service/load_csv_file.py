@@ -42,7 +42,8 @@ class LoadCsvFile:
             self.output += f"[{get_now_date()}] 读取数据中不存在 time 或者 col0 的时间列\n"
             return self
         self.time_column = time_column
-        if generator_config is None or generator_config.date_format is None:
+        if generator_config is None or not hasattr(generator_config,
+                                                   'date_format') or generator_config.date_format is None:
             date_format = '%Y-%m-%d-%H-%M-%S.%f'
         else:
             date_format = generator_config.date_format
@@ -59,7 +60,7 @@ class LoadCsvFile:
         """
         应用表达式到数据框的列，并生成安全列名映射
         """
-        if generator_config is None:
+        if not hasattr(generator_config, 'converters') or generator_config is None:
             return
         key_converters = {converter.column_key: converter.expression for converter in generator_config.converters}
 
@@ -93,7 +94,8 @@ class LoadCsvFile:
         combined_df.update(temp_df)
 
     def apply_dau_config(self, combined_df, generator_config):
-        if generator_config is None or generator_config.dau_config is None or len(generator_config.dau_config) == 0:
+        if (generator_config is None or not hasattr(generator_config, 'dau_config')
+                or generator_config.dau_config is None or len(generator_config.dau_config) == 0):
             return
         try:
             with open(CONFIG_FILE, 'r', encoding='utf-8') as file:

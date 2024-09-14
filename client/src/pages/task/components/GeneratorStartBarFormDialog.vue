@@ -1,22 +1,14 @@
 <script setup lang="ts">
-import { date, useDialogPluginComponent } from 'quasar'
+import { useDialogPluginComponent } from 'quasar'
 import { reactive } from 'vue'
+import { BarConfig } from 'pages/task/components/bar-store.ts'
 
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+const props = defineProps<{
+  config: BarConfig
+}>()
 
-const form = reactive<{
-  chartName: string,
-  xLabel: string,
-  yLabel: string,
-  xRotation: number,
-  width: number
-}>({
-  chartName: date.formatDate(Date.now(), 'YYYYMMDDHHmmss_') + '最大最小值对比图',
-  xLabel: '测点',
-  yLabel: '值',
-  xRotation: -45,
-  width: 0.35
-})
+const form = reactive<BarConfig>(props.config)
 
 const handleSubmit = () => {
   onDialogOK(form)

@@ -18,5 +18,6 @@
   ],
   "eslint.format.enable": true,
   "typescript.format.enable": false,
-  "javascript.format.enable": false
+  "javascript.format.enable": false,
+  "asciidoc.antora.enableAntoraSupport": true
 }

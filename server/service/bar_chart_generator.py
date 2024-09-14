@@ -92,7 +92,10 @@ def draw_compare_bar_chart(data, request: BarChartGeneratorStartRequest, index: 
     max_min_dir = os.path.join(ROOT_DIRECTORY, "最大最小值对比图")
     if not os.path.exists(max_min_dir):
         os.makedirs(max_min_dir)
-    file_path = f'{os.path.join(ROOT_DIRECTORY, "最大最小值对比图", f"{chart_name}-{index}").replace("/", "-")}.png'
+    if index == 0:
+        file_path = f'{os.path.join(ROOT_DIRECTORY, "最大最小值对比图", f"{chart_name}").replace("/", "-")}.png'
+    else:
+        file_path = f'{os.path.join(ROOT_DIRECTORY, "最大最小值对比图", f"{chart_name}-{index}").replace("/", "-")}.png'
     x = range(len(labels))
     width = request.width
     fig, ax = plt.subplots()
@@ -101,9 +104,11 @@ def draw_compare_bar_chart(data, request: BarChartGeneratorStartRequest, index: 
     plt.rcParams['font.size'] = 6
     plt.bar_label(max_bar, label_type='edge')
     plt.bar_label(min_bar, label_type='edge')
-    ax.set_xlabel(request.x_label)
-    ax.set_ylabel(request.y_label)
-    ax.set_title(chart_name)
+    if request.x_label:
+        ax.set_xlabel(request.x_label)
+    if request.y_label:
+        ax.set_ylabel(request.y_label)
+    ax.set_title("最大最小值对比图")
     if request.x_rotation < 0:
         plt.xticks(rotation=request.x_rotation, ha='left')
     elif request.x_rotation > 0:
@@ -112,5 +117,6 @@ def draw_compare_bar_chart(data, request: BarChartGeneratorStartRequest, index: 
     ax.set_xticklabels(labels)
     ax.legend(loc='upper left', bbox_to_anchor=(1, 1))
     plt.subplots_adjust(bottom=0.4)
+    plt.tight_layout()
     plt.savefig(file_path)
     plt.close()

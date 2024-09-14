@@ -76,6 +76,24 @@ def _generate_chart(db: Session, data, generator: TaskGenerator, request: TaskGe
     db.commit()
 
 
+def _get_generate_config(db, generator, request):
+    config: GeneratorConfigRequest | None = None
+    if hasattr(request, 'config') and request.config is not None:
+        generator.output += \
+            f"\n[{get_now_date()}] 检测到有新的配置信息，更新数据库数据\n"
+        config = request.config
+        db.query(TaskGenerator).filter_by(id=generator.id).update({
+            TaskGenerator.config: json.dumps(config.dict()),
+            TaskGenerator.output: generator.output,
+            TaskGenerator.updated_date: datetime.now()
+        })
+        db.commit()
+    elif generator.config_obj is not None:
+        generator.output += \
+            f"\n[{get_now_date()}] 检测到存在配置信息，使用原始配置"
+        config = GeneratorConfigRequest(**generator.config_obj)
+    return config
+
 def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest, db: Session):
     if generator.output is None:
         generator.output = \
@@ -92,21 +110,7 @@ def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest,
     db.commit()
 
     try:
-        config: GeneratorConfigRequest | None = None
-        if request.config is not None:
-            generator.output += \
-                f"\n[{get_now_date()}] 检测到有新的配置信息，更新数据库数据\n"
-            config = request.config
-            db.query(TaskGenerator).filter_by(id=generator.id).update({
-                TaskGenerator.config: json.dumps(config.dict()),
-                TaskGenerator.output: generator.output,
-                TaskGenerator.updated_date: datetime.now()
-            })
-            db.commit()
-        elif generator.config_obj is not None:
-            generator.output += \
-                f"\n[{get_now_date()}] 检测到存在配置信息，使用原始配置"
-            config = generator.config_obj
+        config = _get_generate_config(db, generator, request)
         data = LoadCsvFile(generator.files).load_data(config)
         _generate_chart(db, data, generator, request)
     except Exception as e:
@@ -123,7 +127,9 @@ def generate_chart(generator: TaskGenerator, request: TaskGeneratorStartRequest,
         db.commit()
 
 
-def generate_bar_chart(generators: List[TaskGenerator], request: BarChartGeneratorStartRequest, db: Session):
+
+
+def generate_bar_chart(generators: List[TaskGenerator] , request: BarChartGeneratorStartRequest, db: Session):
     db.query(TaskGenerator).filter(TaskGenerator.id.in_(request.generator_ids)).update({
         TaskGenerator.status: GeneratorResultEnum.PROCESSING,
         TaskGenerator.result: f"生成对比图中",
@@ -141,7 +147,8 @@ def generate_bar_chart(generators: List[TaskGenerator], request: BarChartGenerat
             else:
                 generator.output += log
             logger.info(f"{generator.name} 开始进行表格数据处理")
-            data = LoadCsvFile(generator.files).load_data()
+            config = _get_generate_config(db, generator, request)
+            data = LoadCsvFile(generator.files).load_data(config)
             generator.output += data.output
             db.query(TaskGenerator).filter_by(id=generator.id).update({
                 TaskGenerator.output: generator.output,
