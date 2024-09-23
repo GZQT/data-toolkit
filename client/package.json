@@ -13,8 +13,8 @@
     "dev:electron:kernel": "cross-env RUN_SERVER=true quasar dev -m electron",
     "build": "quasar build",
     "build:electron": "quasar build -m electron",
-    "generate:types": "npx openapi-typescript http://127.0.0.1:18764/openapi.json -o ./src/types/api.d.ts --enum -t",
-    "generate:types:remote": "npx openapi-typescript http://127.0.0.1:8881/openapi.json -o ./src/types/remote-api.d.ts --enum -t"
+    "generate:types": "bunx openapi-typescript http://127.0.0.1:18764/openapi.json -o ./src/types/api.d.ts --enum -t",
+    "generate:types:remote": "bunx openapi-typescript http://127.0.0.1:8881/openapi.json -o ./src/types/remote-api.d.ts --enum -t"
   },
   "dependencies": {
     "@electron/remote": "^2.1.2",
