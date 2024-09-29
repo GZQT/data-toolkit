@@ -25,6 +25,7 @@ class AbstractChatGenerator:
         self.data = data.data
         self.times = data.times
         self.dau_config = data.dau_config
+        self.new_columns = data.new_columns
         self.dir = os.path.join(constant.ROOT_DIRECTORY, generator.name)
         self.excel_name = excel_name
         self.type = ''

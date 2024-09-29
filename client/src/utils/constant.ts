@@ -11,6 +11,16 @@ export const isImage = (path: string) => {
   return false
 }
 
+export const conditionMapping = {
+  MAX: '上限',
+  MIN: '下限'
+}
+
+export const conditionColorMapping = {
+  MAX: 'primary',
+  MIN: 'secondary'
+}
+
 export const thumbStyle: Partial<CSSStyleDeclaration> = {
   right: '4px',
   borderRadius: '7px',

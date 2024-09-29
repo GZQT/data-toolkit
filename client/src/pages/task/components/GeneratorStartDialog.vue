@@ -53,7 +53,7 @@ const props = defineProps<{
   files: string[],
   id: number,
   currentStatus: components['schemas']['GeneratorResultEnum'],
-  config: components['schemas']['GeneratorConfigRequest'] | null
+  config: components['schemas']['GeneratorConfigRequest-Input'] | null
 }>()
 
 const handleSubmit = async () => {
@@ -132,10 +132,10 @@ const handleConfigDialog = () => {
       columns: columns.value,
       data: form.config
     }
-  }).onOk((config: components['schemas']['GeneratorConfigRequest']) => {
+  }).onOk((config: components['schemas']['GeneratorConfigRequest-Input']) => {
     form.config = {
       ...form.config,
-      converters: config.converters,
+      converters: _.cloneDeep(config.converters),
       dauConfig: form.config?.dauConfig ?? []
     }
   })

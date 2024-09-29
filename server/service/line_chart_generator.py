@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 import utils
 from constant import logger
-from dto.generator import TaskGeneratorStartRequest, ChartFillEnum
+from dto.generator import TaskGeneratorStartRequest, ChartFillEnum, GeneratorDataConditionType, GeneratorConfigRequest
 from schema.task import TaskGenerator
 from service.abstract_chat_generator import AbstractChatGenerator
 from service.load_csv_file import LoadCsvFile
@@ -46,6 +46,40 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
         self.columns_index = []
         self.type = "平均值"
         super().__init__(data, generator, db, excel_name)
+
+    def filter_series(self, series):
+        config_obj = self.request.config
+
+        if not config_obj or len(config_obj.converters) == 0:
+            logger.info("不存在阈值配置 1")
+            return series  # 返回原始 series
+
+        converters = config_obj.converters
+
+        if not converters or len(converters) == 0:
+            logger.info("不存在阈值配置 2")
+            return series  # 返回原始 series
+
+        for convert in converters:
+            key = convert.column_key
+            if key in self.new_columns:
+                key = self.new_columns[key]
+            if key != series.name:
+                continue
+            for condition in convert.conditions:
+                if condition.type == GeneratorDataConditionType.MAX:
+                    mask_in_range = (series.index >= condition.start_time) & \
+                                    (series.index <= condition.end_time)
+                    series[mask_in_range] = series[mask_in_range][series[mask_in_range] < condition.value]
+                elif condition.type == GeneratorDataConditionType.MIN:
+                    mask_in_range = (series.index >= condition.start_time) & \
+                                    (series.index <= condition.end_time)
+                    series[mask_in_range] = series[mask_in_range][series[mask_in_range] > condition.value]
+                logger.info(
+                    f"列 '{convert.column_key}' 存在阈值限制 {condition.type}-{condition.start_time}-{condition.end_time}-{condition.value}\n")
+                self.output += f"[{get_now_date()}] 列 '{convert.column_key}' 存在阈值限制 {condition.type}-{condition.start_time}-{condition.end_time}-{condition.value}\n"
+
+        return series  # 返回过滤后的 series
 
     def draw_line_chart(self, sub_dir):
         path = os.path.join(self.dir, sub_dir)
@@ -148,6 +182,7 @@ class AverageLineChartGenerator(AbstractLineChatGenerator, ABC):
 
     def _resampled_plot(self, df):
         resampled = self._table_data_resampled(df)
+        resampled = super().filter_series(resampled)
         plt.plot(resampled.index, resampled, label='平均值', marker='',
                  linewidth=self.line_chart.line_width)
 
@@ -166,6 +201,7 @@ class MaxMinLineChartGenerator(AbstractLineChatGenerator, ABC):
         return self
 
     def _resampled_plot(self, df):
+        df = super().filter_series(df)
         resampled = df.resample(self.line_chart.time_range).agg(['min', 'max'])
         plt.plot(resampled.index, resampled['min'], label='最小值', marker='',
                  linewidth=self.line_chart.line_width)
@@ -187,6 +223,7 @@ class RootMeanSquareLineChartGenerator(AbstractLineChatGenerator, ABC):
 
     def _resampled_plot(self, df):
         resampled = self._table_data_resampled(df)
+        resampled = super().filter_series(resampled)
         plt.plot(resampled.index, resampled, label='均方根', marker='',
                  linewidth=self.line_chart.line_width)
 
@@ -217,8 +254,9 @@ class RawLineChartGenerator(AbstractLineChatGenerator, ABC):
         super().draw_line_chart(sub_dir)
         return self
 
-    def _resampled_plot(self, df, line_key=None):
+    def _resampled_plot(self, df):
         resampled = self._table_data_resampled(df)
+        resampled = super().filter_series(resampled)
         plt.plot(resampled.index, resampled, label='数值', marker='',
                  linewidth=self.line_chart.line_width)
 

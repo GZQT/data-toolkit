@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 
 from constant import GENERATOR_FILE_SEPARATOR, CSV_SUFFIX, CONFIG_FILE, logger
-from dto.generator import GeneratorConfigRequest
+from dto.generator import GeneratorConfigRequest, GeneratorDataConditionType
 from utils import get_now_date
 
 
@@ -26,6 +26,7 @@ class LoadCsvFile:
         self.data = {}
         self.times = []
         self.dau_config = {}
+        self.new_columns = {}
 
     def load_data(self, generator_config: GeneratorConfigRequest = None):
         data_frames_list = [pd.read_csv(file) for file in self.files]
@@ -62,8 +63,6 @@ class LoadCsvFile:
         """
         if not hasattr(generator_config, 'converters') or generator_config is None:
             return
-        key_converters = {converter.column_key: converter.expression for converter in generator_config.converters}
-
         # 生成安全列名映射
         filtered_columns = [col for col in combined_df.columns if col != 'id']
         safe_columns = {col: f'c{i}' for i, col in enumerate(filtered_columns)}
@@ -72,22 +71,21 @@ class LoadCsvFile:
         temp_df = combined_df.copy()
         # 使用安全列名进行表达式替换
         temp_df.rename(columns=safe_columns, inplace=True)
-        for column_key, expression in key_converters.items():
-            if expression == '':
-                self.output += f"[{get_now_date()}] 列 '{column_key}' 不需要进行数据预操作\n"
+        for convert in generator_config.converters:
+            if convert.expression == '':
+                self.output += f"[{get_now_date()}] 列 '{convert.column_key}' 不需要进行数据预操作\n"
                 continue
-            safe_col_key = safe_columns[column_key]
+            safe_col_key = safe_columns[convert.column_key]
             if safe_col_key in temp_df.columns:
                 for i, safe_col in enumerate(safe_columns.values()):
-                    expression = expression.replace(f'c{i}', safe_col)
-
+                    convert.expression = convert.expression.replace(f'c{i}', safe_col)
                 try:
-                    temp_df[safe_col_key] = ne.evaluate(expression, local_dict=local_dict)
-                    self.output += f"[{get_now_date()}] 计算列 '{column_key}' 的表达式 {expression} 成功\n"
+                    temp_df[safe_col_key] = ne.evaluate(convert.expression, local_dict=local_dict)
+                    self.output += f"[{get_now_date()}] 计算列 '{convert.column_key}' 的表达式 {convert.expression} 成功\n"
                 except Exception as e:
-                    self.output += f"[{get_now_date()}] 计算列 '{column_key}' 的表达式 {expression} 时出错: {e}\n"
+                    self.output += f"[{get_now_date()}] 计算列 '{convert.column_key}' 的表达式 {convert.expression} 时出错: {e}\n"
             else:
-                self.output += f"[{get_now_date()}] 列 '{column_key}' 转化为后 '{safe_col_key}' 不存在于数据中\n"
+                self.output += f"[{get_now_date()}] 列 '{convert.column_key}' 转化为后 '{safe_col_key}' 不存在于数据中\n"
 
         # 还原列名
         temp_df.rename(columns=reverse_safe_columns, inplace=True)
@@ -135,5 +133,6 @@ class LoadCsvFile:
             self.output += f"\n{get_now_date()} 更改列名称 {config.column} 为 {mapping_column}"
             new_columns[config.column] = mapping_column
         combined_df.rename(columns=new_columns, inplace=True)
+        self.new_columns = new_columns
         self.data = combined_df
         self.output += f"\n{get_now_date()} 列名称更改完成"

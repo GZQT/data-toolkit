@@ -30,6 +30,11 @@ class GeneratorDataActionEnum(Enum):
     DIVIDE = "DIVIDE"
 
 
+class GeneratorDataConditionType(Enum):
+    MAX = 'MAX'
+    MIN = 'MIN'
+
+
 class GeneratorBase(CamelModel):
     name: str
 
@@ -39,9 +44,17 @@ class DauConfig(CamelModel):
     mapping: int
 
 
+class GeneratorDataCondition(CamelModel):
+    type: GeneratorDataConditionType
+    value: float
+    start_time: datetime.datetime
+    end_time: datetime.datetime
+
+
 class GeneratorDataConverterRequest(CamelModel):
     column_key: str
     expression: str
+    conditions: List[GeneratorDataCondition] | None = []
 
 
 class GeneratorConfigRequest(CamelModel):

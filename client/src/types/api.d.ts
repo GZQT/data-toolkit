@@ -134,14 +134,26 @@ export type components = {
       status?: components["schemas"]["GeneratorResultEnum"];
       /** Result */
       result: string | null;
-      configObj: components["schemas"]["GeneratorConfigRequest"] | null;
+      configObj: components["schemas"]["GeneratorConfigRequest-Output"] | null;
       /** Output */
       output: string | null;
     };
     /** GeneratorConfigRequest */
-    GeneratorConfigRequest: {
+    "GeneratorConfigRequest-Input": {
       /** Converters */
-      converters: components["schemas"]["GeneratorDataConverterRequest"][];
+      converters: components["schemas"]["GeneratorDataConverterRequest-Input"][];
+      /** Dauconfig */
+      dauConfig: components["schemas"]["DauConfig"][] | null;
+      /**
+       * Dateformat
+       * @default %Y-%m-%d-%H-%M-%S.%f
+       */
+      dateFormat?: string | null;
+    };
+    /** GeneratorConfigRequest */
+    "GeneratorConfigRequest-Output": {
+      /** Converters */
+      converters: components["schemas"]["GeneratorDataConverterRequest-Output"][];
       /** Dauconfig */
       dauConfig: components["schemas"]["DauConfig"][] | null;
       /**
@@ -156,14 +168,52 @@ export type components = {
       name: string;
       /** Files */
       files: string;
-      configObj: components["schemas"]["GeneratorConfigRequest"] | null;
+      configObj: components["schemas"]["GeneratorConfigRequest-Input"] | null;
     };
+    /** GeneratorDataCondition */
+    GeneratorDataCondition: {
+      type: components["schemas"]["GeneratorDataConditionType"];
+      /** Value */
+      value: number;
+      /**
+       * Starttime
+       * Format: date-time
+       */
+      startTime: string;
+      /**
+       * Endtime
+       * Format: date-time
+       */
+      endTime: string;
+    };
+    /**
+     * GeneratorDataConditionType
+     * @enum {string}
+     */
+    GeneratorDataConditionType: "MAX" | "MIN";
     /** GeneratorDataConverterRequest */
-    GeneratorDataConverterRequest: {
+    "GeneratorDataConverterRequest-Input": {
       /** Columnkey */
       columnKey: string;
       /** Expression */
       expression: string;
+      /**
+       * Conditions
+       * @default []
+       */
+      conditions?: components["schemas"]["GeneratorDataCondition"][] | null;
+    };
+    /** GeneratorDataConverterRequest */
+    "GeneratorDataConverterRequest-Output": {
+      /** Columnkey */
+      columnKey: string;
+      /** Expression */
+      expression: string;
+      /**
+       * Conditions
+       * @default []
+       */
+      conditions?: components["schemas"]["GeneratorDataCondition"][] | null;
     };
     /** GeneratorResponse */
     GeneratorResponse: {
@@ -187,7 +237,7 @@ export type components = {
       status?: components["schemas"]["GeneratorResultEnum"];
       /** Result */
       result: string | null;
-      configObj: components["schemas"]["GeneratorConfigRequest"] | null;
+      configObj: components["schemas"]["GeneratorConfigRequest-Output"] | null;
     };
     /**
      * GeneratorResultEnum
@@ -342,7 +392,7 @@ export type components = {
       maxMinLineChart: components["schemas"]["LineChartRequest"];
       rootMeanSquareLineChart: components["schemas"]["LineChartRequest"];
       rawLineChart: components["schemas"]["LineChartRequest"];
-      config?: components["schemas"]["GeneratorConfigRequest"] | null;
+      config?: components["schemas"]["GeneratorConfigRequest-Input"] | null;
       /** Savedata */
       saveData: boolean;
       /** Averagebarchart */
@@ -808,7 +858,7 @@ export type operations = {
     };
     responses: {
       /** @description Successful Response */
-      201: {
+      200: {
         content: {
           "application/json": unknown;
         };

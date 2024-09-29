@@ -83,7 +83,7 @@ def _get_generate_config(db, generator, request):
             f"\n[{get_now_date()}] 检测到有新的配置信息，更新数据库数据\n"
         config = request.config
         db.query(TaskGenerator).filter_by(id=generator.id).update({
-            TaskGenerator.config: json.dumps(config.dict()),
+            TaskGenerator.config: config.model_dump_json(),
             TaskGenerator.output: generator.output,
             TaskGenerator.updated_date: datetime.now()
         })
