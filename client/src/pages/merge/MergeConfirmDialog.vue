@@ -2,16 +2,7 @@
 
 import { useDialogPluginComponent } from 'quasar'
 import { useMergeStore } from 'pages/merge/merge-store'
-import { onMounted, reactive, watch } from 'vue'
-import { isDataColumn } from 'src/utils'
-
-interface Data {
-  base: {
-    fileName?: string
-    filePath?: string
-    column?: string
-  }
-}
+import { onMounted } from 'vue'
 
 const store = useMergeStore()
 defineEmits([
@@ -24,19 +15,13 @@ const {
   onDialogOK,
   onDialogCancel
 } = useDialogPluginComponent()
-const data = reactive<Data>({
-  base: {}
-})
 
 onMounted(() => {
 
 })
 
-watch(() => data.base.filePath, (value, oldValue) => {
-  console.log(value, oldValue)
-})
-
 const handleSave = () => {
+  store.handleSubmit()
   onDialogOK()
 }
 
@@ -46,42 +31,26 @@ const handleSave = () => {
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
       <q-card-section class="flex justify-between items-center">
-        <div class="text-h6">合并信息配置</div>
+        <div class="text-h6">合并配置</div>
         <q-btn flat round @click="onDialogCancel" icon="close"/>
       </q-card-section>
       <q-card-section class="flex column q-gutter-y-md">
-        <q-select
-          label="指定一个基准点文件"
+        <q-toggle
+          v-model="store.mergeConfig.removeBaseNull"
           dense
-          class="full-width ellipsis"
-          v-model="data.base.filePath"
-          :options="store.mergeData.filter(item => item.file)"
-          option-value="file"
-          option-label="fileName"
-          emit-value
-          outlined
-        >
-          <template v-slot:selected-item="scope">
-            <div class="overflow-hidden ellipsis full-width">
-              {{scope.opt}}
-            </div>
-          </template>
-        </q-select>
-        <q-select
-          label="指定一个基准点"
+          checked-icon="check"
+          color="red"
+          label="基准点数据为空时，移除此行"
+          unchecked-icon="clear"
+        />
+        <q-toggle
+          v-model="store.mergeConfig.removeNull"
           dense
-          class="full-width ellipsis"
-          v-model="data.base.column"
-          :options="(store.mergeData.find(item => item.file === data.base.filePath)?.columns ?? []).filter(item => isDataColumn(item))"
-          popup-content-style="height: 200px"
-          outlined
-        >
-          <template v-slot:selected-item="scope">
-            <div class="overflow-hidden ellipsis full-width">
-              {{scope.opt}}
-            </div>
-          </template>
-        </q-select>
+          checked-icon="check"
+          color="red"
+          label="合并数据有一个为空时，移除此行"
+          unchecked-icon="clear"
+        />
       </q-card-section>
       <q-card-actions align="right">
         <!--        <q-btn color="primary" label="OK" @click="onOKClick" />-->

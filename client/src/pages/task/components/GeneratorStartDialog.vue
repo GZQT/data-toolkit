@@ -93,7 +93,6 @@ onMounted(async () => {
   allColumns.value = await window.FileApi.getCsvHeader(file)
   if (props.config) {
     form.config = props.config
-    console.log(form.config)
   }
 })
 

@@ -295,6 +295,19 @@ export type components = {
       /** Column */
       column: string;
     };
+    /** MergeConfig */
+    MergeConfig: {
+      /**
+       * Removebasenull
+       * @default true
+       */
+      removeBaseNull?: boolean;
+      /**
+       * Removenull
+       * @default false
+       */
+      removeNull?: boolean;
+    };
     /** MergeFiles */
     MergeFiles: {
       /** Filepath */
@@ -307,6 +320,7 @@ export type components = {
       base: components["schemas"]["MergeBase"] | null;
       /** Files */
       files: components["schemas"]["MergeFiles"][];
+      config: components["schemas"]["MergeConfig"] | null;
     };
     /** PreviewImageRequest */
     PreviewImageRequest: {

@@ -2,10 +2,18 @@
 import { useMergeStore } from 'pages/merge/merge-store'
 import { isDataColumn } from 'src/utils'
 import { ref } from 'vue'
-import { QFile } from 'quasar'
+import { QFile, useQuasar } from 'quasar'
+import MergeConfirmDialog from 'pages/merge/MergeConfirmDialog.vue'
 
 const store = useMergeStore()
 const selectFiles = ref<QFile[]>([])
+const $q = useQuasar()
+
+const handleConfirm = () => {
+  $q.dialog({
+    component: MergeConfirmDialog
+  })
+}
 
 </script>
 
@@ -74,7 +82,7 @@ const selectFiles = ref<QFile[]>([])
   </q-scroll-area>
 
   <q-page-sticky position="bottom-right" :offset="[18, 18]">
-    <q-btn :loading="store.data.loading" fab icon="merge" color="primary" @click="store.handleSubmit">
+    <q-btn :loading="store.data.loading" fab icon="merge" color="primary" @click="handleConfirm">
       <q-tooltip>
         合并
       </q-tooltip>

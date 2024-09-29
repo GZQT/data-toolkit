@@ -34,6 +34,12 @@ export const useMergeStore = defineStore('mergeStore', () => {
     loading: false
   })
   const selectFile = ref<QFile | undefined>()
+  const mergeConfig = reactive({
+    // 基准点数据为空时，移除此行
+    removeBaseNull: true,
+    // 合并数据时，这一行数据有一个为空时，移除此行
+    removeNull: false
+  })
 
   const handleUpdateFile = async (file: File, index: number) => {
     try {
@@ -97,6 +103,10 @@ export const useMergeStore = defineStore('mergeStore', () => {
           filePath: data.baseFilePath,
           column: data.baseColumn
         },
+        config: {
+          removeBaseNull: mergeConfig.removeBaseNull,
+          removeNull: mergeConfig.removeNull
+        },
         files: mergeData.value
           .filter(item => item.file && item.file.length > 0)
           .map(item => ({
@@ -138,6 +148,7 @@ export const useMergeStore = defineStore('mergeStore', () => {
     data,
     mergeData,
     selectFile,
+    mergeConfig,
     handleUpdateFile,
     handleAdd,
     handleRemove,
