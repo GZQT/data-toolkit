@@ -83,19 +83,43 @@ class AbstractChatGenerator:
             nan_values = numeric[numeric.isna()]
             if nan_values is not None and len(nan_values) > 0:
                 self.output += f"\n[{get_now_date()}] 存在不合法的数据 \n {nan_values} \n"
+
             table_value = self._table_data_resampled(column_data)
-            max_time = table_value.idxmax()
-            min_time = table_value.idxmin()
+            # 在这里调用 filter_series 方法
+            table_value = self.filter_series(table_value)
+
+            # 检查 table_value 是否为空
+            if table_value.empty:
+                max_value = None
+                max_time = None
+                min_value = None
+                min_time = None
+                change = None
+            else:
+                max_time = table_value.idxmax()
+                min_time = table_value.idxmin()
+
+                # 检查 max_time 和 min_time 是否为 NaT
+                if pd.isna(max_time) or pd.isna(min_time):
+                    max_value = None
+                    min_value = None
+                    change = None
+                else:
+                    max_value = table_value.loc[max_time]
+                    min_value = table_value.loc[min_time]
+                    change = max_value - min_value
+
             install_location = ''
             if table_key in dau_install_no_list:
                 install_location = self.dau_config[table_key]['installLocation']
+
             table_result.append({
                 "编号": table_key,
-                "最大值数值": table_value.loc[max_time],
+                "最大值数值": max_value,
                 "最大值时间": max_time,
-                "最小值数值": table_value.loc[min_time],
+                "最小值数值": min_value,
                 "最小值时间": min_time,
-                "变化量": table_value.loc[max_time] - table_value.loc[min_time],
+                "变化量": change,
                 '安装位置': install_location
             })
         return table_result
@@ -103,3 +127,7 @@ class AbstractChatGenerator:
     @abstractmethod
     def _table_data_resampled(self, df):
         return df
+
+    @abstractmethod
+    def filter_series(self, series):
+        return series
