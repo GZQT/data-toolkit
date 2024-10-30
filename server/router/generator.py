@@ -8,7 +8,8 @@ from starlette.responses import StreamingResponse
 from constant import logger
 from dependency import get_db
 from dto.generator import GeneratorResponse, GeneratorCreateRequest, \
-    TaskGeneratorStartRequest, GeneratorAllResponse, BarChartGeneratorStartRequest, PreviewImageRequest
+    TaskGeneratorStartRequest, GeneratorAllResponse, BarChartGeneratorStartRequest, PreviewImageRequest, \
+    GeneratorDataConditionType
 from schema.task import TaskGenerator
 from service.chart_generator import generate_chart, generate_bar_chart
 from service.chart_preview import preview_line_chart
@@ -44,9 +45,9 @@ def add_generator(task_id: int, generator: GeneratorCreateRequest, db: Session =
     db.refresh(entity)
     return entity
 
-
 @router.put("/{task_id}/generator/{generator_id}", status_code=204)
 def update_generator(task_id: int, generator_id: int, generator: GeneratorCreateRequest, db: Session = Depends(get_db)):
+    print(generator.config_obj)
     if generator.config_obj is None:
         generator.config_obj = {
             "converters": [],
@@ -54,7 +55,7 @@ def update_generator(task_id: int, generator_id: int, generator: GeneratorCreate
         }
     (db.query(TaskGenerator).filter_by(id=generator_id).
      update({TaskGenerator.name: generator.name,
-             TaskGenerator.config: json.dumps(generator.config_obj.dict()),
+             TaskGenerator.config: generator.config_obj.model_dump_json(),
              TaskGenerator.files: generator.files,
              TaskGenerator.updated_date: datetime.datetime.now()}))
     db.commit()

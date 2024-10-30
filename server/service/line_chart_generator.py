@@ -67,14 +67,13 @@ class AbstractLineChatGenerator(AbstractChatGenerator, ABC):
             if key != series.name:
                 continue
             for condition in convert.conditions:
+                mask_in_range = (series.index >= condition.start_time) & (series.index <= condition.end_time)
                 if condition.type == GeneratorDataConditionType.MAX:
-                    mask_in_range = (series.index >= condition.start_time) & \
-                                    (series.index <= condition.end_time)
-                    series[mask_in_range] = series[mask_in_range][series[mask_in_range] < condition.value]
+                    mask_exceeds = series >= condition.value
+                    series[mask_in_range & mask_exceeds] = np.nan
                 elif condition.type == GeneratorDataConditionType.MIN:
-                    mask_in_range = (series.index >= condition.start_time) & \
-                                    (series.index <= condition.end_time)
-                    series[mask_in_range] = series[mask_in_range][series[mask_in_range] > condition.value]
+                    mask_below = series <= condition.value
+                    series[mask_in_range & mask_below] = np.nan
                 logger.info(
                     f"列 '{convert.column_key}' 存在阈值限制 {condition.type}-{condition.start_time}-{condition.end_time}-{condition.value}\n")
                 self.output += f"[{get_now_date()}] 列 '{convert.column_key}' 存在阈值限制 {condition.type}-{condition.start_time}-{condition.end_time}-{condition.value}\n"

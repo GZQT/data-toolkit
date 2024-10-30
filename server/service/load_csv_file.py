@@ -96,7 +96,7 @@ class LoadCsvFile:
                 or generator_config.dau_config is None or len(generator_config.dau_config) == 0):
             return
         try:
-            with open(CONFIG_FILE, 'r', encoding='utf-8') as file:
+            with open(CONFIG_FILE, 'r') as file:
                 config = json.load(file)
         except FileNotFoundError:
             self.output += f"\n{get_now_date()} 未找到配置文件 {CONFIG_FILE}"
